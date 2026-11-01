@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Puran Haat — Cloud Storage rules
+//
+// Public marketplace images (avatars and item photos) are readable by anyone.
+// Writes are limited to the signed-in owner, image content types, and a size
+// cap so the bucket cannot be used as arbitrary file hosting.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /items/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
