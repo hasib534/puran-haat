@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management - EcoTrade</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#131e17",
+                    "on-primary-fixed-variant": "#23501e",
+                    "on-tertiary-fixed-variant": "#7c2e19",
+                    "on-secondary-container": "#5b675e",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e6e3d0",
+                    "error": "#ba1a1a",
+                    "secondary": "#556158",
+                    "outline": "#72796e",
+                    "surface-tint": "#3b6934",
+                    "secondary-fixed-dim": "#bdcabe",
+                    "surface-dim": "#dddbc8",
+                    "primary-fixed": "#bcf0ae",
+                    "on-primary-fixed": "#002201",
+                    "on-surface-variant": "#42493e",
+                    "on-tertiary-container": "#ffb09b",
+                    "on-secondary-fixed-variant": "#3e4a41",
+                    "inverse-surface": "#313124",
+                    "primary-container": "#2d5a27",
+                    "primary": "#154212",
+                    "background": "#fdfae7",
+                    "outline-variant": "#c2c9bb",
+                    "on-background": "#1c1c11",
+                    "inverse-primary": "#a1d494",
+                    "primary-fixed-dim": "#a1d494",
+                    "surface-container-high": "#ece9d6",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e6e3d0",
+                    "surface-bright": "#fdfae7",
+                    "surface": "#fdfae7",
+                    "on-surface": "#1c1c11",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#f4f1de",
+                    "on-primary-container": "#9dd090",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#d9e6da",
+                    "surface-container-low": "#f7f4e1",
+                    "tertiary-container": "#883721",
+                    "tertiary-fixed": "#ffdbd2",
+                    "secondary-container": "#d9e6da",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#f1eedb",
+                    "tertiary": "#6a210d",
+                    "on-tertiary-fixed": "#3c0800",
+                    "tertiary-fixed-dim": "#ffb4a1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "16px",
+                    "gutter": "16px",
+                    "margin": "20px",
+                    "md": "24px",
+                    "lg": "32px",
+                    "base": "4px",
+                    "xl": "48px",
+                    "xs": "8px"
+            },
+            "fontFamily": {
+                    "body-md": [
+                            "Outfit"
+                    ],
+                    "display-lg": [
+                            "Outfit"
+                    ],
+                    "body-lg": [
+                            "Outfit"
+                    ],
+                    "headline-md": [
+                            "Outfit"
+                    ],
+                    "display-lg-mobile": [
+                            "Outfit"
+                    ],
+                    "headline-sm": [
+                            "Outfit"
+                    ],
+                    "body-sm": [
+                            "Outfit"
+                    ],
+                    "label-md": [
+                            "Outfit"
+                    ]
+            },
+            "fontSize": {
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "26px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-30 flex justify-between items-center px-margin py-sm bg-surface/80 backdrop-blur-md shadow-sm shadow-primary/5">
+<div class="flex items-center gap-xs">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">EcoTrade Management</h1>
+</div>
+<div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- NavigationDrawer (Web) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full z-40 flex-col w-72 rounded-r-xl bg-surface-container-low dark:bg-surface-container-lowest shadow-sm shadow-primary/5 mt-[72px]">
+<div class="p-margin flex items-center gap-sm border-b border-surface-variant/20">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A detailed headshot portrait of a professional system administrator in a clean, brightly lit modern office setting. The person exudes calm authority and competence, dressed in business casual attire. The lighting is soft and natural, emphasizing a trustworthy and approachable demeanor. The background is slightly blurred to keep focus on the subject. Minimalist and professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyHo_uyhmg6UmCYTCiJO3aA9aVX2dVkFt-t3xo_SsH7BFOerEESQHgnGu81SMcgH5CVvZlV0Sn0wpa4L2tmwRn115lcWfuB_UFf4OC2XdS6LYtId327wrc7IajdR1_kGifdo7i4UpqGBLJ_wr__ogHxa9ZFiNqiTqCoGMV85nM7XD0qW_EaxjfzROoim8aSY35ffAqNDyZ63DL1T4LiFbDaRaj2RLWS679pLsRN5iCosLuLzJX-TGE"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">EcoTrade Admin</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Super Admin Office</p>
+</div>
+</div>
+<div class="flex-1 py-md overflow-y-auto">
+<ul class="space-y-2 px-sm">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-lg font-label-md text-label-md active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                            Dashboard
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold font-label-md text-label-md active:scale-95 transition-transform duration-150 shadow-sm" href="#">
+<span class="material-symbols-outlined fill">verified_user</span>
+                            User Verification
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-lg font-label-md text-label-md active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">gavel</span>
+                            Community Auctions
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-lg font-label-md text-label-md active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">workspace_premium</span>
+                            Sustainability Rewards
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-lg font-label-md text-label-md active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+                            System Settings
+                        </a>
+</li>
+</ul>
+</div>
+<div class="p-margin text-center border-t border-surface-variant/20">
+<span class="font-label-md text-label-md text-on-surface-variant">v2.1.0</span>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full md:ml-72 p-margin overflow-y-auto">
+<div class="max-w-6xl mx-auto space-y-md">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-sm">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background">User Management</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Verify new traders and moderate flagged accounts to maintain community trust.</p>
+</div>
+<!-- Search and Actions -->
+<div class="flex items-center gap-sm w-full md:w-auto">
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-secondary-container/30 border-none rounded-full font-body-sm text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-on-surface-variant/70" placeholder="Search traders..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex border-b border-surface-variant/50">
+<button class="px-6 py-3 font-label-md text-label-md text-primary border-b-2 border-primary transition-colors">
+                        Pending Verification (12)
+                    </button>
+<button class="px-6 py-3 font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors border-b-2 border-transparent">
+                        Flagged Users (3)
+                    </button>
+</div>
+<!-- Verification List (Bento-style Cards) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-sm mt-md">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-sm shadow-sm shadow-primary/5 border border-surface-variant/20 flex flex-col gap-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-container"></div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-surface-variant/30" data-alt="A clean, minimalist profile picture of a young professional woman smiling warmly. The lighting is bright and natural, reflecting an optimistic and trustworthy vibe. The background is a soft, out-of-focus pastel green, evoking themes of sustainability and nature. The overall aesthetic is modern, approachable, and high-quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJwKH8bYt-bPt2N7BbncE2SvolhGU38sCC92Pq3wGJ1O71nrhEswnYYR8qHsTTZT2UsW3DU9u9X839T_Ifr7VVmmjanpULMre7a3w0VbkvdH9GICKhdyGv3LJnvfIMT7GYZBcxLUgonQLeDUKu-x-ynPeQFJcoawKLFZPSQDKPphEvU6KHmEMS7GSPQpXvdHwANkqvFg2Eyec8_PsUOeB7UxWNJbhD3_C3x6M7egVGQNh2bngY0oDs"/>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sarah Jenkins</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Joined 2 days ago</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-tertiary-container/20 text-tertiary font-label-md text-[10px] rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-2 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">ID &amp; Utility Bill</p>
+<p class="font-body-sm text-[11px] text-on-surface-variant">2 files uploaded</p>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline">View Docs</button>
+</div>
+<div class="flex gap-2 mt-auto pt-2">
+<button class="flex-1 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">check</span> Approve
+                            </button>
+<button class="flex-1 py-2 border border-outline text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">close</span> Reject
+                            </button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-sm shadow-sm shadow-primary/5 border border-surface-variant/20 flex flex-col gap-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-container"></div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-headline-sm">
+                                    MJ
+                                </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Marcus Johnson</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Joined 12 hours ago</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-tertiary-container/20 text-tertiary font-label-md text-[10px] rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-2 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Driver's License</p>
+<p class="font-body-sm text-[11px] text-on-surface-variant">1 file uploaded</p>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline">View Docs</button>
+</div>
+<div class="flex gap-2 mt-auto pt-2">
+<button class="flex-1 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">check</span> Approve
+                            </button>
+<button class="flex-1 py-2 border border-outline text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">close</span> Reject
+                            </button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-sm shadow-sm shadow-primary/5 border border-surface-variant/20 flex flex-col gap-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-container"></div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-surface-variant/30" data-alt="A brightly lit, modern portrait of a man in his thirties with glasses and a casual button-down shirt. The aesthetic is clean and professional, suitable for a trusted community marketplace profile. The background is a crisp white with a very subtle gradient to a pale, organic beige. The mood is friendly and reliable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZGphFNxGj2LJGj0idekDEzO4KyvthXWxOErPM5xJzNe_V5H4p1ZMII8OdWwRpfM9l-xLQOg_n-U7suyCaaX8Z0Ow-fcHBDOODu-zBaPFpeGSMh4I_ls066_gu98xIV7Z9FIlbsqRflB5jsX_Am3kJb5QaFNyTLCzTqMdD2P0ZSXhl7WFdOhbaHYWwxHf6v9-NB5ytyDq3x-unQu_kXQTEeG3Hn4k00lDQPhKJWzaoL2xNJaKxIlnL"/>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">David Chen</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Joined 3 days ago</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-tertiary-container/20 text-tertiary font-label-md text-[10px] rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 mt-2 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-error-container/50 flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined text-[18px]">error</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Incomplete Docs</p>
+<p class="font-body-sm text-[11px] text-on-surface-variant">Missing proof of address</p>
+</div>
+<button class="text-primary font-label-md text-label-md hover:underline">Review</button>
+</div>
+<div class="flex gap-2 mt-auto pt-2">
+<button class="flex-1 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined text-[16px]">check</span> Approve
+                            </button>
+<button class="flex-1 py-2 border border-outline text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-variant/50 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">close</span> Reject
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EcoTrade Onboarding - Step 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#f1eedb",
+                        "inverse-primary": "#a1d494",
+                        "on-primary-fixed-variant": "#23501e",
+                        "outline": "#72796e",
+                        "surface-tint": "#3b6934",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#5b675e",
+                        "primary-fixed-dim": "#a1d494",
+                        "outline-variant": "#c2c9bb",
+                        "on-background": "#1c1c11",
+                        "surface-bright": "#fdfae7",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f7f4e1",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-container-high": "#ece9d6",
+                        "primary": "#154212",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-surface": "#1c1c11",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#002201",
+                        "background": "#fdfae7",
+                        "on-tertiary-fixed": "#3c0800",
+                        "primary-container": "#2d5a27",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-dim": "#dddbc8",
+                        "tertiary": "#6a210d",
+                        "surface-container-highest": "#e6e3d0",
+                        "surface-variant": "#e6e3d0",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d9e6da",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "tertiary-fixed": "#ffdbd2",
+                        "on-secondary-fixed": "#131e17",
+                        "secondary": "#556158",
+                        "on-primary-container": "#9dd090",
+                        "inverse-on-surface": "#f4f1de",
+                        "secondary-container": "#d9e6da",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#313124",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#883721",
+                        "surface": "#fdfae7",
+                        "on-surface-variant": "#42493e",
+                        "primary-fixed": "#bcf0ae"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "xl": "48px",
+                        "lg": "32px",
+                        "sm": "16px",
+                        "gutter": "16px",
+                        "margin": "20px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "label-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background">
+<!-- Top Navigation (Onboarding context, simplified) -->
+<header class="absolute top-0 w-full flex items-center justify-between px-margin py-md z-10 bg-transparent">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="eco">eco</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">EcoTrade</span>
+</div>
+<button class="font-label-md text-label-md text-primary opacity-80 hover:opacity-100 transition-opacity">Skip</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[480px] px-margin pt-[100px] pb-[120px] flex flex-col flex-grow items-center justify-center text-center relative z-0"><div class="w-full aspect-square max-w-[320px] mb-lg relative bg-surface-container rounded-xl shadow-md overflow-hidden flex items-center justify-center"><img alt="EcoTrade Community" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLudxBTe5lSi9c7ny-wVn8viTEwvDvqASpTKdUXr7AFg6AO30yrOiEaU1OWtPELhRzEqdB12l4NVbWagaQyy8EH-7sMUEpTBHeCyTvhe7tf6_QqB4H4YS0P2rXg-_h7vBDwSbRLMjqU46sP49m46o9EU-XQ9i0Um9yKoRpASF5h7AiDh90wX_lkCL49MuKf7kocBRo_P2hkDIe84O6ZFrFFhL_X5k2e7VHmpV6yFgSjOSPQEBhQoB9aRLMA"></div><h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary font-bold mb-sm tracking-tight">Trade Your Unused Items</h1><p class="font-headline-sm text-headline-sm text-primary opacity-80 mb-lg">Give your items a second life. Trade, don't toss.</p><p class="font-body-lg text-body-lg text-on-surface-variant max-w-[340px] mx-auto">Join a community where your household goods find new life. Exchange items easily and reduce waste.</p></main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-0 w-full max-w-[480px] bg-background px-margin pb-xl pt-sm flex flex-col gap-sm z-10">
+<!-- Progress Indicator -->
+<div class="flex items-center justify-center gap-2 mb-sm"><div class="w-8 h-2 rounded-full bg-primary transition-all"></div><div class="w-2 h-2 rounded-full bg-outline-variant"></div><div class="w-2 h-2 rounded-full bg-outline-variant"></div><div class="w-2 h-2 rounded-full bg-outline-variant"></div></div>
+<!-- Primary Action -->
+<button class="w-full bg-primary-container text-on-primary-container font-headline-sm text-headline-sm py-sm rounded-full shadow-md hover:opacity-90 active:scale-95 transition-all">
+            Next
+        </button>
+<!-- Secondary Action (Skip - alternate placement for accessibility) -->
+<button class="w-full bg-transparent text-primary border border-primary font-headline-sm text-headline-sm py-sm rounded-full hover:bg-primary/5 active:scale-95 transition-all font-bold">
+            Skip Intro
+        </button>
+</div>
+
+
+</body></html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade - Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "primary": "#154212",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "on-secondary-fixed": "#131e17",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-dim": "#dddbc8",
+                        "on-surface-variant": "#42493e",
+                        "secondary": "#556158",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e6e3d0",
+                        "on-primary-fixed-variant": "#23501e",
+                        "inverse-surface": "#313124",
+                        "primary-container": "#2d5a27",
+                        "on-error-container": "#93000a",
+                        "background": "#fdfae7",
+                        "primary-fixed-dim": "#a1d494",
+                        "tertiary-container": "#883721",
+                        "on-background": "#1c1c11",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f7f4e1",
+                        "on-secondary-container": "#5b675e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-surface": "#1c1c11",
+                        "on-primary-fixed": "#002201",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "tertiary": "#6a210d",
+                        "inverse-primary": "#a1d494",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface": "#fdfae7",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdbd2",
+                        "outline-variant": "#c2c9bb",
+                        "inverse-on-surface": "#f4f1de",
+                        "surface-container-high": "#ece9d6",
+                        "surface-container-highest": "#e6e3d0",
+                        "surface-container": "#f1eedb",
+                        "surface-tint": "#3b6934",
+                        "secondary-fixed": "#d9e6da",
+                        "outline": "#72796e",
+                        "primary-fixed": "#bcf0ae",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-bright": "#fdfae7",
+                        "secondary-container": "#d9e6da",
+                        "on-primary-container": "#9dd090"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "xl": "48px",
+                        "lg": "32px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "margin": "20px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "body-sm": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Subtle ambient mesh gradient background */
+        .ambient-bg {
+            background-color: #fdfae7;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(113,57%,76%,0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(43,84%,87%,0.4) 0px, transparent 50%);
+        }
+
+        /* Glassmorphism subtle touches */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex items-center justify-center p-margin ambient-bg relative overflow-x-hidden overflow-y-auto">
+<!-- Decorative Image Element behind the card -->
+<div class="fixed inset-0 opacity-20 pointer-events-none mix-blend-multiply bg-cover bg-center" data-alt="A soft, abstract macro photograph of layered monstera leaves bathed in warm, diffused morning sunlight. The lighting is high-key and serene, creating subtle, organic shadow play. The color palette focuses on pale greens and creamy whites, aligning with a sustainable, modern eco-friendly aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD9kCQJgziU6m-iDXHg4YZCcUCnLXTbq6ctsDEzxpaqhUDCQCpAdwsobv8Uzcga0Vf1dmCCwqRfWcbq4oAqoYAlerxAmCTHFlyUzVyFq9qWr4u_PFznBfmMhCSveRQPL2zQTQH4pVUeObC5pf5YJIFEdZ4HpheCxqFSZK5w_hFXjAA52JUNuq1qllBluHqGNyKQrbdL7dwetLVowPAzPvJ3kLzGUC7ioSQWaNDrH2KQYUa9Wzt1qnnX')">
+</div>
+<!-- Main Container Card -->
+<main class="w-full max-w-[440px] glass-panel rounded-[24px] shadow-[0_8px_32px_rgba(21,66,18,0.06)] border border-white/50 p-lg relative z-10 my-8">
+<!-- Header -->
+<div class="text-center mb-md"><div class="flex items-center justify-center gap-3 mb-xs">
+<span class="material-symbols-outlined text-primary text-[40px]">sync_alt</span>
+<span class="font-display-lg text-display-lg text-primary">EcoTrade</span>
+</div>
+<p class="font-body-md text-body-md text-secondary mt-1">Connect, trade, and sustain.</p></div>
+<!-- Segmented Control -->
+<div class="flex p-1 bg-surface-container rounded-xl mb-lg relative">
+<button class="flex-1 py-2 font-label-md text-label-md rounded-lg text-on-primary bg-primary shadow-sm transition-all duration-300 relative z-10" id="tab-login" onclick="switchTab('login')">
+                Login
+            </button>
+<button class="flex-1 py-2 font-label-md text-label-md rounded-lg text-on-surface-variant hover:text-on-surface transition-all duration-300 relative z-10" id="tab-signup" onclick="switchTab('signup')">
+                Sign Up
+            </button>
+<!-- Animated background pill (simplified for vanilla JS without complex positioning) -->
+</div>
+<!-- Form Area -->
+<form class="space-y-sm" id="auth-form" onsubmit="event.preventDefault();">
+<!-- Login Fields -->
+<div class="space-y-sm block" id="login-fields">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="login-email">Username or Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="login-email" placeholder="you@example.com" type="text"/>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-1">
+<label class="block font-label-md text-label-md text-on-surface" for="login-password">Password</label>
+<a class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors" href="#" id="link-forgot">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="login-password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sign Up Fields -->
+<div class="space-y-sm hidden" id="signup-fields">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="signup-name">Full Name</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">person</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="signup-name" placeholder="Jane Doe" type="text"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="signup-username">Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">alternate_email</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="signup-username" placeholder="janedoe" type="text"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="signup-email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="signup-email" placeholder="you@example.com" type="email"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="signup-password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="signup-password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1" for="signup-confirm-password">Confirm Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock_reset</span>
+<input class="w-full bg-surface-variant border-none rounded-xl py-3 pl-10 pr-10 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline-variant" id="signup-confirm-password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Action Button -->
+<button class="w-full bg-primary text-on-primary font-headline-sm text-headline-sm py-3 rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.15)] hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98] transition-all mt-md" id="btn-submit" type="submit">
+                Login
+            </button>
+</form>
+<!-- Divider -->
+<div class="flex items-center gap-4 my-md">
+<div class="h-px flex-1 bg-outline-variant/50"></div>
+<span class="font-label-md text-label-md text-secondary">Or continue with</span>
+<div class="h-px flex-1 bg-outline-variant/50"></div>
+</div>
+<!-- Social Logins -->
+<div class="space-y-xs">
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-xl py-3 font-label-md text-label-md text-on-surface hover:bg-surface-variant hover:border-outline transition-colors">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
+                Google
+            </button>
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-xl py-3 font-label-md text-label-md text-on-surface hover:bg-surface-variant hover:border-outline transition-colors">
+<span class="material-symbols-outlined icon-fill">file_download</span>
+                Apple
+            </button>
+</div>
+</main>
+<script>
+        function switchTab(tab) {
+            const btnLogin = document.getElementById('tab-login');
+            const btnSignup = document.getElementById('tab-signup');
+            const loginFields = document.getElementById('login-fields');
+            const signupFields = document.getElementById('signup-fields');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            // Active/Inactive class sets
+            const activeClasses = ['text-on-primary', 'bg-primary', 'shadow-sm'];
+            const inactiveClasses = ['text-on-surface-variant', 'bg-transparent', 'hover:text-on-surface'];
+
+            if (tab === 'login') {
+                // Update Tabs
+                btnLogin.classList.add(...activeClasses);
+                btnLogin.classList.remove(...inactiveClasses);
+                btnSignup.classList.add(...inactiveClasses);
+                btnSignup.classList.remove(...activeClasses);
+
+                // Update Form Content
+                loginFields.classList.remove('hidden');
+                loginFields.classList.add('block');
+                signupFields.classList.add('hidden');
+                signupFields.classList.remove('block');
+                btnSubmit.textContent = 'Login';
+            } else {
+                // Update Tabs
+                btnSignup.classList.add(...activeClasses);
+                btnSignup.classList.remove(...inactiveClasses);
+                btnLogin.classList.add(...inactiveClasses);
+                btnLogin.classList.remove(...activeClasses);
+
+                // Update Form Content
+                signupFields.classList.remove('hidden');
+                signupFields.classList.add('block');
+                loginFields.classList.add('hidden');
+                loginFields.classList.remove('block');
+                btnSubmit.textContent = 'Create Account';
+            }
+        }
+    </script>
+</body></html>

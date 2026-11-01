@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade Admin - User Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#42493e",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#6a210d",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-background": "#1c1c11",
+                        "secondary-fixed": "#d9e6da",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e6e3d0",
+                        "inverse-on-surface": "#f4f1de",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbd2",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "surface-variant": "#e6e3d0",
+                        "on-primary-container": "#9dd090",
+                        "surface-dim": "#dddbc8",
+                        "on-primary-fixed": "#002201",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-container-high": "#ece9d6",
+                        "surface-bright": "#fdfae7",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#313124",
+                        "primary-container": "#2d5a27",
+                        "primary-fixed-dim": "#a1d494",
+                        "surface-container": "#f1eedb",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#883721",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c2c9bb",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fdfae7",
+                        "secondary-container": "#d9e6da",
+                        "on-surface": "#1c1c11",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "primary-fixed": "#bcf0ae",
+                        "outline": "#72796e",
+                        "inverse-primary": "#a1d494",
+                        "on-secondary-container": "#5b675e",
+                        "surface-container-low": "#f7f4e1",
+                        "secondary": "#556158",
+                        "primary": "#154212",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#3b6934",
+                        "on-secondary-fixed": "#131e17",
+                        "background": "#fdfae7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "base": "4px",
+                        "md": "24px",
+                        "sm": "16px",
+                        "lg": "32px",
+                        "margin": "20px",
+                        "xs": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "headline-sm": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopAppBar (Mobile only for detailed view, normally hidden but included per constraints) -->
+<header class="w-full top-0 sticky bg-surface shadow-sm md:hidden z-40">
+<div class="flex justify-between items-center px-margin py-base w-full">
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant cursor-pointer active:scale-95 transition-transform p-2 rounded-full hover:bg-secondary-container/50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm-mobile text-primary font-bold">EcoTrade Admin</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
+<img alt="Admin Avatar" class="w-full h-full object-cover" data-alt="A small circular avatar placeholder image for an administrative user in a clean, minimalist UI context. The avatar features a generic modern icon representing a person, rendered in soft green and neutral tones on an off-white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlnvRsQlR79Y3740RhiLzxhhZ_6gsACwr_kOWp44gObTnqszUSCg7NTwg8h4Lbhnp7oqsPC-Q8YB169gGHl2irDqxf__ijSiI5PfjzrEouaBO5Di9M1IXou1rEdNtKyIaK5yVOPB72AvtH1ZWJCt3AmSxVqPboSWjFzwSEifn7jRkZ2c6FWpvewhRh-8KMCds35sdf2JIxsmNrdtpTJxP1tqJvSNpsM5mLDLuGAdh4lLcxK8nDwPIh"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<!-- NavigationDrawer (Desktop) -->
+<aside class="hidden lg:flex flex-col h-full py-md bg-surface-container border-r border-outline-variant/10 w-64 fixed left-0 top-0 z-30">
+<div class="px-margin mb-lg flex flex-col gap-xs">
+<div class="flex items-center gap-sm mb-4">
+<img alt="Admin Avatar" class="w-10 h-10 rounded-full object-cover" data-alt="A high quality avatar placeholder image for an administrative user in a clean, minimalist UI context. The avatar features a modern, professional looking icon representing a person, rendered in soft green and neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFFbrz5Xl7lIdCnz5mSgKfV7-FPzv5MmqiTgr4UMzELdQ90Hccjv7YjKWdDQ2Xf2HvT30FElsNpkN80kCGsTK8Jt4_lsr2ZjQmcMlHRL1bFYSv3B1K-T_1AZmJ1GA9h204ERl0iG5WEAvS8jyNbzFM5L6K0WN1H6BrYSbmG-tt2cLZrY-kbv6yHDeEYk0z1l66sTdLHBwOQ6bTAk9BE4Oua1-4YHTEYzU0JnAUuDQwPrdNcfKJm-ms"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Admin Portal</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">System Oversight</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="bg-primary-container text-on-primary-container rounded-full mx-2 px-4 py-3 flex items-center gap-3 duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface mx-2 px-4 py-3 flex items-center gap-3 hover:bg-secondary-fixed-dim/30 rounded-full duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event_available</span>
+<span class="font-label-md text-label-md">Auctions</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface mx-2 px-4 py-3 flex items-center gap-3 hover:bg-secondary-fixed-dim/30 rounded-full duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface mx-2 px-4 py-3 flex items-center gap-3 hover:bg-secondary-fixed-dim/30 rounded-full duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 p-margin md:p-lg overflow-y-auto w-full pb-32 lg:pb-lg">
+<!-- Breadcrumb & Header -->
+<div class="mb-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="font-body-sm text-body-sm cursor-pointer hover:text-primary transition-colors">Verification</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-body-sm text-body-sm text-primary font-semibold">Sarah Jenkins</span>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background">Review Documents</h2>
+</div>
+<!-- Quick Actions Desktop -->
+<div class="hidden md:flex gap-3">
+<button class="px-6 py-3 rounded-full border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">close</span>
+                        Reject
+                    </button>
+<button class="px-6 py-3 rounded-full bg-tertiary text-on-tertiary font-label-md text-label-md hover:bg-tertiary/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">check</span>
+                        Approve User
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-sm md:gap-md">
+<!-- User Context Card (Span 4) -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-md">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A portrait photo of a smiling woman in her early 30s, taken outdoors with soft, natural lighting. She has dark hair and is wearing a casual green top, conveying a friendly and approachable neighborly vibe in a bright, modern setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdddhUejGT9Z2PXVhKJHK85PMPhghyAvWiQ3uVuHCFXoK40ZZbB46zK1ROH57_W6KqdDHyzx5GM2JuqXNeJ9hZsJR26nhobuA_xONrbxflRScECwUglEWCzdT64gLyGgXR0isuBSjOO8iYIpxr_WHgHh6hVAPw7ScRSdObjaN6TQT8gzEk_a5o6yWgrYngyVCMnzl8ZxUASEDIU9d00uVXfpPeWxYOyQ7l4J7xEQymS7GgZDnRDL3s"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-background">Sarah Jenkins</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">ID: USR-8492-AX</p>
+</div>
+</div>
+<div class="h-px w-full bg-primary/10"></div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Submitted</span>
+<span class="font-body-sm text-body-sm text-on-background text-right">Oct 24, 2023<br/>14:32 EST</span>
+</div>
+<div class="flex justify-between items-start">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Location</span>
+<span class="font-body-sm text-body-sm text-on-background text-right">Portland, OR<br/>97204</span>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Risk Score</span>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">Low Risk (12)</span>
+</div>
+</div>
+<div class="h-px w-full bg-primary/10 mt-auto"></div>
+<!-- Admin Notes Section -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Admin Notes</label>
+<textarea class="w-full rounded-lg bg-secondary-fixed/30 border-none text-body-sm text-on-background focus:ring-1 focus:ring-primary p-3 resize-none h-24" placeholder="Add internal notes here..."></textarea>
+</div>
+</div>
+<!-- Document Viewer Area (Span 8) -->
+<div class="md:col-span-8 flex flex-col gap-sm md:gap-md">
+<!-- Primary ID Document -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">badge</span>
+<h3 class="font-headline-sm text-headline-sm text-on-background">Government ID</h3>
+</div>
+<span class="px-3 py-1 rounded-full bg-primary-container/20 text-primary-container font-label-md text-label-md border border-primary-container/30">Requires Manual Check</span>
+</div>
+<div class="relative w-full aspect-[16/9] bg-surface-variant rounded-lg overflow-hidden group cursor-zoom-in">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A highly detailed close-up shot of a stylized, generic state driver's license resting on a clean, light wood surface. The lighting is bright and even, highlighting the clear text and holographic security features on the card, conveying a sense of authenticity and modern verification processes." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-KHzanBIRZdBJ_F4j7Z92b4qgWBnSbhYrPaouHA8uohUHjxyfmxAM-ZmUnoOEtbypz7cKl-_bRyCmlU5c_RpPjNzzcaudCdZSpElljQwWvFYSahk2N9QCUnsH7OlWZ-Kdfv8NvK-yw3hn53LzbNc7Ui7WYNlywG-UUt53vXN-Fjlgfgfk_SiSdwvAy7utoU8zIPTHv3WzFPw7OhB_1sSC9vfqLBLlawuJYtl5E5HbMfOZBjZicy57')"></div>
+<!-- Overlay Controls -->
+<div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-10 h-10 rounded-full bg-surface/90 text-on-surface shadow flex items-center justify-center hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">zoom_in</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface/90 text-on-surface shadow flex items-center justify-center hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">rotate_right</span>
+</button>
+</div>
+</div>
+<!-- Extraction Results -->
+<div class="grid grid-cols-2 gap-4 mt-2">
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant/10">
+<span class="font-label-md text-label-md text-on-surface-variant block mb-1">Extracted Name</span>
+<span class="font-body-md text-body-md text-on-background flex items-center gap-2">
+                                    Sarah Jenkins <span class="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+</span>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant/10">
+<span class="font-label-md text-label-md text-on-surface-variant block mb-1">Expiration Date</span>
+<span class="font-body-md text-body-md text-on-background flex items-center gap-2">
+                                    05/14/2028 <span class="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Secondary Document -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border border-outline-variant/20 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<h3 class="font-headline-sm text-headline-sm text-on-background">Utility Bill</h3>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container/20 text-on-secondary-container font-label-md text-label-md">Auto-Verified</span>
+</div>
+<div class="relative w-full h-48 bg-surface-variant rounded-lg overflow-hidden group cursor-zoom-in">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A cropped, close-up photograph of a printed utility bill laying flat on a white desk. The focus is on the address section showing 'Portland, OR'. The lighting is bright office lighting. The paper texture is visible, emphasizing document authenticity in a clean administrative environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtp3c9xar9pZHDVhAjc4Ib2D6IK_X5busZ7J739E1c3-LqriSRgTEJAAbDJTYibM4IaeX1vi87RCNlXLCRxiaKKNMTnLB8clGAxZRvFPyF9zyeZKw3_zfhxn_4w7AG0dHJFqCiSwQEuu-DTRW4wPJw5Qzw4jHFGbouHxQfkJd46brCZJ7eMMWVIfF1Ecl-eXc4jqWjCRbuj99B_1df_vXm_Dbdw5CSs2bV3Cca2E2KzEHCVaVIhHU2')"></div>
+<div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-10 h-10 rounded-full bg-surface/90 text-on-surface shadow flex items-center justify-center hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">zoom_in</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Action Bar (Sticky Bottom) -->
+<div class="md:hidden fixed bottom-16 left-0 w-full bg-surface-container-lowest border-t border-outline-variant/20 p-4 flex gap-3 z-40 shadow-[0_-4px_12px_rgba(21,66,18,0.08)]">
+<button class="flex-1 py-3 rounded-full border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">close</span>
+                    Reject
+                </button>
+<button class="flex-1 py-3 rounded-full bg-tertiary text-on-tertiary font-label-md text-label-md hover:bg-tertiary/90 transition-colors shadow-sm flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">check</span>
+                    Approve
+                </button>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(21,66,18,0.08)] z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-tertiary-container text-on-tertiary-container rounded-2xl px-4 py-1.5 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-md text-label-md mt-1">Verify</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant rounded-2xl active:scale-90 duration-150 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event_note</span>
+<span class="font-label-md text-label-md mt-1">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant rounded-2xl active:scale-90 duration-150 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md mt-1">Users</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant rounded-2xl active:scale-90 duration-150 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">list_alt</span>
+<span class="font-label-md text-label-md mt-1">Logs</span>
+</a>
+</nav>
+</body></html>

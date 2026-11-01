@@ -1,0 +1,147 @@
+- generic [ref=f10e8]:
+  - generic [ref=f10e9]:
+    - generic [ref=f10e118]:
+      - generic [ref=f10e119]:
+        - generic [ref=f10e120]: Post an Item
+        - generic [ref=f10e121]: পুরান জিনিস দিন, নতুন গল্প নিন
+      - generic [ref=f10e123]:
+        - generic [ref=f10e124]:
+          - generic [ref=f10e125]: Photos (ছবি যুক্ত করুন)
+          - generic [ref=f10e126] [cursor=pointer]:
+            - generic [ref=f10e127]: 
+            - generic [ref=f10e129]: Tap to add up to 5 photos
+            - generic [ref=f10e130]: JPG, PNG • Good natural lighting recommended
+        - generic [ref=f10e131]:
+          - generic [ref=f10e132]: Item Title *
+          - textbox "e.g. Vintage Teak Dining Chair, Pottery Set..." [ref=f10e133]: E2E UI Vintage Chair
+        - generic [ref=f10e134]:
+          - generic [ref=f10e135]: Category
+          - generic [ref=f10e137]:
+            - generic [ref=f10e138] [cursor=pointer]:
+              - generic [ref=f10e139]: 
+              - generic [ref=f10e140]: Verified Only
+            - generic [ref=f10e141] [cursor=pointer]:
+              - generic [ref=f10e142]: 
+              - generic [ref=f10e143]: Furniture
+            - generic [ref=f10e144] [cursor=pointer]:
+              - generic [ref=f10e145]: 
+              - generic [ref=f10e146]: Books
+            - generic [ref=f10e147] [cursor=pointer]:
+              - generic [ref=f10e148]: 
+              - generic [ref=f10e149]: Kitchen
+            - generic [ref=f10e150] [cursor=pointer]:
+              - generic [ref=f10e151]: 
+              - generic [ref=f10e152]: Clothing
+            - generic [ref=f10e153] [cursor=pointer]:
+              - generic [ref=f10e154]: 
+              - generic [ref=f10e155]: Garden
+            - generic [ref=f10e156] [cursor=pointer]:
+              - generic [ref=f10e157]: 
+              - generic [ref=f10e158]: Electronics
+        - generic [ref=f10e159]:
+          - generic [ref=f10e160]: Condition (অবস্থা)
+          - generic [ref=f10e161]:
+            - generic [ref=f10e162] [cursor=pointer]: Brand New
+            - generic [ref=f10e164] [cursor=pointer]: Like New
+            - generic [active] [ref=f10e166] [cursor=pointer]: Gently Used
+            - generic [ref=f10e168] [cursor=pointer]: Fair
+        - generic [ref=f10e170]:
+          - generic [ref=f10e171]: Exchange Mode (বিনিময় ধরণ)
+          - generic [ref=f10e172]:
+            - generic [ref=f10e173] [cursor=pointer]:
+              - generic [ref=f10e174]: 
+              - generic [ref=f10e175]: Direct Barter
+              - generic [ref=f10e176]: Swap for another item or small adjustment
+            - generic [ref=f10e177] [cursor=pointer]:
+              - generic [ref=f10e178]: 
+              - generic [ref=f10e179]: Free Gift
+              - generic [ref=f10e180]: Give away to community member in need
+        - generic [ref=f10e181]:
+          - generic [ref=f10e182]: What would you like in return? (ঐচ্ছিক চাওয়া)
+          - textbox "e.g. Books, table lamp, gardening tools..." [ref=f10e183]
+        - generic [ref=f10e184]:
+          - generic [ref=f10e185]: Pickup Location
+          - textbox "Dhanmondi, Mirpur, TSC..." [ref=f10e186]: Dhanmondi, Dhaka
+        - generic [ref=f10e187]:
+          - generic [ref=f10e188]: Description
+          - textbox "Describe history, flaws, or why you are giving it away..." [ref=f10e189]: A polished teak chair from the UI smoke test.
+        - generic [ref=f10e190] [cursor=pointer]:
+          - generic [ref=f10e191]: 
+          - generic [ref=f10e192]: Publish to Puran Haat
+    - generic [ref=f10e15]:
+      - generic [ref=f10e16]:
+        - generic [ref=f10e17]: Eco Impact
+        - generic [ref=f10e18]: Your sustainability profile
+      - generic [ref=f10e22]:
+        - generic [ref=f10e23]: puranhaat.ui.1793499969484
+        - generic [ref=f10e24]: Dhaka • Verified Trader
+        - generic [ref=f10e25]: puranhaat.ui.1793499969484@example.com
+        - generic [ref=f10e26]:
+          - generic [ref=f10e27]: 
+          - generic [ref=f10e28]: 0.0 rating
+      - generic [ref=f10e29]:
+        - generic [ref=f10e30]:
+          - generic [ref=f10e31]: 
+          - generic [ref=f10e32]: "0"
+          - generic [ref=f10e33]: Eco Points
+        - generic [ref=f10e34]:
+          - generic [ref=f10e35]: 
+          - generic [ref=f10e36]: "0"
+          - generic [ref=f10e37]: Trades
+        - generic [ref=f10e38]:
+          - generic [ref=f10e39]: 
+          - generic [ref=f10e40]: "0"
+          - generic [ref=f10e41]: Saved
+      - generic [ref=f10e42]:
+        - generic [ref=f10e43]: Community Haat Impact
+        - generic [ref=f10e44]: 🌱 You helped divert ~0 kg of CO₂ from landfills by trading instead of buying new.
+      - generic [ref=f10e46]:
+        - generic [ref=f10e47]: Account
+        - generic [ref=f10e48] [cursor=pointer]:
+          - generic [ref=f10e49]: 
+          - generic [ref=f10e50]: Edit Profile
+          - generic [ref=f10e51]: 
+        - generic [ref=f10e52] [cursor=pointer]:
+          - generic [ref=f10e53]: 
+          - generic [ref=f10e54]: Notifications
+          - generic [ref=f10e55]: 
+        - generic [ref=f10e56] [cursor=pointer]:
+          - generic [ref=f10e57]: 
+          - generic [ref=f10e58]: Trust & Safety
+          - generic [ref=f10e59]: 
+        - generic [ref=f10e60] [cursor=pointer]:
+          - generic [ref=f10e61]: 
+          - generic [ref=f10e62]: Help & Support
+          - generic [ref=f10e63]: 
+        - generic [ref=f10e64] [cursor=pointer]:
+          - generic [ref=f10e65]: 
+          - generic [ref=f10e66]: Sign Out
+          - generic [ref=f10e67]: 
+      - generic [ref=f10e69] [cursor=pointer]:
+        - generic [ref=f10e70]: 
+        - generic [ref=f10e71]: Seed Sample Data to Firebase
+  - tablist [ref=f10e73]:
+    - tab "  Home" [ref=f10e75] [cursor=pointer]:
+      - generic [ref=f10e76]:
+        - generic [ref=f10e77]: 
+        - generic [ref=f10e79]: 
+      - generic [ref=f10e81]: Home
+    - tab "  Discover" [ref=f10e83] [cursor=pointer]:
+      - generic [ref=f10e84]:
+        - generic [ref=f10e85]: 
+        - generic [ref=f10e87]: 
+      - generic [ref=f10e89]: Discover
+    - tab " " [selected] [ref=f10e91] [cursor=pointer]:
+      - generic [ref=f10e92]:
+        - generic [ref=f10e93]: 
+        - generic [ref=f10e96]: 
+    - tab "  Chats" [ref=f10e100] [cursor=pointer]:
+      - generic [ref=f10e101]:
+        - generic [ref=f10e102]: 
+        - generic [ref=f10e104]: 
+      - generic [ref=f10e106]: Chats
+    - tab "  Profile" [ref=f10e108] [cursor=pointer]:
+      - generic [ref=f10e109]:
+        - generic [ref=f10e110]: 
+        - generic [ref=f10e112]: 
+      - generic [ref=f10e114]: Profile

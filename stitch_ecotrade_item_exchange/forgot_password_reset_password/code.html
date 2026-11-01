@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade - Reset Password</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#3c0800",
+                    "on-surface-variant": "#42493e",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#154212",
+                    "on-secondary-fixed": "#131e17",
+                    "secondary-fixed-dim": "#bdcabe",
+                    "primary-fixed": "#bcf0ae",
+                    "tertiary-container": "#883721",
+                    "inverse-surface": "#313124",
+                    "inverse-on-surface": "#f4f1de",
+                    "on-tertiary-fixed-variant": "#7c2e19",
+                    "on-primary-fixed-variant": "#23501e",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fdfae7",
+                    "tertiary-fixed-dim": "#ffb4a1",
+                    "error-container": "#ffdad6",
+                    "surface": "#fdfae7",
+                    "surface-dim": "#dddbc8",
+                    "inverse-primary": "#a1d494",
+                    "primary-fixed-dim": "#a1d494",
+                    "surface-container-highest": "#e6e3d0",
+                    "secondary-fixed": "#d9e6da",
+                    "outline": "#72796e",
+                    "on-tertiary-container": "#ffb09b",
+                    "surface-tint": "#3b6934",
+                    "on-secondary-container": "#5b675e",
+                    "surface-container-low": "#f7f4e1",
+                    "secondary-container": "#d9e6da",
+                    "surface-container-high": "#ece9d6",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#9dd090",
+                    "secondary": "#556158",
+                    "on-background": "#1c1c11",
+                    "tertiary-fixed": "#ffdbd2",
+                    "primary-container": "#2d5a27",
+                    "outline-variant": "#c2c9bb",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "tertiary": "#6a210d",
+                    "on-primary-fixed": "#002201",
+                    "surface-variant": "#e6e3d0",
+                    "surface-container": "#f1eedb",
+                    "background": "#fdfae7",
+                    "on-secondary-fixed-variant": "#3e4a41",
+                    "on-surface": "#1c1c11"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "margin": "20px",
+                    "gutter": "16px",
+                    "xs": "8px",
+                    "base": "4px",
+                    "sm": "16px",
+                    "lg": "32px",
+                    "xl": "48px"
+            },
+            "fontFamily": {
+                    "body-md": [
+                            "Outfit"
+                    ],
+                    "body-lg": [
+                            "Outfit"
+                    ],
+                    "label-md": [
+                            "Outfit"
+                    ],
+                    "body-sm": [
+                            "Outfit"
+                    ],
+                    "headline-sm": [
+                            "Outfit"
+                    ],
+                    "display-lg": [
+                            "Outfit"
+                    ],
+                    "display-lg-mobile": [
+                            "Outfit"
+                    ],
+                    "headline-md": [
+                            "Outfit"
+                    ]
+            },
+            "fontSize": {
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "26px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md antialiased">
+<header class="w-full top-0 sticky bg-surface shadow-sm z-40 flex items-center justify-between px-margin py-base">
+<button aria-label="Go back" class="text-primary hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 p-2 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary">EcoTrade</span>
+<div class="w-10"></div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-margin py-lg">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-[0_4px_24px_rgba(21,66,18,0.08)] p-md flex flex-col gap-md">
+<div class="text-center flex flex-col gap-xs">
+<span class="material-symbols-outlined text-primary text-[48px] mx-auto mb-xs icon-fill">lock_reset</span>
+<h1 class="font-headline-md text-headline-md text-on-surface">Reset Password</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Please enter a new password below to secure your EcoTrade account.</p>
+</div>
+<form class="flex flex-col gap-md mt-sm">
+<div class="flex flex-col gap-base">
+<label class="font-label-md text-label-md text-on-surface" for="new-password">New Password</label>
+<div class="relative">
+<input class="w-full bg-secondary-fixed text-on-surface rounded-lg border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-3 pl-4 pr-12 font-body-md text-body-md placeholder:text-on-surface-variant/50" id="new-password" placeholder="Enter new password" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant p-1 rounded-full hover:bg-primary-container/10 transition-colors" onclick="togglePassword('new-password', 'icon-new-password')" type="button">
+<span class="material-symbols-outlined" id="icon-new-password">visibility_off</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-md text-label-md text-on-surface" for="confirm-password">Confirm New Password</label>
+<div class="relative">
+<input class="w-full bg-secondary-fixed text-on-surface rounded-lg border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-3 pl-4 pr-12 font-body-md text-body-md placeholder:text-on-surface-variant/50" id="confirm-password" placeholder="Confirm new password" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant p-1 rounded-full hover:bg-primary-container/10 transition-colors" onclick="togglePassword('confirm-password', 'icon-confirm-password')" type="button">
+<span class="material-symbols-outlined" id="icon-confirm-password">visibility_off</span>
+</button>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-sm flex flex-col gap-xs mt-xs">
+<h3 class="font-label-md text-label-md text-on-surface">Password Requirements:</h3>
+<ul class="flex flex-col gap-1">
+<li class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span> At least 8 characters
+                        </li>
+<li class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span> Includes a number
+                        </li>
+<li class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-outline">radio_button_unchecked</span> Includes a special character
+                        </li>
+</ul>
+</div>
+<button class="w-full bg-tertiary text-on-tertiary font-label-md text-label-md py-3 rounded-full hover:bg-tertiary/90 active:scale-95 transition-all duration-200 mt-sm shadow-md shadow-tertiary/20" type="button">
+                    Reset Password
+                </button>
+</form>
+</div>
+</main>
+<script>
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        }
+    </script>
+</body></html>

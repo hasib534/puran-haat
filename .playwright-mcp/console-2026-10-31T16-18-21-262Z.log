@@ -1,0 +1,23 @@
+[     387ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at xl (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:37617)
+    at ki (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:88762)
+    at Pc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:122027)
+    at xc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:121079)
+    at Ec (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:120921)
+    at fc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:117427)
+    at lf (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:129516)
+    at Jc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:128082)
+    at nf (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:128357)
+    at http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:127712
+[     939ms] [WARNING] Items listener failed: Missing or insufficient permissions. @ http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:832
+[  642140ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at xl (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:37617)
+    at ki (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:88762)
+    at Pc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:122027)
+    at xc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:121079)
+    at Ec (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:120921)
+    at fc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:117427)
+    at lf (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:129516)
+    at Jc (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:128082)
+    at nf (http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:128357)
+    at http://localhost:4173/_expo/static/js/web/entry-7d1c952feb25cb955ac432ca73898f15.js:171:127712

@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Track Your Impact - EcoTrade</title>
+<!-- Google Fonts: Outfit -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#f1eedb",
+                      "inverse-primary": "#a1d494",
+                      "on-primary-fixed-variant": "#23501e",
+                      "outline": "#72796e",
+                      "surface-tint": "#3b6934",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#5b675e",
+                      "primary-fixed-dim": "#a1d494",
+                      "outline-variant": "#c2c9bb",
+                      "on-background": "#1c1c11",
+                      "surface-bright": "#fdfae7",
+                      "on-error": "#ffffff",
+                      "surface-container-low": "#f7f4e1",
+                      "secondary-fixed-dim": "#bdcabe",
+                      "surface-container-high": "#ece9d6",
+                      "primary": "#154212",
+                      "on-tertiary-fixed-variant": "#7c2e19",
+                      "on-surface": "#1c1c11",
+                      "tertiary-fixed-dim": "#ffb4a1",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed": "#002201",
+                      "background": "#fdfae7",
+                      "on-tertiary-fixed": "#3c0800",
+                      "primary-container": "#2d5a27",
+                      "on-tertiary-container": "#ffb09b",
+                      "surface-dim": "#dddbc8",
+                      "tertiary": "#6a210d",
+                      "surface-container-highest": "#e6e3d0",
+                      "surface-variant": "#e6e3d0",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#d9e6da",
+                      "on-secondary-fixed-variant": "#3e4a41",
+                      "tertiary-fixed": "#ffdbd2",
+                      "on-secondary-fixed": "#131e17",
+                      "secondary": "#556158",
+                      "on-primary-container": "#9dd090",
+                      "inverse-on-surface": "#f4f1de",
+                      "secondary-container": "#d9e6da",
+                      "on-primary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "inverse-surface": "#313124",
+                      "on-secondary": "#ffffff",
+                      "tertiary-container": "#883721",
+                      "surface": "#fdfae7",
+                      "on-surface-variant": "#42493e",
+                      "primary-fixed": "#bcf0ae"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "base": "4px",
+                      "xl": "48px",
+                      "lg": "32px",
+                      "sm": "16px",
+                      "gutter": "16px",
+                      "margin": "20px",
+                      "md": "24px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Outfit"],
+                      "body-md": ["Outfit"],
+                      "body-lg": ["Outfit"],
+                      "headline-md": ["Outfit"],
+                      "display-lg-mobile": ["Outfit"],
+                      "headline-sm": ["Outfit"],
+                      "display-lg": ["Outfit"],
+                      "label-md": ["Outfit"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Custom styles for soft, organic animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .glass-panel {
+            background: rgba(253, 250, 231, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Header: Progress & Skip -->
+<header class="w-full px-margin py-md flex items-center justify-between sticky top-0 z-10 bg-background/80 backdrop-blur-md">
+<!-- Progress Indicator (3 of 4) -->
+<div aria-label="Progress: Step 3 of 4" class="flex gap-xs">
+<div aria-hidden="true" class="h-2 w-8 rounded-full bg-primary"></div>
+<div aria-hidden="true" class="h-2 w-8 rounded-full bg-primary"></div>
+<div aria-hidden="true" class="h-2 w-8 rounded-full bg-primary"></div>
+<div aria-hidden="true" class="h-2 w-8 rounded-full bg-surface-variant"></div>
+</div>
+<!-- Secondary Action -->
+<button class="font-label-md text-label-md text-outline hover:text-primary transition-colors duration-200">
+            Skip
+        </button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col px-margin pb-xl">
+<!-- Visual Presentation Area (Bento Layout + Ambient Image) -->
+<section class="w-full flex-grow flex flex-col justify-center mb-lg relative">
+<!-- Atmospheric Background Image -->
+<div class="absolute inset-0 w-full h-full rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(21,66,18,0.06)] animate-float" style="animation-duration: 8s;">
+<div class="bg-cover bg-center w-full h-full opacity-90 mix-blend-multiply" data-alt="A highly polished, 3D abstract illustration representing environmental data and sustainability. The scene features soft, organic geometric shapes like rounded cylinders and smooth curves, rendered in a light-mode aesthetic. The color palette revolves around crisp parchment whites, soft mint greens, deep forest greens, and warm terracotta accents. The lighting is diffused and ambient, casting soft, tactile shadows that create a sense of depth and modern minimalism. It looks like a premium, tactile dashboard widget." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBI3fcPjossSZSz8yOkKTh8B03uvBqierlCJ1hESa2gsfMdlIqjdsDa7Zfh42EwhbU99udNqlTEGX5XpLXm0foXdaFawUoWdMWYJbJymq48L4TkXSu3FqGj4S3hv5CJxcQtgMbjvikP0brrQwtVnjdqwLd8J-wPjverOoNiNvEAwfP8r9FYUsviop98y-cLD_WBVM8UQaQ1ZuUyLAr3S21Z2jLa5mQX3_Xi0bvpJVauX3p7_6ee0rhP')"></div>
+</div>
+<!-- Glassmorphic Data Overlay Grid -->
+<div class="relative z-10 w-full h-full p-sm grid grid-cols-2 grid-rows-2 gap-sm items-center justify-center"><div class="col-span-2 text-center mb-base"><span class="font-label-md text-label-md uppercase tracking-[0.2em] text-outline opacity-70">Your Sustainability Journey</span></div>
+<!-- Main Impact Card -->
+<div class="col-span-2 glass-panel rounded-2xl p-md shadow-sm transform transition-transform hover:scale-[1.02] duration-300"><div class="flex justify-between items-start mb-sm"><div class="flex items-center gap-xs text-primary"><span class="material-symbols-outlined text-[20px]">eco</span><span class="font-label-md text-label-md uppercase tracking-widest">CO2 Prevented</span></div><span class="font-label-md text-label-md text-outline bg-surface-container px-xs py-base rounded-full">Monthly</span></div><div class="flex items-baseline gap-xs mb-md"><span class="font-display-lg text-display-lg text-primary tracking-tight">124</span><span class="font-body-md text-body-md text-on-surface-variant">kg</span></div><div class="space-y-xs"><div class="flex justify-between font-label-md text-label-md text-outline"><span class="">Progress to Goal</span><span class="">85%</span></div><div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full w-[85%] transition-all duration-1000"></div></div></div></div>
+<!-- Secondary Data Card 1 -->
+<div class="glass-panel rounded-2xl p-sm shadow-sm flex flex-col justify-between h-full transform transition-transform hover:scale-[1.05] duration-300"><div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center mb-sm"><span class="material-symbols-outlined text-secondary text-[20px]">recycling</span></div><div><div class="font-headline-md text-headline-md text-on-background leading-none mb-base">38</div><div class="font-label-md text-label-md text-outline">Items Diverted</div></div></div>
+<!-- Secondary Data Card 2 -->
+<div class="glass-panel rounded-2xl p-sm shadow-sm flex flex-col justify-between h-full transform transition-transform hover:scale-[1.05] duration-300"><div class="w-8 h-8 rounded-lg bg-tertiary/10 flex items-center justify-center mb-sm"><span class="material-symbols-outlined text-tertiary text-[20px]">stars</span></div><div><div class="font-headline-md text-headline-md text-on-background leading-none mb-base">Top 5%</div><div class="font-label-md text-label-md text-outline">Community Rank</div></div></div>
+</div>
+</section>
+<!-- Typography & Messaging -->
+<section class="text-center mt-auto">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-background mb-sm tracking-tight">
+                Track Your Impact
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant px-sm">
+                See how much CO2 you've prevented and how many items you've diverted from landfills. Your actions make a difference.
+            </p>
+</section>
+</main>
+<!-- Bottom Action Area -->
+<footer class="w-full px-margin pb-lg pt-sm bg-background">
+<button class="w-full bg-primary-container text-on-primary font-headline-sm text-headline-sm py-sm rounded-full shadow-sm hover:opacity-95 active:scale-[0.98] transition-all duration-200 flex justify-center items-center gap-xs">
+            Next
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</footer>
+
+
+</body></html>

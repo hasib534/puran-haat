@@ -1,0 +1,75 @@
+- generic [ref=f11e8]:
+  - generic [ref=f11e15]:
+    - generic [ref=f11e16]:
+      - generic [ref=f11e17]: Eco Impact
+      - generic [ref=f11e18]: Your sustainability profile
+    - generic [ref=f11e22]:
+      - generic [ref=f11e23]: Guest Trader
+      - generic [ref=f11e24]: Dhaka • Member
+      - generic [ref=f11e115]: Sign in to start trading and track your eco impact.
+      - generic [ref=f11e26]:
+        - generic [ref=f11e27]: 
+        - generic [ref=f11e28]: 0.0 rating
+    - generic [ref=f11e29]:
+      - generic [ref=f11e30]:
+        - generic [ref=f11e31]: 
+        - generic [ref=f11e32]: "0"
+        - generic [ref=f11e33]: Eco Points
+      - generic [ref=f11e34]:
+        - generic [ref=f11e35]: 
+        - generic [ref=f11e36]: "0"
+        - generic [ref=f11e37]: Trades
+      - generic [ref=f11e38]:
+        - generic [ref=f11e39]: 
+        - generic [ref=f11e40]: "0"
+        - generic [ref=f11e41]: Saved
+    - generic [ref=f11e42]:
+      - generic [ref=f11e43]: Community Haat Impact
+      - generic [ref=f11e44]: 🌱 You helped divert ~0 kg of CO₂ from landfills by trading instead of buying new.
+    - generic [ref=f11e46]:
+      - generic [ref=f11e47]: Account
+      - generic [ref=f11e48] [cursor=pointer]:
+        - generic [ref=f11e49]: 
+        - generic [ref=f11e50]: Edit Profile
+        - generic [ref=f11e51]: 
+      - generic [ref=f11e52] [cursor=pointer]:
+        - generic [ref=f11e53]: 
+        - generic [ref=f11e54]: Notifications
+        - generic [ref=f11e55]: 
+      - generic [ref=f11e56] [cursor=pointer]:
+        - generic [ref=f11e57]: 
+        - generic [ref=f11e58]: Trust & Safety
+        - generic [ref=f11e59]: 
+      - generic [ref=f11e60] [cursor=pointer]:
+        - generic [ref=f11e61]: 
+        - generic [ref=f11e62]: Help & Support
+        - generic [ref=f11e63]: 
+      - generic [ref=f11e116] [cursor=pointer]:
+        - generic [ref=f11e117]: 
+        - generic [ref=f11e118]: Sign In
+        - generic [ref=f11e119]: 
+  - tablist [ref=f11e73]:
+    - tab "  Home" [ref=f11e75] [cursor=pointer]:
+      - generic [ref=f11e76]:
+        - generic [ref=f11e77]: 
+        - generic [ref=f11e79]: 
+      - generic [ref=f11e81]: Home
+    - tab "  Discover" [ref=f11e83] [cursor=pointer]:
+      - generic [ref=f11e84]:
+        - generic [ref=f11e85]: 
+        - generic [ref=f11e87]: 
+      - generic [ref=f11e89]: Discover
+    - tab " " [ref=f11e91] [cursor=pointer]:
+      - generic [ref=f11e92]:
+        - generic [ref=f11e93]: 
+        - generic [ref=f11e96]: 
+    - tab "  Chats" [ref=f11e100] [cursor=pointer]:
+      - generic [ref=f11e101]:
+        - generic [ref=f11e102]: 
+        - generic [ref=f11e104]: 
+      - generic [ref=f11e106]: Chats
+    - tab "  Profile" [selected] [ref=f11e108] [cursor=pointer]:
+      - generic [ref=f11e109]:
+        - generic [ref=f11e110]: 
+        - generic [ref=f11e112]: 
+      - generic [ref=f11e114]: Profile

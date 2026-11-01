@@ -1,0 +1,143 @@
+- generic [ref=f1e8]:
+  - generic [ref=f1e9]:
+    - generic [ref=f1e114]:
+      - generic [ref=f1e115]:
+        - generic [ref=f1e116] [cursor=pointer]:
+          - generic [ref=f1e117]: 
+          - generic [ref=f1e118]: Dhanmondi, Dhaka
+          - generic [ref=f1e119]: 
+        - generic [ref=f1e120]:
+          - generic [ref=f1e121]: Puran Haat
+          - generic [ref=f1e122]: পুরান হাট
+        - generic [ref=f1e123]:
+          - generic [ref=f1e124] [cursor=pointer]:
+            - generic [ref=f1e125]: 
+            - generic [ref=f1e126]: "3"
+          - generic [ref=f1e128] [cursor=pointer]
+      - generic [ref=f1e132]:
+        - generic [ref=f1e134]:
+          - generic [ref=f1e135]:
+            - generic [ref=f1e136]:
+              - generic [ref=f1e137]: 
+              - textbox [ref=f1e213]:
+                - /placeholder: Search vintage items, books, pots...
+            - generic [ref=f1e139] [cursor=pointer]: 
+          - generic [ref=f1e141]:
+            - generic [ref=f1e142]:
+              - generic [ref=f1e143]: Categories
+              - generic [ref=f1e144]: ক্যাটাগরি
+            - generic [ref=f1e146]:
+              - generic [ref=f1e148] [cursor=pointer]:
+                - generic [ref=f1e149]: 
+                - generic [ref=f1e150]: All Items
+              - generic [ref=f1e152] [cursor=pointer]:
+                - generic [ref=f1e153]: 
+                - generic [ref=f1e154]: Verified Only
+              - generic [ref=f1e156] [cursor=pointer]:
+                - generic [ref=f1e157]: 
+                - generic [ref=f1e158]: Furniture
+              - generic [ref=f1e160] [cursor=pointer]:
+                - generic [ref=f1e161]: 
+                - generic [ref=f1e162]: Books
+              - generic [ref=f1e164] [cursor=pointer]:
+                - generic [ref=f1e165]: 
+                - generic [ref=f1e166]: Kitchen
+              - generic [ref=f1e168] [cursor=pointer]:
+                - generic [ref=f1e169]: 
+                - generic [ref=f1e170]: Clothing
+              - generic [ref=f1e172] [cursor=pointer]:
+                - generic [ref=f1e173]: 
+                - generic [ref=f1e174]: Garden
+              - generic [ref=f1e176] [cursor=pointer]:
+                - generic [ref=f1e177]: 
+                - generic [ref=f1e178]: Electronics
+          - generic [ref=f1e179]:
+            - generic [ref=f1e180]: 
+            - generic [ref=f1e182]:
+              - generic [ref=f1e183]: Community Haat Impact
+              - generic [ref=f1e184]: 🌱 48.6 kg CO₂ diverted from landfills this month across Dhaka
+          - generic [ref=f1e185]:
+            - generic [ref=f1e186]:
+              - generic [ref=f1e187] [cursor=pointer]: All Haat
+              - generic [ref=f1e189] [cursor=pointer]: Direct Swap
+              - generic [ref=f1e191] [cursor=pointer]: Free Gift
+            - generic [ref=f1e193]: 0 items
+        - generic [ref=f1e194]:
+          - generic [ref=f1e195]: 
+          - generic [ref=f1e196]: No items found
+          - generic [ref=f1e197]: Try searching for different keywords or clear filters
+    - generic [ref=f1e219]:
+      - generic [ref=f1e220]:
+        - generic [ref=f1e221]: Eco Impact
+        - generic [ref=f1e222]: Your sustainability profile
+      - generic [ref=f1e226]:
+        - generic [ref=f1e227]: Tanvir Ahmed
+        - generic [ref=f1e228]: "@tanvir_haat"
+        - generic [ref=f1e229]: Dhaka • Verified Trader
+        - generic [ref=f1e230]: Passionate about restoring old furniture and growing urban gardens. Always happy to trade seeds or advice!
+        - generic [ref=f1e231]:
+          - generic [ref=f1e232]: 
+          - generic [ref=f1e233]: 4.9 rating
+      - generic [ref=f1e234]:
+        - generic [ref=f1e235]:
+          - generic [ref=f1e236]: 
+          - generic [ref=f1e237]: "340"
+          - generic [ref=f1e238]: Eco Points
+        - generic [ref=f1e239]:
+          - generic [ref=f1e240]: 
+          - generic [ref=f1e241]: "18"
+          - generic [ref=f1e242]: Trades
+        - generic [ref=f1e243]:
+          - generic [ref=f1e244]: 
+          - generic [ref=f1e245]: "0"
+          - generic [ref=f1e246]: Saved
+      - generic [ref=f1e247]:
+        - generic [ref=f1e248]: Community Haat Impact
+        - generic [ref=f1e249]: 🌱 You helped divert ~34 kg of CO₂ from landfills by trading instead of buying new.
+      - generic [ref=f1e252]:
+        - generic [ref=f1e253]: Account
+        - generic [ref=f1e254] [cursor=pointer]:
+          - generic [ref=f1e255]: 
+          - generic [ref=f1e256]: Edit Profile
+          - generic [ref=f1e257]: 
+        - generic [ref=f1e258] [cursor=pointer]:
+          - generic [ref=f1e259]: 
+          - generic [ref=f1e260]: Notifications
+          - generic [ref=f1e261]: 
+        - generic [ref=f1e262] [cursor=pointer]:
+          - generic [ref=f1e263]: 
+          - generic [ref=f1e264]: Trust & Safety
+          - generic [ref=f1e265]: 
+        - generic [ref=f1e266] [cursor=pointer]:
+          - generic [ref=f1e267]: 
+          - generic [ref=f1e268]: Help & Support
+          - generic [ref=f1e269]: 
+        - generic [ref=f1e270] [cursor=pointer]:
+          - generic [ref=f1e271]: 
+          - generic [ref=f1e272]: Sign In
+          - generic [ref=f1e273]: 
+  - tablist [ref=f1e82]:
+    - tab "  Home" [ref=f1e198] [cursor=pointer]:
+      - generic [ref=f1e85]:
+        - generic [ref=f1e86]: 
+        - generic [ref=f1e87]: 
+      - generic [ref=f1e88]: Home
+    - tab "  Discover" [ref=f1e201] [cursor=pointer]:
+      - generic [ref=f1e91]:
+        - generic [ref=f1e92]: 
+        - generic [ref=f1e93]: 
+      - generic [ref=f1e94]: Discover
+    - tab " " [ref=f1e204] [cursor=pointer]:
+      - generic [ref=f1e97]:
+        - generic [ref=f1e98]: 
+        - generic [ref=f1e100]: 
+    - tab "  Chats" [ref=f1e207] [cursor=pointer]:
+      - generic [ref=f1e104]:
+        - generic [ref=f1e105]: 
+        - generic [ref=f1e106]: 
+      - generic [ref=f1e107]: Chats
+    - tab "  Profile" [active] [selected] [ref=f1e210] [cursor=pointer]:
+      - generic [ref=f1e110]:
+        - generic [ref=f1e111]: 
+        - generic [ref=f1e112]: 
+      - generic [ref=f1e113]: Profile

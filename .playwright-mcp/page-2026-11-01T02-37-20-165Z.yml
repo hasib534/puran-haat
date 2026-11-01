@@ -1,0 +1,19 @@
+- generic [ref=f11e1]:
+  - generic [ref=f11e160]:
+    - generic [ref=f11e161]:
+      - generic [ref=f11e162] [cursor=pointer]: 
+      - generic [ref=f11e164]: Create Account
+    - generic [ref=f11e165]:
+      - generic [ref=f11e166]:
+        - generic [ref=f11e167]: Email
+        - textbox "you@example.com" [ref=f11e168]
+      - generic [ref=f11e169]:
+        - generic [ref=f11e170]: Password
+        - textbox "At least 6 characters" [ref=f11e171]
+      - generic [ref=f11e174] [cursor=pointer]: Sign Up
+      - generic [ref=f11e176]: OR
+      - generic [ref=f11e180] [cursor=pointer]:
+        - generic [ref=f11e181]: 
+        - generic [ref=f11e182]: Continue with Google
+      - generic [active] [ref=f11e183] [cursor=pointer]: Already have an account? Sign in
+  - iframe [aria-hidden] [ref=f11e154]

@@ -1,0 +1,40 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - generic [aria-hidden] [ref=f2e6]:
+        - generic [ref=f2e7]: Loading
+        - progressbar [aria-hidden] [ref=f2e8]
+      - main [ref=f2e15]:
+        - generic [ref=f2e16]:
+          - generic [ref=f2e17]: Sign in with Google
+          - generic [ref=f2e23]:
+            - heading "Sign in" [level=1] [ref=f2e24]
+            - generic [ref=f2e26]:
+              - text: to continue to
+              - button "puran-haat-app.firebaseapp.com" [ref=f2e27] [cursor=pointer]
+        - generic [ref=f2e35]:
+          - generic [ref=f2e40]:
+            - textbox "Email or phone" [active] [ref=f2e41]
+            - generic [aria-hidden]: Email or phone
+          - button "Forgot email?" [ref=f2e45] [cursor=pointer]
+        - generic [ref=f2e47]:
+          - button "Next" [ref=f2e51]
+          - button "Create account" [ref=f2e59]
+    - contentinfo [ref=f2e66]:
+      - combobox "Change language English (United States)" [ref=f2e70] [cursor=pointer]:
+        - generic [aria-hidden]:
+          - generic: English (United States)
+      - list [ref=f2e72]:
+        - listitem [ref=f2e73]:
+          - link "Open Google Account Help Center (external, opens in a new window)" [ref=f2e74] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+            - text: Help
+        - listitem [ref=f2e75]:
+          - link "Privacy Policy (external, opens in a new window)" [ref=f2e76] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=BD&hl=en-US&privacy=true
+            - text: Privacy
+        - listitem [ref=f2e77]:
+          - link "Google Terms of Service (external, opens in a new window)" [ref=f2e78] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=BD&hl=en-US
+            - text: Terms
+  - iframe [ref=f2e79]

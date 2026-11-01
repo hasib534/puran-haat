@@ -1,0 +1,340 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EcoTrade - User Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#bdcabe",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-surface-variant": "#42493e",
+                        "on-primary-container": "#9dd090",
+                        "on-tertiary-container": "#ffb09b",
+                        "secondary-fixed": "#d9e6da",
+                        "on-secondary-container": "#5b675e",
+                        "surface": "#fdfae7",
+                        "tertiary": "#6a210d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "on-primary": "#ffffff",
+                        "outline": "#72796e",
+                        "inverse-on-surface": "#f4f1de",
+                        "surface-dim": "#dddbc8",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#002201",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e6e3d0",
+                        "primary": "#154212",
+                        "primary-container": "#2d5a27",
+                        "surface-container-highest": "#e6e3d0",
+                        "primary-fixed": "#bcf0ae",
+                        "secondary": "#556158",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "surface-tint": "#3b6934",
+                        "inverse-surface": "#313124",
+                        "on-surface": "#1c1c11",
+                        "on-background": "#1c1c11",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface-container": "#f1eedb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#ece9d6",
+                        "tertiary-container": "#883721",
+                        "surface-container-low": "#f7f4e1",
+                        "primary-fixed-dim": "#a1d494",
+                        "outline-variant": "#c2c9bb",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "background": "#fdfae7",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#a1d494",
+                        "secondary-container": "#d9e6da",
+                        "surface-bright": "#fdfae7",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdbd2",
+                        "on-secondary-fixed": "#131e17"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin": "20px",
+                        "lg": "32px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "xl": "48px",
+                        "md": "24px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "display-lg": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32 pb-xl">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface-dim shadow-sm dark:shadow-none z-40">
+<div class="flex items-center justify-between px-margin py-base w-full">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary dark:text-primary-fixed">EcoTrade</h1>
+<button class="w-10 h-10 rounded-full overflow-hidden hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 border-2 border-transparent hover:border-primary-container">
+<img alt="User Profile Picture" class="w-full h-full object-cover" data-alt="A close-up portrait of a friendly young adult outdoors, smiling naturally. Warm, natural sunlight filters through green tree leaves, casting soft, dappled shadows. The aesthetic is organic, approachable, and high-quality, fitting a modern community app profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZtcLp7fRUKTK36ZzchsC2YxjLLoaVJFgdSSrHhlV-xqlD5-MaB5WWfcInf9IzkW0Hkt7_ileX2HsA8tpKzIufn81jy3KoLDr7ogRKuTBKavOdYur4h3KEPFoA8XtyHusAzWh_rromvdfVJRfeOPoZEivWifZEcUSmci5YsPN1Uywk3rjgLaTUHqCQ_pcok6K5V377SlaSgOZUpUFTwQXQAhOuRrZtBarS-melWiuwh2pVCgqMBx8_">
+</button>
+</div>
+</header>
+<main class="px-margin py-md space-y-lg max-w-4xl mx-auto">
+<!-- Profile Header -->
+<section class="flex flex-col items-center text-center space-y-sm relative">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-surface shadow-lg mb-2 relative z-10">
+<img alt="Sarah Jenkins" class="w-full h-full object-cover" data-alt="A close-up portrait of a friendly young adult outdoors, smiling naturally. Warm, natural sunlight filters through green tree leaves, casting soft, dappled shadows. The aesthetic is organic, approachable, and high-quality, fitting a modern community app profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt7EJBgHrVEWAGJJ2XcihABYkt0XpEh5_mYeiy1bn3dE742vg07QUgeZaOWybuJ0ma6fhQisvX-H3SZUK247LdLEj5Omb-5sx6CYuEqvlmsZYVZpgGIod_WhLnUOAjc7gbJ9WkH6eZDgKe4sdjbC1Yv9kzKXyw-Aw8zs759q0TFm_okDXbjoxwobkIp4do7bPESsh7h4Li9KnsILNZ1YMCa4sOI23INf_FwUdQN_rYVF8G9nUxAd2c">
+</div>
+<div>
+<div class="flex items-center justify-center gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Sarah Jenkins</h2>
+<div class="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'wght' 700;">check_circle</span>
+<span class="font-label-md text-[10px] uppercase tracking-wider">Verified</span>
+</div>
+</div>
+<div class="flex items-center justify-center space-x-1 text-on-surface-variant mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="font-body-sm text-body-sm">Portland, OR</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto">Avid gardener, vintage clothing enthusiast, and believer in the circular economy.</p>
+<div class="flex gap-4 mt-4">
+<button class="bg-tertiary text-on-tertiary font-label-md text-label-md px-6 py-3 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">edit</span> Edit Profile
+                </button>
+</div>
+</section>
+<!-- Sustainability Impact Dashboard (Bento Grid) -->
+<section class="space-y-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sustainability Impact</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Large Featured Impact -->
+<div class="col-span-2 row-span-2 bg-surface-container rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-[0_4px_24px_rgba(21,66,18,0.04)]">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div>
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined">recycling</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Landfill Diverted</span>
+</div>
+<h4 class="font-display-lg text-display-lg text-on-surface mt-2">12 <span class="font-headline-sm text-headline-sm text-on-surface-variant font-normal">items</span></h4>
+</div>
+<!-- Circular Progress/Graphic -->
+<div class="mt-8 flex justify-center items-center">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+<circle class="text-surface-variant" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary transition-all duration-1000 ease-out" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="283" stroke-dashoffset="100" stroke-width="8" style="stroke-dashoffset: 150;"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-primary text-3xl">eco</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Smaller Bento Cards -->
+<div class="bg-surface-container rounded-2xl p-4 shadow-[0_4px_24px_rgba(21,66,18,0.04)] flex flex-col justify-between">
+<div class="flex items-center gap-2 text-primary-container mb-4">
+<span class="material-symbols-outlined text-[20px]">co2</span>
+<span class="font-label-md text-label-md">CO2 Offset</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-on-surface">45<span class="text-sm font-normal text-on-surface-variant ml-1">kg</span></div>
+<div class="w-full bg-surface-variant h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary-container h-full w-[65%] rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container rounded-2xl p-4 shadow-[0_4px_24px_rgba(21,66,18,0.04)] flex flex-col justify-between">
+<div class="flex items-center gap-2 text-tertiary mb-4">
+<span class="material-symbols-outlined text-[20px]">volunteer_activism</span>
+<span class="font-label-md text-label-md">Swaps</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-on-surface">8</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Total completed</p>
+</div>
+</div>
+<div class="col-span-2 md:col-span-2 bg-primary text-on-primary rounded-2xl p-5 shadow-lg relative overflow-hidden flex items-center justify-between">
+<div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+<div class="relative z-10">
+<h4 class="font-headline-sm text-headline-sm">Top Contributor</h4>
+<p class="font-body-sm text-body-sm text-primary-fixed-dim mt-1">Top 5% in your neighborhood</p>
+</div>
+<span class="material-symbols-outlined text-4xl text-primary-fixed relative z-10">workspace_premium</span>
+</div>
+</div>
+</section>
+<!-- Active Items -->
+<section class="space-y-sm mt-md">
+<div class="flex justify-between items-end mb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Active Listings</h3>
+<button class="font-label-md text-label-md text-primary hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<!-- Item Card 1 -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(21,66,18,0.05)] flex flex-col group">
+<div class="h-32 w-full relative overflow-hidden bg-surface-variant">
+<img alt="Ceramic Planter" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A clean, minimalist shot of a vintage ceramic planter pot sitting on a light wooden table. The lighting is soft and natural, casting a gentle shadow. The style is modern, catalog-like, and appealing for a marketplace listing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkzRkiMHRzpJKdSxLc56cqXA-krcTCbKj7dOi1_qypO_CR39k_SXxLytJqGEni4gGeOg67oJglWGNu2IS1lXFzycYVCTFuiwlY-CV3j3x63yG18ljZq1Ga4OH19zFNoXmKKkrS4SgqoD3N5yfsaeiIVUSq8SA1ckZFkq9uhtlOVMHg8fN1Ey_3POxQb6yy7sqw6eaQOg2uLkHnlMSO4gATCjdrKF1MZxf_YWF-6nJE-OWnbQhg_QXT">
+<div class="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-primary">Garden</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h4 class="font-body-md text-body-md text-on-surface font-medium truncate">Vintage Ceramic Planter</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 mb-3">Excellent condition, rarely used.</p>
+<div class="mt-auto flex gap-2">
+<button class="flex-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md py-2 rounded-lg hover:bg-surface-variant transition-colors">Edit</button>
+</div>
+</div>
+</div>
+<!-- Item Card 2 -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(21,66,18,0.05)] flex flex-col group">
+<div class="h-32 w-full relative overflow-hidden bg-surface-variant">
+<img alt="Knit Sweaters" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A close-up of a neatly folded stack of colorful, slightly worn but high-quality knit sweaters on a light background. Soft, diffused lighting creates a cozy and sustainable aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm7Xk5Lhh2tiqGXBzBmtcUmUO26-TcVeDU9SR-33E8XbG3HwT8bFwjhYg8OnEzubP7nO2gWxzpgKYMYe3eZ8oV8w8Ph3FakbsTKS3j-kFkZCpE0wlJ8v77htJIY9KFEsgqc9Scv_n-GjUluowkPSslOV_P8VgZFxNfXjbyGFUXS-IRMAnpfm154mStnA782GYuFsZ0sLuKnopZmdOXfyKI55HDC8ybIhrQoNiKTUF4cP4Y3O_TlhXq">
+<div class="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-primary">Clothing</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h4 class="font-body-md text-body-md text-on-surface font-medium truncate">Hand-Knit Sweater Bundle</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 mb-3">Size M, wool blend.</p>
+<div class="mt-auto flex gap-2">
+<button class="flex-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md py-2 rounded-lg hover:bg-surface-variant transition-colors">Edit</button>
+</div>
+</div>
+</div>
+<!-- Add New Item Area -->
+<button class="border-2 border-dashed border-outline-variant rounded-2xl flex flex-col items-center justify-center p-6 text-on-surface-variant hover:bg-surface-variant/50 hover:border-primary/50 transition-colors group min-h-[220px]">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-3 group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined text-2xl">add</span>
+</div>
+<span class="font-body-md text-body-md font-medium">List New Item</span>
+</button>
+</div>
+</section>
+<!-- Recently Swapped -->
+<section class="space-y-sm mt-md border-t border-outline-variant/20 pt-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recently Swapped</h3>
+<div class="space-y-3">
+<!-- History Item 1 -->
+<div class="flex items-center p-3 rounded-xl hover:bg-surface-container transition-colors">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-variant shrink-0 mr-4">
+<img alt="Desk Lamp" class="w-full h-full object-cover" data-alt="A small, modern desk lamp on a clean surface. Minimalist design, neutral colors, well-lit to look attractive for a trade history log." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcTgyKJfR2DQZj8hr3ys0PVwtlRrYx7C1HJSyYjAbv98klvq4LGwyAWX0QpeTXkLs_LG7RUyYojVKZK6pdaEkcME1CGrIY5_qnCZignBtrJulIpeDALuUM5zKedus5M024qM5FHrlsPZaLgD1xWWGok4rfV4dHTGmodVh81jpitgHvnJrtavY3jO-fofl7nUCl5-eWYZf3xMwr88W3MA04ZhUdMKCCAcQWp2GZfMlyfFFXGlIkDooy">
+</div>
+<div class="flex-1">
+<h4 class="font-body-md text-body-md text-on-surface font-medium">Modern Desk Lamp</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Traded with @mark_t</p>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md text-primary bg-primary-container/20 px-2 py-1 rounded-full">Completed</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">2 days ago</p>
+</div>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/20 ml-[72px]"></div>
+<!-- History Item 2 -->
+<div class="flex items-center p-3 rounded-xl hover:bg-surface-container transition-colors">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-variant shrink-0 mr-4">
+<img alt="Books" class="w-full h-full object-cover" data-alt="A stack of hardcover books with beautiful bindings, resting on a wooden shelf. Warm library lighting. Invokes a sense of sharing knowledge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKiJ7TXEEfI4UbvLHVw1THfz48bavtWuuE8zJlZDHwv3-hO_ECA7S6i8NndIR3N6GtGmRuojOR8wm0FlHMu_MmH8eafxB9XLXLCk_LSanNZidpv63WdhoD_WEI5zcJooh4O66jkY3cLMBT8KecwWaegzo-71JvfAxAuzXaZXLlOmev8swMD1p3zWbl1-q_neePr9PWYQ3sC8bc0fatE5J8mSMEWsNeFQkDP9xRABi1bJpkWqhIFzcP">
+</div>
+<div class="flex-1">
+<h4 class="font-body-md text-body-md text-on-surface font-medium">Sci-Fi Book Collection</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Traded with @jessica88</p>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md text-primary bg-primary-container/20 px-2 py-1 rounded-full">Completed</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">1 week ago</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl bg-surface-container dark:bg-surface-container-highest shadow-[0_-4px_12px_rgba(21,66,18,0.06)] z-50 flex justify-around items-center px-4 pt-2 pb-6">
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-md text-label-md mt-1">Search</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined text-3xl" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md mt-1">Trade</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="font-label-md text-label-md mt-1">Chat</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1.5 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</button>
+</nav>
+<!-- Desktop Sidebar/Nav (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-surface-container flex-col border-r border-outline-variant/20 p-6 z-30 pt-24">
+<div class="space-y-4 flex-1">
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-body-md font-medium">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-body-md font-medium">Search</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full bg-primary-container text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-body-md font-medium">Profile</span>
+</a>
+</div>
+</nav>
+<script>
+        // Micro-interaction for circular progress
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const circle = document.querySelector('circle.text-primary');
+                if(circle) {
+                    // Dash offset calculated based on the arbitrary number '12' relative to a goal
+                    circle.style.strokeDashoffset = '150'; 
+                }
+            }, 300);
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade - Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#c2c9bb",
+                      "on-surface": "#1c1c11",
+                      "outline": "#72796e",
+                      "on-primary-fixed-variant": "#23501e",
+                      "secondary-fixed": "#d9e6da",
+                      "background": "#fdfae7",
+                      "error-container": "#ffdad6",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#3b6934",
+                      "surface-container-lowest": "#ffffff",
+                      "error": "#ba1a1a",
+                      "primary": "#154212",
+                      "surface-bright": "#fdfae7",
+                      "inverse-on-surface": "#f4f1de",
+                      "on-error": "#ffffff",
+                      "inverse-primary": "#a1d494",
+                      "tertiary-fixed-dim": "#ffb4a1",
+                      "surface-variant": "#e6e3d0",
+                      "tertiary-fixed": "#ffdbd2",
+                      "on-primary-container": "#9dd090",
+                      "inverse-surface": "#313124",
+                      "primary-container": "#2d5a27",
+                      "on-primary": "#ffffff",
+                      "surface-dim": "#dddbc8",
+                      "on-tertiary-container": "#ffb09b",
+                      "secondary": "#556158",
+                      "surface-container": "#f1eedb",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#131e17",
+                      "tertiary-container": "#883721",
+                      "on-background": "#1c1c11",
+                      "on-primary-fixed": "#002201",
+                      "secondary-fixed-dim": "#bdcabe",
+                      "surface-container-high": "#ece9d6",
+                      "on-surface-variant": "#42493e",
+                      "on-tertiary-fixed": "#3c0800",
+                      "on-tertiary-fixed-variant": "#7c2e19",
+                      "on-secondary-fixed-variant": "#3e4a41",
+                      "surface-container-low": "#f7f4e1",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#bcf0ae",
+                      "on-secondary-container": "#5b675e",
+                      "tertiary": "#6a210d",
+                      "surface": "#fdfae7",
+                      "secondary-container": "#d9e6da",
+                      "surface-container-highest": "#e6e3d0",
+                      "primary-fixed-dim": "#a1d494"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "margin": "20px",
+                      "md": "24px",
+                      "xs": "8px",
+                      "base": "4px",
+                      "sm": "16px",
+                      "xl": "48px",
+                      "lg": "32px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Outfit"
+                      ],
+                      "display-lg": [
+                              "Outfit"
+                      ],
+                      "body-sm": [
+                              "Outfit"
+                      ],
+                      "label-md": [
+                              "Outfit"
+                      ],
+                      "body-md": [
+                              "Outfit"
+                      ],
+                      "body-lg": [
+                              "Outfit"
+                      ],
+                      "display-lg-mobile": [
+                              "Outfit"
+                      ],
+                      "headline-sm": [
+                              "Outfit"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface text-primary font-headline-sm-mobile md:text-headline-sm docked full-width top-0 bg-surface flex justify-between items-center w-full px-margin py-base z-50 sticky top-0 md:hidden">
+<button class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+<div class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">EcoTrade</div>
+<button class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Desktop Nav -->
+<header class="hidden md:flex bg-surface text-primary font-headline-sm docked full-width top-0 bg-surface flex justify-between items-center w-full px-margin py-base z-50 sticky top-0 shadow-sm">
+<div class="font-display-lg text-display-lg text-primary tracking-tight flex items-center gap-2">
+            EcoTrade
+        </div>
+<nav class="flex gap-8">
+<a class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out px-4 py-2 rounded-full" href="#">Home</a>
+<a class="text-primary hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out px-4 py-2 rounded-full font-bold bg-primary-container/20" href="#">Search</a>
+<a class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out px-4 py-2 rounded-full" href="#">Trade</a>
+<a class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out px-4 py-2 rounded-full" href="#">Chat</a>
+<a class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out px-4 py-2 rounded-full" href="#">Profile</a>
+</nav>
+<div class="flex gap-4">
+<button class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+<button class="text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-150 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col px-margin py-md md:pb-xl pb-24 md:max-w-4xl md:mx-auto w-full gap-lg">
+<!-- Search Bar Section -->
+<section class="flex flex-col gap-sm">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary">Discover</h1>
+<div class="flex items-center bg-secondary-container/40 rounded-full px-4 py-2 shadow-[0_2px_8px_rgba(21,66,18,0.05)] border border-primary/10">
+<span class="material-symbols-outlined text-outline mr-2" data-icon="search">search</span>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-on-surface font-body-md placeholder:text-outline-variant outline-none" placeholder="Search items to exchange..." type="text"/>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/50 mx-2"></div>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+</section>
+<!-- Recent Searches Section -->
+<section class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-sm-mobile md:font-headline-sm text-headline-sm-mobile md:text-headline-sm text-on-surface">Recent Searches</h2>
+<button class="font-label-md text-label-md text-primary tracking-wide">CLEAR ALL</button>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1 bg-surface-container rounded-full px-3 py-1.5 shadow-sm border border-primary/5">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="history">history</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Vintage chair</span>
+<button class="hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[16px]" data-icon="close">close</span></button>
+</div>
+<div class="flex items-center gap-1 bg-surface-container rounded-full px-3 py-1.5 shadow-sm border border-primary/5">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="history">history</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Plant seeds</span>
+<button class="hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[16px]" data-icon="close">close</span></button>
+</div>
+<div class="flex items-center gap-1 bg-surface-container rounded-full px-3 py-1.5 shadow-sm border border-primary/5">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="history">history</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Books</span>
+<button class="hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[16px]" data-icon="close">close</span></button>
+</div>
+</div>
+</section>
+<!-- Browse Categories -->
+<section class="flex flex-col gap-sm">
+<h2 class="font-headline-sm-mobile md:font-headline-sm text-headline-sm-mobile md:text-headline-sm text-on-surface">Browse Categories</h2>
+<div class="grid grid-cols-3 md:grid-cols-6 gap-sm">
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="chair">chair</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Furniture</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="local_florist">local_florist</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Garden</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Books</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Kitchenware</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="devices">devices</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Electronics</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(21,66,18,0.03)] border border-primary/5 hover:shadow-[0_8px_16px_rgba(21,66,18,0.06)] hover:-translate-y-1 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="checkroom">checkroom</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Clothing</span>
+</div>
+</div>
+</section>
+<!-- Trending Near You Section -->
+<section class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-sm-mobile md:font-headline-sm text-headline-sm-mobile md:text-headline-sm text-on-surface">Trending Near You</h2>
+<button class="font-label-md text-label-md text-primary tracking-wide">SEE ALL</button>
+</div>
+<div class="flex overflow-x-auto gap-sm pb-4 snap-x snap-mandatory hide-scrollbar -mx-margin px-margin">
+<!-- Item Card 1 -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(21,66,18,0.04)] border border-primary/5 snap-center flex flex-col">
+<div class="h-40 bg-surface-variant relative">
+<img class="w-full h-full object-cover" data-alt="A warm, brightly lit photograph of a perfectly restored mid-century modern wooden armchair sitting in a sunlit living room with potted plants in the background. The aesthetic is clean, sustainable modernism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKKW-dyr5FDR6ucOrhFM6FWbAcExI6p-FZpZ5YvUHR90mL72JztfJ_pmJWrQxJsDzJqUi7KkmpjBMODiSf5vtWiRr2cnMOM3cFxRBRAuv5vy6Iq1hXbMWm1wfllZ1hsMwGdchTb67Nj5-dqSxpZ2lKLok3HWcOoN-hbdDeIh85xFEWiQkmYkEdRm3XxPBv8_vmPzKPRTLOAqsbsYvY4_YP6u7mIXbziGotm1i5m6ULPp1_6pSbNBlF"/>
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full p-1.5 shadow-sm text-on-surface-variant hover:text-tertiary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold truncate pr-2">Mid-Century Armchair</h3>
+<div class="flex items-center gap-1 bg-primary-container/20 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-primary text-[14px]" data-icon="verified">verified</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                            1.2 miles away
+                        </p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a smiling woman with glasses, softly lit against a blurred green background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNGBT_EaEXRv1sAoEi4jDeHgP-puByJyUhkdddX9HrlhLE5737FTz0jK8F5poBrIryNQKR3E61qcoilUyy125hhsbWGoQAXSUvmLEHud5-o6RRYbxaEc0lZWZpYASb7ks9AEN0I-ld43-yUiCjdq4vMugUq3pDzuoHOu6WlxZDrLwgkYcM18pmT_ts0iYhcGWkeazaO5MKCazeeDrBcmXu-ZWc7OBdDf5o3SUkSefL0FinT9rXPW8C"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Sarah J.</span>
+<div class="flex items-center text-tertiary text-sm ml-auto">
+<span class="material-symbols-outlined text-[14px] fill-current" data-icon="star" data-weight="fill">star</span>
+<span class="font-label-md ml-0.5">4.9</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item Card 2 -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(21,66,18,0.04)] border border-primary/5 snap-center flex flex-col">
+<div class="h-40 bg-surface-variant relative">
+<img class="w-full h-full object-cover" data-alt="A macro shot of vibrant green succulent plants in a collection of small, handmade terracotta pots arranged neatly on a wooden shelf in natural daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCS2Bem802c0Jd7NjKRAme7ffHj6Xam1AT7B2wcro9CdnQqMlvV19D4TDaGymeefA7PVbXUFMSyxBZUH40G3McMqFj2gFCDyA_3qVf1_tsc9tNn1vPnFQYdOblKbyqC8DN8OL358ANQ0bhAZEpGsZgcl7aWsuGwIr9qn0xyy0llkfmoX7fDHbvLl8uGiQ279MDIUdDuft24leiDVbdwkiBQkKI8mwr2TOXGwAv2vMFtjozOdJnsE9w"/>
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full p-1.5 shadow-sm text-on-surface-variant hover:text-tertiary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold truncate pr-2">Succulent Collection</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                            0.8 miles away
+                        </p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young man wearing a beanie, smiling softly in a well-lit cafe setting with a subtle depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqxgWxZNsCB8kcQ2mXKPAdn2sU4VJMVGKpM0nUMMwOcd9x1d1Mwm_0QWQKxuXDsVjd9IjSM6viXElN6IjgTN88e2271n-4dhvxwTtY4IuDnCs30AtMzLUr2T_FkjPl9avoVavPMseeEFicYrScoWTrL2ZDPve8bXl3KwZuDG5SveQpJ80qq8KMZAypOvEgy8qMiotUpRGor_ArREHEYXzB9vmvQnJKX-4L6qs7guz4D3gOqkA97-tK"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Mark D.</span>
+<div class="flex items-center text-tertiary text-sm ml-auto">
+<span class="material-symbols-outlined text-[14px] fill-current" data-icon="star" data-weight="fill">star</span>
+<span class="font-label-md ml-0.5">5.0</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item Card 3 -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(21,66,18,0.04)] border border-primary/5 snap-center flex flex-col">
+<div class="h-40 bg-surface-variant relative">
+<img class="w-full h-full object-cover" data-alt="A sleek, modern espresso machine resting on a minimalist clean white kitchen counter. Natural morning light casts soft shadows over the polished metal details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALPBGCfOQNJN413HUgzYs59tFFRhmr-Y4aRP7RpB6V4HJUrHz61RsIwHzACWmAbkqYnJ_b_0pQoFXc94w_tQOK321jrrzGcu7cq9VyX4pP5jUiIG1n5bTZqhXXWUWTl_7U235E2wA4oicGPl6Q3zuL4b0XO_jPifg2eS2zhoEtBu2i9Tzp3Zj0HIM8kzeCN0ma2i7_qAZqfXpdfVd8dV5uNc52srsvw9LUGNZJ3Z8ZnwhKUcwkUTNa"/>
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full p-1.5 shadow-sm text-on-surface-variant hover:text-tertiary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<div class="p-sm flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold truncate pr-2">Espresso Machine</h3>
+<div class="flex items-center gap-1 bg-primary-container/20 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-primary text-[14px]" data-icon="verified">verified</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                            2.5 miles away
+                        </p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A warm portrait photo of an older woman with silver hair smiling gently, illuminated by natural afternoon light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsqeAYlHurJ6p_nOPwHQO007r2un6r83C51tC5HhVUw-_iL9_Mz7bZSSIFch9-g1DKBGuifSGb1MXwR_bgMPxbPKkwQtaiiIlhVRuhTKH38hR9O4dPEIk1yEGG3OLyHe7kr8wadkQHOIKK9cF3IT7lOJuuziXdpK2-QL2y9VNtblJBevuxGeL2F1WPwUyBthboX6isWBageQuSn8EQuN464J10yrB1ODSfNAD9NwMdNfZ_DF-vBD_x"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Elena R.</span>
+<div class="flex items-center text-tertiary text-sm ml-auto">
+<span class="material-symbols-outlined text-[14px] fill-current" data-icon="star" data-weight="fill">star</span>
+<span class="font-label-md ml-0.5">4.8</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface-container font-label-md text-label-md font-headline-md text-headline-md text-primary docked full-width bottom-0 rounded-t-xl bg-surface-container shadow-[0_-4px_12px_rgba(21,66,18,0.05)] shadow-md fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-surface-container/95 backdrop-blur-md">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="mt-1">Home</span>
+</a>
+<!-- Search (ACTIVE) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1.5 transition-all duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="search" data-weight="fill">search</span>
+<span class="mt-1">Search</span>
+</a>
+<!-- Trade -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="swap_horiz">swap_horiz</span>
+<span class="mt-1">Trade</span>
+</a>
+<!-- Chat -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="mt-1">Chat</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="mt-1">Profile</span>
+</a>
+</nav>
+<style>
+        /* Hide scrollbar for horizontal scroll areas but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

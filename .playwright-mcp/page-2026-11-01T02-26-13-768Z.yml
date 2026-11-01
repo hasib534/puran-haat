@@ -1,0 +1,17 @@
+- generic [ref=f8e201]:
+  - generic [ref=f8e202]:
+    - generic [ref=f8e203] [cursor=pointer]: 
+    - generic [ref=f8e205]: Create Account
+  - generic [ref=f8e206]:
+    - generic [ref=f8e207]:
+      - generic [ref=f8e208]: Email
+      - textbox "you@example.com" [ref=f8e209]: puranhaat.ui.1793499969484@example.com
+    - generic [ref=f8e210]:
+      - generic [ref=f8e211]: Password
+      - textbox "At least 6 characters" [ref=f8e212]: PuranHaat123!
+    - progressbar [ref=f8e226]
+    - generic [ref=f8e217]: OR
+    - generic:
+      - generic [ref=f8e222]: 
+      - generic [ref=f8e223]: Continue with Google
+    - generic [ref=f8e224] [cursor=pointer]: Already have an account? Sign in

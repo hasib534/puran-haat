@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade - Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface": "#fdfae7",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f4f1de",
+                        "on-tertiary-fixed": "#3c0800",
+                        "background": "#fdfae7",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#6a210d",
+                        "secondary-fixed": "#d9e6da",
+                        "secondary": "#556158",
+                        "surface-container-high": "#ece9d6",
+                        "on-primary-fixed": "#002201",
+                        "on-primary-container": "#9dd090",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-bright": "#fdfae7",
+                        "surface-container": "#f1eedb",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#d9e6da",
+                        "tertiary-container": "#883721",
+                        "on-surface-variant": "#42493e",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#5b675e",
+                        "primary": "#154212",
+                        "outline-variant": "#c2c9bb",
+                        "surface-container-highest": "#e6e3d0",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "outline": "#72796e",
+                        "on-secondary-fixed": "#131e17",
+                        "primary-container": "#2d5a27",
+                        "on-surface": "#1c1c11",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-dim": "#dddbc8",
+                        "surface-variant": "#e6e3d0",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f7f4e1",
+                        "inverse-primary": "#a1d494",
+                        "primary-fixed": "#bcf0ae",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1d494",
+                        "tertiary-fixed": "#ffdbd2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3b6934",
+                        "inverse-surface": "#313124",
+                        "on-background": "#1c1c11"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "sm": "16px",
+                        "md": "24px",
+                        "lg": "32px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xl": "48px",
+                        "margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-sm": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface shadow-sm z-40 flex items-center justify-between px-margin py-base">
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="A small, circular profile portrait of a smiling woman in her 30s with short curly dark hair, wearing a casual light green sweater, set against a soft, bright, slightly blurred urban background. The image has a clean, approachable, natural lighting aesthetic fitting a community platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYUEIkJQpCFi__EwNGLxooLxLg-yegwSOOdOrAr9MsLRe7uCgG6J5sm1lI2h5Zh9kBKQ44tfMT5DNppZ2pyy8x8GEPHhHDMH0fXLvV7u8zkeEzOcUFgkInDN1kAiv7U3jgQDL4w-m2deRww2fcIbagyRoLo4Iqo3vd-bQCuK-D6ATQBHFqnoWjGZN8n02bXeLQDlxdfQbGzkKchaq_Gy3N2ynPxHqb8D2c0vFg_0WtSrwZkIxMvqCD"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm-mobile text-headline-sm-mobile text-on-surface font-semibold">Sarah M.</span>
+<span class="font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+                        4.9 (12 trades)
+                    </span>
+</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Item Context Bar -->
+<div class="bg-surface-container px-margin py-sm flex items-center justify-between border-b border-outline-variant/30 sticky top-[64px] z-30">
+<div class="flex items-center gap-sm">
+<img class="w-12 h-12 rounded-md object-cover shadow-sm" data-alt="A close-up photograph of a vintage, well-maintained manual coffee grinder with a dark wooden body and a tarnished brass crank handle, sitting on a clean, light-colored wooden table bathed in soft, natural morning sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnqf1zvStEp0ohveAEu-lmwhXzF9P4YsgCngn3MsOKnHtNsVO1vunIIaB3OT3xjySKukIrFpICcTGYuD88ijhPaFm-5siBvu0QQVYMKve3asL-BVgpX29YjniBNnQPVjz1QGJfF9TWPUqpo2svi2Ty8HfQmsqaIB2QO4FTidN9BtLJ9hkF_FSWlMcAASIG9lwvexJsfWq1F5OvToNSilwjQ00QaDBUe4LGaL9nWscPlCG33Iuaq8ru"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium uppercase tracking-wide">Proposed Trade</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">Vintage Coffee Grinder</span>
+</div>
+</div>
+<button class="bg-surface text-primary border border-primary px-3 py-1.5 rounded-full font-label-md text-label-md shadow-sm hover:bg-primary/5 transition-colors">
+            View Details
+        </button>
+</div>
+<!-- Chat Canvas -->
+<main class="flex-1 flex flex-col p-margin gap-md overflow-y-auto pb-[100px]">
+<!-- Date Divider -->
+<div class="flex items-center justify-center my-2">
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md">Today</span>
+</div>
+<!-- Received Message -->
+<div class="flex gap-3 max-w-[85%] self-start">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-auto" data-alt="A small, circular profile portrait of a smiling woman in her 30s with short curly dark hair, wearing a casual light green sweater, set against a soft, bright, slightly blurred urban background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlDhLnUWrBflZI00GgaDlBS_qHNZ3Tzm4k-hg28ofOSNzfN-kBge55tTqQROlz9dVY65rx802QlWbgXBp0MXSmyGHZ6Ui4kMlA_gnuMyLKhpUFSarnQnQjYfXHCuYm4-AJISCjzyDpV8YU04SrB4zElhjOfTSHdNM_9_dz-vHaW3mxsdHBSNHDAEqYs-3rQH-A0P92IAHlcpomN0BxPSlBe7JMr4WJIfumIUoZJGxISTMYgADvbVoe"/>
+<div class="flex flex-col gap-1">
+<div class="bg-surface-container text-on-surface p-sm rounded-2xl rounded-bl-sm shadow-sm relative">
+<p class="font-body-md text-body-md">Hi Marcus! Thanks for reaching out. Yes, the coffee grinder is still available. I'm really looking for some good quality terracotta pots for my balcony garden in exchange.</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant ml-2">10:42 AM</span>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex gap-3 max-w-[85%] self-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="bg-primary text-on-primary p-sm rounded-2xl rounded-br-sm shadow-md relative">
+<p class="font-body-md text-body-md">Hey Sarah! That's perfect. I actually have three medium-sized terracotta pots I'm not using anymore. They're in great condition, just need a quick rinse.</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant mr-2 flex items-center gap-1">
+                    10:45 AM
+                    <span class="material-symbols-outlined text-[14px] text-primary" data-icon="done_all" data-weight="fill" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</span>
+</div>
+</div>
+<!-- Sent Message with Image -->
+<div class="flex gap-3 max-w-[85%] self-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="bg-primary text-on-primary p-1 rounded-2xl rounded-br-sm shadow-md relative">
+<img class="w-48 h-auto rounded-xl object-cover mb-1" data-alt="A photograph showing three medium-sized, clean terracotta plant pots sitting together on a sunny outdoor wooden deck, with a few blurry green plant leaves in the background. The lighting is bright and cheerful." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7McWkrsGX3Nv__IdCeVZ0ZTynFqrHIYK7atim0bMhGXCCZLEqCB3_G4AX18MyTipfoMTE3JdIoxEhOhKDOa03UmtnpoMuwf3wwH54VnEKEO4Z9ssPKx3CZTmoFdYqGVdKpct3Hi6JOwUAW8DlI1iN1iVuU889_G2QZFOC7uy2BOlHJ9YmXP4kq6Ueez9gJxCjLEqDS6aj1-5NmqV4Jl5BqP3HY6D5cZTDXbCIVaIvJfHls-enVyYB"/>
+<p class="font-body-md text-body-md px-3 pb-2 pt-1">Here's a quick photo of them.</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant mr-2 flex items-center gap-1">
+                    10:47 AM
+                    <span class="material-symbols-outlined text-[14px] text-primary" data-icon="done_all" data-weight="fill" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</span>
+</div>
+</div>
+<!-- Received Message -->
+<div class="flex gap-3 max-w-[85%] self-start">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-auto" data-alt="A small, circular profile portrait of a smiling woman in her 30s with short curly dark hair, wearing a casual light green sweater, set against a soft, bright, slightly blurred urban background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdXQuWg-gzzqH5iC2VlgAohQgMWRVbnSHDn_2INiuaPLVaYkn8WPGbrJWJezQy5CCcLlEORhh-woucs9ydPgMaH1UnSFlfiivYJD3mT7O7r_sireUTK4FTzJXqxMMkytkV1IN1L2yyYi6lHrst8kEyEhxklOjIgguaFysX-cX7YpGXDYEIhM0uIJRcCWESXqPgCrc7fK1_6hwPUdYsZ83g79k1z_qqg113H6gCDMh7jwfzvgeXRhDh"/>
+<div class="flex flex-col gap-1">
+<div class="bg-surface-container text-on-surface p-sm rounded-2xl rounded-bl-sm shadow-sm relative">
+<p class="font-body-md text-body-md">Those look lovely! That seems like a very fair trade to me. Are you free to meet up sometime this weekend?</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant ml-2">11:05 AM</span>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div class="flex gap-3 max-w-[85%] self-start opacity-70">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-auto" data-alt="A small, circular profile portrait of a smiling woman in her 30s with short curly dark hair, wearing a casual light green sweater, set against a soft, bright, slightly blurred urban background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo6gjE6gxDkqFEBeQoKTOzFdK19ffOl29onFCc61neErlEHYaa1yU8QEdD19WtM60YCWd5nbvKgfxP-T-E9FMBr3OcBpA57brMtR1eHkKZkdT83QVtJa2xfixw3RBTaedV8NDGiKzniAU0q_hne7AeK8cJnLv3Hz7MNxfX97t6J6tJOWuuRE9SvlzqsSQJrkyu9vU0KsVhKk63agr6a3DYBQtn2Ohfrz0cgRgCHEw6d6fFysYv8xac"/>
+<div class="bg-surface-container text-on-surface py-2 px-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1">
+<div class="w-2 h-2 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+<div class="w-2 h-2 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+<div class="w-2 h-2 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+</div>
+</div>
+</main>
+<!-- Message Input Area -->
+<div class="fixed bottom-0 left-0 w-full bg-surface shadow-[0_-4px_12px_rgba(21,66,18,0.06)] px-4 py-3 z-50">
+<div class="flex items-center gap-2 max-w-4xl mx-auto">
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-colors flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="add_photo_alternate">add_photo_alternate</span>
+</button>
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-colors flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+<div class="flex-1 relative">
+<input class="w-full bg-secondary-container/50 border-none rounded-full py-3 px-5 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary/50 focus:bg-surface transition-all" placeholder="Type a message..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary p-3 rounded-full hover:bg-primary/90 transition-colors shadow-md flex-shrink-0 active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="send" data-weight="fill" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<!-- Safe area padding for mobile -->
+<div class="h-6 w-full"></div>
+</div>
+</body></html>

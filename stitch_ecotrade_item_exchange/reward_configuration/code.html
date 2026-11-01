@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade Admin - Reward Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#9dd090",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fdfae7",
+                        "on-secondary-container": "#5b675e",
+                        "surface-variant": "#e6e3d0",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface-dim": "#dddbc8",
+                        "tertiary-container": "#883721",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#131e17",
+                        "on-tertiary-container": "#ffb09b",
+                        "primary": "#154212",
+                        "surface": "#fdfae7",
+                        "surface-container-low": "#f7f4e1",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "on-surface": "#1c1c11",
+                        "surface-container": "#f1eedb",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#6a210d",
+                        "surface-container-high": "#ece9d6",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1c11",
+                        "on-surface-variant": "#42493e",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "secondary-container": "#d9e6da",
+                        "outline": "#72796e",
+                        "on-primary-fixed": "#002201",
+                        "surface-tint": "#3b6934",
+                        "inverse-surface": "#313124",
+                        "tertiary-fixed": "#ffdbd2",
+                        "error-container": "#ffdad6",
+                        "background": "#fdfae7",
+                        "on-tertiary-fixed": "#3c0800",
+                        "primary-fixed-dim": "#a1d494",
+                        "error": "#ba1a1a",
+                        "secondary": "#556158",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#d9e6da",
+                        "inverse-on-surface": "#f4f1de",
+                        "outline-variant": "#c2c9bb",
+                        "inverse-primary": "#a1d494",
+                        "primary-container": "#2d5a27",
+                        "surface-container-highest": "#e6e3d0",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "primary-fixed": "#bcf0ae"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "20px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "lg": "32px",
+                        "xl": "48px",
+                        "xs": "8px",
+                        "md": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "label-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky shadow-sm bg-surface z-50 flex items-center justify-between px-margin py-4 md:hidden">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary cursor-pointer active:scale-95 duration-150" data-icon="menu">menu</span>
+<span class="font-headline-sm text-headline-sm text-primary">EcoTrade Management</span>
+</div>
+<span class="material-symbols-outlined text-primary cursor-pointer active:scale-95 duration-150" data-icon="notifications">notifications</span>
+</header>
+<!-- NavigationDrawer (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low py-lg pr-sm z-40 shadow-sm border-r border-outline-variant/20">
+<div class="px-md mb-lg">
+<span class="font-headline-sm text-headline-sm text-primary">EcoTrade Admin</span>
+</div>
+<div class="flex flex-col gap-xs flex-grow">
+<!-- Overview -->
+<a class="flex items-center gap-sm px-md py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<!-- Verification -->
+<a class="flex items-center gap-sm px-md py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</a>
+<!-- Auctions -->
+<a class="flex items-center gap-sm px-md py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-label-md text-label-md">Auctions</span>
+</a>
+<!-- Users -->
+<a class="flex items-center gap-sm px-md py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+<!-- Rewards (Active) -->
+<a class="flex items-center gap-sm px-md py-3 bg-primary-container text-on-primary-container rounded-r-full font-bold transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="font-label-md text-label-md">Rewards</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin md:p-lg w-full max-w-7xl mx-auto flex flex-col gap-md md:gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col gap-xs md:flex-row md:items-center justify-between">
+<div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary">Reward Configuration</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage multipliers, badges, and manual distributions.</p>
+</div>
+<button class="bg-tertiary text-on-tertiary px-sm py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary-container transition-colors shadow-sm self-start md:self-auto flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Rule
+            </button>
+</section>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Left Column (Multipliers & Distribution) -->
+<div class="flex flex-col gap-md lg:col-span-1">
+<!-- Eco-Point Multipliers Card -->
+<div class="bg-surface-container-lowest rounded-xl p-sm md:p-md shadow-[0_4px_20px_rgba(21,66,18,0.05)] border border-outline-variant/30 flex flex-col gap-sm">
+<div class="flex items-center gap-sm border-b border-outline-variant/10 pb-sm">
+<span class="material-symbols-outlined text-primary p-2 bg-secondary-container rounded-full" data-icon="trending_up">trending_up</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Eco-Point Multipliers</h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Rule 1 -->
+<div class="flex justify-between items-center p-sm bg-surface-container-low rounded-lg">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">Weekend Trades</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active Sat-Sun</span>
+</div>
+<div class="flex items-center gap-xs bg-primary-container px-3 py-1 rounded-full">
+<span class="font-label-md text-label-md text-on-primary-container">2.0x</span>
+</div>
+</div>
+<!-- Rule 2 -->
+<div class="flex justify-between items-center p-sm bg-surface-container-low rounded-lg">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface">First Trade Bonus</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">New users only</span>
+</div>
+<div class="flex items-center gap-xs bg-primary-container px-3 py-1 rounded-full">
+<span class="font-label-md text-label-md text-on-primary-container">1.5x</span>
+</div>
+</div>
+<!-- Rule 3 (Inactive) -->
+<div class="flex justify-between items-center p-sm bg-surface-container-low/50 rounded-lg opacity-75">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-semibold text-on-surface-variant">Earth Day Promo</span>
+<span class="font-body-sm text-body-sm text-outline">Inactive</span>
+</div>
+<div class="flex items-center gap-xs bg-surface-variant px-3 py-1 rounded-full">
+<span class="font-label-md text-label-md text-on-surface-variant">3.0x</span>
+</div>
+</div>
+</div>
+<button class="mt-xs text-primary font-label-md text-label-md hover:underline self-start">Manage Rules</button>
+</div>
+<!-- Point Distribution Tool -->
+<div class="bg-surface-container-lowest rounded-xl p-sm md:p-md shadow-[0_4px_20px_rgba(21,66,18,0.05)] border border-outline-variant/30 flex flex-col gap-sm">
+<div class="flex items-center gap-sm border-b border-outline-variant/10 pb-sm">
+<span class="material-symbols-outlined text-tertiary p-2 bg-tertiary-fixed rounded-full" data-icon="send">send</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Manual Distribution</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Award points directly to a specific user account.</p>
+<form class="flex flex-col gap-sm mt-xs">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">User ID or Email</label>
+<input class="bg-secondary-container/30 border-none rounded-lg px-sm py-2 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline" placeholder="e.g. USR-9824" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Points to Award</label>
+<input class="bg-secondary-container/30 border-none rounded-lg px-sm py-2 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline" placeholder="0" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Reason (Optional)</label>
+<input class="bg-secondary-container/30 border-none rounded-lg px-sm py-2 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-colors placeholder:text-outline" placeholder="e.g. Bug bounty" type="text"/>
+</div>
+<button class="mt-xs bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" type="button">
+                            Award Points
+                        </button>
+</form>
+</div>
+</div>
+<!-- Right Column (Badge Management Grid) -->
+<div class="lg:col-span-2 flex flex-col gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-sm md:p-md shadow-[0_4px_20px_rgba(21,66,18,0.05)] border border-outline-variant/30 flex flex-col h-full gap-sm">
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary p-2 bg-secondary-container rounded-full" data-icon="stars">stars</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Badge Management</h2>
+</div>
+<button class="text-primary hover:bg-surface-container-high p-1 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+<!-- Badge Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-sm mt-xs">
+<!-- Badge Card 1 -->
+<div class="bg-surface-container p-sm rounded-xl flex flex-col gap-xs items-center text-center relative group border border-transparent hover:border-primary/20 transition-all">
+<div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</div>
+<div class="w-16 h-16 bg-primary-fixed-dim rounded-full flex items-center justify-center mb-1 shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-on-primary-fixed" data-icon="eco">eco</span>
+</div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Sustainability Hero</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Awarded for saving 100kg of CO2 through trades.</p>
+<div class="mt-auto pt-2 w-full flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Tier 3</span>
+<span class="font-label-md text-label-md text-primary bg-primary-container/30 px-2 py-0.5 rounded-full">Active</span>
+</div>
+</div>
+<!-- Badge Card 2 -->
+<div class="bg-surface-container p-sm rounded-xl flex flex-col gap-xs items-center text-center relative group border border-transparent hover:border-primary/20 transition-all">
+<div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</div>
+<div class="w-16 h-16 bg-tertiary-fixed-dim rounded-full flex items-center justify-center mb-1 shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-on-tertiary-fixed" data-icon="build">build</span>
+</div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Pro Fixer</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Successfully repaired and traded 10 electronics.</p>
+<div class="mt-auto pt-2 w-full flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Tier 2</span>
+<span class="font-label-md text-label-md text-primary bg-primary-container/30 px-2 py-0.5 rounded-full">Active</span>
+</div>
+</div>
+<!-- Badge Card 3 -->
+<div class="bg-surface-container p-sm rounded-xl flex flex-col gap-xs items-center text-center relative group border border-transparent hover:border-primary/20 transition-all">
+<div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+</div>
+<div class="w-16 h-16 bg-secondary-fixed-dim rounded-full flex items-center justify-center mb-1 shadow-sm">
+<span class="material-symbols-outlined text-[32px] text-on-secondary-fixed" data-icon="local_shipping">local_shipping</span>
+</div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Reliable Courier</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Completed 50 localized deliveries on time.</p>
+<div class="mt-auto pt-2 w-full flex justify-between items-center">
+<span class="font-label-md text-label-md text-outline">Tier 1</span>
+<span class="font-label-md text-label-md text-primary bg-primary-container/30 px-2 py-0.5 rounded-full">Active</span>
+</div>
+</div>
+<!-- Add New Badge Placeholder -->
+<div class="bg-surface-container/50 border-2 border-dashed border-outline-variant p-sm rounded-xl flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container hover:border-primary transition-colors min-h-[180px]">
+<span class="material-symbols-outlined text-[32px] text-outline mb-2" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Create New Badge</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 md:hidden shadow-lg bg-surface rounded-t-xl">
+<!-- Overview -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform hover:bg-surface-container-high rounded-xl p-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md text-[10px]">Overview</span>
+</a>
+<!-- Verify -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform hover:bg-surface-container-high rounded-xl p-1" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md text-[10px]">Verify</span>
+</a>
+<!-- Auctions -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform hover:bg-surface-container-high rounded-xl p-1" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-label-md text-label-md text-[10px]">Auctions</span>
+</a>
+<!-- Users -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform hover:bg-surface-container-high rounded-xl p-1" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md text-[10px]">Users</span>
+</a>
+<!-- Rewards (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-2xl px-4 py-1 active:scale-90 transition-transform hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="font-label-md text-label-md text-[10px]">Rewards</span>
+</a>
+</nav>
+</body></html>

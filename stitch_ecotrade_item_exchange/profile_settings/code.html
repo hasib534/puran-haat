@@ -1,0 +1,327 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EcoTrade - Profile Settings</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Outfit -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#f1eedb",
+                    "secondary-container": "#d9e6da",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dddbc8",
+                    "tertiary": "#6a210d",
+                    "on-secondary-fixed-variant": "#3e4a41",
+                    "tertiary-fixed": "#ffdbd2",
+                    "surface-variant": "#e6e3d0",
+                    "on-secondary-container": "#5b675e",
+                    "primary-container": "#2d5a27",
+                    "background": "#fdfae7",
+                    "tertiary-fixed-dim": "#ffb4a1",
+                    "on-surface": "#1c1c11",
+                    "tertiary-container": "#883721",
+                    "surface-container-high": "#ece9d6",
+                    "surface-tint": "#3b6934",
+                    "surface-bright": "#fdfae7",
+                    "on-primary-container": "#9dd090",
+                    "primary": "#154212",
+                    "surface-container-low": "#f7f4e1",
+                    "on-secondary-fixed": "#131e17",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#313124",
+                    "surface": "#fdfae7",
+                    "inverse-on-surface": "#f4f1de",
+                    "secondary-fixed-dim": "#bdcabe",
+                    "surface-container-highest": "#e6e3d0",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#556158",
+                    "outline-variant": "#c2c9bb",
+                    "primary-fixed-dim": "#a1d494",
+                    "on-tertiary-container": "#ffb09b",
+                    "on-background": "#1c1c11",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#72796e",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#7c2e19",
+                    "secondary-fixed": "#d9e6da",
+                    "on-primary-fixed-variant": "#23501e",
+                    "primary-fixed": "#bcf0ae",
+                    "on-tertiary-fixed": "#3c0800",
+                    "on-surface-variant": "#42493e",
+                    "on-primary-fixed": "#002201",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#a1d494"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "32px",
+                    "md": "24px",
+                    "xl": "48px",
+                    "xs": "8px",
+                    "sm": "16px",
+                    "margin": "20px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Outfit"],
+                    "headline-sm": ["Outfit"],
+                    "body-sm": ["Outfit"],
+                    "label-md": ["Outfit"],
+                    "display-lg": ["Outfit"],
+                    "body-md": ["Outfit"],
+                    "display-lg-mobile": ["Outfit"],
+                    "headline-md": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Base styles to ensure consistency */
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: theme('colors.primary');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: theme('colors.primary');
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(100%);
+        }
+        
+        /* Soft ambient shadows for cards */
+        .ambient-shadow {
+            box-shadow: 0 4px 20px rgba(21, 66, 18, 0.05), 0 1px 3px rgba(21, 66, 18, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-background font-body-md text-body-md pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface z-40 shadow-sm flex items-center justify-between px-margin py-base w-full">
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</button>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary">EcoTrade</h1>
+</div>
+<div class="flex items-center">
+<button class="p-1 rounded-full overflow-hidden hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 border-2 border-transparent focus:border-primary-container">
+<img class="w-10 h-10 object-cover rounded-full bg-surface-variant" data-alt="A close-up portrait of a friendly individual smiling warmly in a bright, sunlit outdoor setting. The light mode aesthetic features soft, natural light filtering through green leaves, highlighting the warm tones of their skin and natural clothing. The mood is approachable and trustworthy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACPyx7w_QsilqcB4F6KZe3J-6Gbo_D-MCSGUhkYK44do8xbFJZ6zm3vA0tJkDGnCUpLS1oXWUZggwCZ2GIlixRLEdYd_gWFBQL4PIH6mu4YpawnVEqszcEChVto_XQ9p8MjyKIw09dKM04hyVd9g0Lz-eDQFgDVjjyvASOsSVbZJnHnQ2HmGBmnbPtGO9bDEwgt_p0P5zmXTPrJC_GSRPxgw01UpPzJJ528SbxxRp42cHzK7DDQOWP">
+</button>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="max-w-4xl mx-auto px-margin py-md grid grid-cols-1 md:grid-cols-8 gap-md mt-4">
+<!-- Desktop Sidebar Nav (Hidden on Mobile) -->
+<aside class="hidden md:block md:col-span-2 space-y-2 sticky top-[80px] self-start h-fit">
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-headline-sm text-headline-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-headline-sm text-headline-sm">Search</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-headline-sm text-headline-sm">Trade</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-headline-sm text-headline-sm">Chat</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary-container/90 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-headline-sm text-headline-sm">Profile</span>
+</a>
+</nav>
+</aside>
+<!-- Settings Content Area -->
+<div class="md:col-span-6 flex flex-col gap-md">
+<div class="mb-sm">
+<h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary mb-1">Profile Settings</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Manage your account details and EcoTrade preferences.</p>
+</div>
+<!-- Bento Grid Layout for Settings -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm md:gap-md">
+<!-- Account Information Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md ambient-shadow md:col-span-2 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: &quot;FILL&quot; 1;">account_circle</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Account Information</h3>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Full Name</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors" type="text" value="Jane Doe">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Username</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors" type="text" value="@janedoe_eco">
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Email Address</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors" type="email" value="jane.doe@example.com">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Phone Number</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors" type="tel" value="+1 (555) 123-4567">
+</div>
+</div>
+</div>
+</section>
+<!-- Sustainability Preferences Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md ambient-shadow flex flex-col shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: &quot;FILL&quot; 1;">eco</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sustainability</h3>
+</div>
+<div class="space-y-5 flex-grow">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Interested Categories</p>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center px-3 py-1.5 rounded-full bg-primary-container/20 text-primary-fixed-variant font-label-md text-label-md cursor-pointer hover:bg-primary-container/30 transition-colors">
+                                    Garden <span class="material-symbols-outlined text-[16px] ml-1 text-headline-sm">close</span>
+</span>
+<span class="inline-flex items-center px-3 py-1.5 rounded-full bg-primary-container/20 text-primary-fixed-variant font-label-md text-label-md cursor-pointer hover:bg-primary-container/30 transition-colors">
+                                    Tools <span class="material-symbols-outlined text-[16px] ml-1 text-headline-sm">close</span>
+</span>
+<span class="inline-flex items-center px-3 py-1.5 rounded-full bg-primary-container/20 text-primary-fixed-variant font-label-md text-label-md cursor-pointer hover:bg-primary-container/30 transition-colors">
+                                    Books <span class="material-symbols-outlined text-[16px] ml-1 text-headline-sm">close</span>
+</span>
+<button class="inline-flex items-center px-3 py-1.5 rounded-full border border-dashed border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] mr-1 text-headline-sm">add</span> Add
+                                </button>
+</div>
+</div>
+<div class="border-t border-primary/10 pt-4">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Eco-Impact Visibility</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Show carbon saved on public profile</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Notifications & Security Stack -->
+<div class="flex flex-col gap-sm md:gap-md">
+<!-- Notifications Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md ambient-shadow shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: &quot;FILL&quot; 1;">notifications</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Notifications</h3>
+</div>
+<ul class="space-y-4">
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">New Trades</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</li>
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Messages</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</li>
+<li class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Community Updates</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</li>
+</ul>
+</section>
+<!-- Security Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md ambient-shadow shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: &quot;FILL&quot; 1;">security</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Security</h3>
+</div>
+<div class="space-y-4">
+<button class="w-full text-left py-2 flex items-center justify-between font-body-md text-body-md text-on-surface hover:bg-surface-variant/50 rounded-lg -mx-2 px-2 transition-colors">
+<span class="">Change Password</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+<div class="border-t border-primary/10 pt-4">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md text-on-surface">Two-Factor Auth</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Extra layer of security</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Legal & About Card -->
+<section class="bg-surface-container-lowest rounded-xl p-md ambient-shadow md:col-span-2 shadow-sm">
+<div class="flex items-center gap-3 mb-4"><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Terms of Service</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">open_in_new</span></a><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Privacy Policy</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">open_in_new</span></a><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Help Center</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">help</span></a></div>
+<div class="flex flex-col sm:flex-row gap-4"><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Terms of Service</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">open_in_new</span></a><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Privacy Policy</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">open_in_new</span></a><a class="flex-1 p-md rounded-lg border border-outline-variant hover:border-primary/30 hover:bg-surface-variant/30 transition-colors flex items-center justify-between group" href="#"><span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Help Center</span><span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">help</span></a></div>
+</section>
+<!-- Logout Action -->
+<div class="md:col-span-2 flex justify-center mt-sm mb-lg py-md">
+<button class="bg-error text-on-error font-headline-sm text-headline-sm py-3 px-8 rounded-full hover:bg-error/90 active:scale-95 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-error/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">logout</span>
+                        Logout
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Visible on Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-[#f1eedb] shadow-[0_-4px_12px_rgba(21,66,18,0.06)] md:hidden"><a class="flex flex-col items-center justify-center text-[#72796e] hover:text-primary transition-colors p-2" href="#"><span class="material-symbols-outlined text-[28px] mb-1">home</span><span class="font-label-md text-label-md">Home</span></a><a class="flex flex-col items-center justify-center text-[#72796e] hover:text-primary transition-colors p-2" href="#"><span class="material-symbols-outlined text-[28px] mb-1">search</span><span class="font-label-md text-label-md">Search</span></a><a class="flex flex-col items-center justify-center text-[#72796e] hover:text-primary transition-colors p-2" href="#"><span class="material-symbols-outlined text-[28px] mb-1">add_circle</span><span class="font-label-md text-label-md">Trade</span></a><a class="flex flex-col items-center justify-center text-[#72796e] hover:text-primary transition-colors p-2" href="#"><span class="material-symbols-outlined text-[28px] mb-1">forum</span><span class="font-label-md text-label-md">Chat</span></a><a class="flex flex-col items-center justify-center bg-[#2d5a27] text-[#9dd090] rounded-full px-6 py-2 active:scale-95 transition-transform" href="#"><span class="material-symbols-outlined text-[28px] mb-1" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-label-md text-label-md font-bold">Profile</span></a></nav>
+
+
+</body></html>

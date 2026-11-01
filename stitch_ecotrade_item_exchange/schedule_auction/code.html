@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade Admin - Schedule Auction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#42493e",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#6a210d",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-background": "#1c1c11",
+                        "secondary-fixed": "#d9e6da",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e6e3d0",
+                        "inverse-on-surface": "#f4f1de",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbd2",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "surface-variant": "#e6e3d0",
+                        "on-primary-container": "#9dd090",
+                        "surface-dim": "#dddbc8",
+                        "on-primary-fixed": "#002201",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-container-high": "#ece9d6",
+                        "surface-bright": "#fdfae7",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#313124",
+                        "primary-container": "#2d5a27",
+                        "primary-fixed-dim": "#a1d494",
+                        "surface-container": "#f1eedb",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#883721",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c2c9bb",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fdfae7",
+                        "secondary-container": "#d9e6da",
+                        "on-surface": "#1c1c11",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "primary-fixed": "#bcf0ae",
+                        "outline": "#72796e",
+                        "inverse-primary": "#a1d494",
+                        "on-secondary-container": "#5b675e",
+                        "surface-container-low": "#f7f4e1",
+                        "secondary": "#556158",
+                        "primary": "#154212",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#3b6934",
+                        "on-secondary-fixed": "#131e17",
+                        "background": "#fdfae7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "base": "4px",
+                        "md": "24px",
+                        "sm": "16px",
+                        "lg": "32px",
+                        "margin": "20px",
+                        "xs": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "headline-sm": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- NavigationDrawer (Desktop) -->
+<aside class="hidden lg:flex flex-col h-full py-md w-64 fixed left-0 top-0 bg-surface-container border-r border-outline-variant/10 z-40">
+<div class="px-margin mb-lg flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="A small, stylized profile avatar for a system administrator, clean lines, minimalist illustration style, incorporating forest green and mint tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFmyw7c0dsdiNuYIacs3KgJ09rQ3JYyZ9BT8TzxNoSqccJ7aVE2d7kSyzYr7RbwsrEb5E3M2tjqlTpPW5M3QyNezAZunvdT76YRhapKVDGpXv09Qd8CjmQDjzyh0cwwveujkklfAsrFvgYOQvKvWqsp7DpQLQnQdb0H-zJZf7tlJ6tGpXzG_ll4HE7wkvdWfeVQSSvEP0ijWIsDOZOggWnQhgXkZK6BUvogS8hUblclzHLAVtmem4O"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">Admin Portal</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">System Oversight</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2 px-sm">
+<a class="flex items-center gap-md px-4 py-3 rounded-full text-on-surface-variant hover:bg-secondary-fixed-dim/30 hover:text-on-surface duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Verification</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 rounded-full bg-primary-container text-on-primary-container mx-2 duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="font-label-md text-label-md">Auctions</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 rounded-full text-on-surface-variant hover:bg-secondary-fixed-dim/30 hover:text-on-surface duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 rounded-full text-on-surface-variant hover:bg-secondary-fixed-dim/30 hover:text-on-surface duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col lg:ml-64 w-full relative min-h-screen">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-30 bg-surface shadow-sm px-margin py-base flex justify-between items-center transition-colors">
+<div class="flex items-center gap-sm cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="admin_panel_settings">admin_panel_settings</span>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">EcoTrade Admin</h1>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-md text-label-md">AU</div>
+</div>
+</header>
+<!-- Main Form Canvas -->
+<main class="flex-1 p-margin md:p-lg lg:p-xl max-w-5xl mx-auto w-full pb-32 lg:pb-xl">
+<div class="mb-lg">
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-xs">Schedule New Auction</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Configure settings for a new community auction event. All required fields are marked.</p>
+</div>
+<form class="space-y-xl">
+<!-- Bento Grid Layout for Form -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg">
+<!-- Core Details Card -->
+<div class="md:col-span-8 bg-surface-container-lowest rounded-xl p-md md:p-lg shadow-[0_4px_24px_rgba(21,66,18,0.04)] border border-outline-variant/20">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-md flex items-center gap-sm border-b border-outline-variant/10 pb-sm">
+<span class="material-symbols-outlined">edit_document</span>
+                            Auction Details
+                        </h3>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="auction-title">Auction Title <span class="text-error">*</span></label>
+<input class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 px-4" id="auction-title" placeholder="e.g., Spring Community Tool Exchange" type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="item-desc">Item Description &amp; Context <span class="text-error">*</span></label>
+<textarea class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 px-4 resize-none" id="item-desc" placeholder="Provide a detailed description of the items being auctioned..." rows="4"></textarea>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="start-bid">Starting Bid (Eco-Points) <span class="text-error">*</span></label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">eco</span>
+<input class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 pl-12 pr-4" id="start-bid" placeholder="100" type="number"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="category">Category</label>
+<select class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 px-4" id="category">
+<option>Tools &amp; Equipment</option>
+<option>Home Goods</option>
+<option>Electronics</option>
+<option>Garden</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Scheduling Card -->
+<div class="md:col-span-4 space-y-md md:space-y-lg">
+<div class="bg-surface-container-lowest rounded-xl p-md md:p-lg shadow-[0_4px_24px_rgba(21,66,18,0.04)] border border-outline-variant/20">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-md flex items-center gap-sm border-b border-outline-variant/10 pb-sm">
+<span class="material-symbols-outlined">schedule</span>
+                                Timing
+                            </h3>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="start-date">Start Date &amp; Time <span class="text-error">*</span></label>
+<input class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 px-4" id="start-date" type="datetime-local"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="duration">Duration (Hours) <span class="text-error">*</span></label>
+<input class="w-full bg-surface-container rounded-lg border-none focus:ring-2 focus:ring-primary text-on-background font-body-md text-body-md py-3 px-4" id="duration" placeholder="24" type="number"/>
+</div>
+</div>
+</div>
+<!-- Moderation Card -->
+<div class="bg-primary-container rounded-xl p-md shadow-[0_4px_24px_rgba(21,66,18,0.08)]">
+<h3 class="font-headline-sm text-headline-sm text-on-primary-container mb-sm flex items-center gap-sm">
+<span class="material-symbols-outlined">gavel</span>
+                                Rules &amp; Moderation
+                            </h3>
+<p class="font-body-sm text-body-sm text-on-primary-container/80 mb-md">Enable strict moderation filters for high-value community exchanges.</p>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-label-md text-label-md text-on-primary-container group-hover:text-primary-fixed duration-200">Enforce verified bidders only</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant/30 rounded-full peer peer-checked:bg-primary-fixed after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex justify-end gap-sm pt-md border-t border-outline-variant/20">
+<button class="px-6 py-3 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary/5 transition-colors" type="button">Cancel</button>
+<button class="px-6 py-3 rounded-full font-label-md text-label-md bg-tertiary text-on-tertiary shadow-sm hover:bg-tertiary/90 hover:shadow-md transition-all active:scale-95" type="submit">Schedule Auction</button>
+</div>
+</form>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(21,66,18,0.08)] z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Verify</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-tertiary-container text-on-tertiary-container rounded-2xl px-4 py-1.5 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="event_note">event_note</span>
+<span class="font-label-md text-label-md">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:bg-surface-variant active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="list_alt">list_alt</span>
+<span class="font-label-md text-label-md">Logs</span>
+</a>
+</nav>
+</body></html>

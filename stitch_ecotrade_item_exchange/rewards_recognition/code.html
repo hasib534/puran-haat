@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rewards &amp; Recognition - EcoTrade Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#131e17",
+                        "on-primary-fixed-variant": "#23501e",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-secondary-container": "#5b675e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e6e3d0",
+                        "error": "#ba1a1a",
+                        "secondary": "#556158",
+                        "outline": "#72796e",
+                        "surface-tint": "#3b6934",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-dim": "#dddbc8",
+                        "primary-fixed": "#bcf0ae",
+                        "on-primary-fixed": "#002201",
+                        "on-surface-variant": "#42493e",
+                        "on-tertiary-container": "#ffb09b",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "inverse-surface": "#313124",
+                        "primary-container": "#2d5a27",
+                        "primary": "#154212",
+                        "background": "#fdfae7",
+                        "outline-variant": "#c2c9bb",
+                        "on-background": "#1c1c11",
+                        "inverse-primary": "#a1d494",
+                        "primary-fixed-dim": "#a1d494",
+                        "surface-container-high": "#ece9d6",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e6e3d0",
+                        "surface-bright": "#fdfae7",
+                        "surface": "#fdfae7",
+                        "on-surface": "#1c1c11",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#f4f1de",
+                        "on-primary-container": "#9dd090",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#d9e6da",
+                        "surface-container-low": "#f7f4e1",
+                        "tertiary-container": "#883721",
+                        "tertiary-fixed": "#ffdbd2",
+                        "secondary-container": "#d9e6da",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#f1eedb",
+                        "tertiary": "#6a210d",
+                        "on-tertiary-fixed": "#3c0800",
+                        "tertiary-fixed-dim": "#ffb4a1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "gutter": "16px",
+                        "margin": "20px",
+                        "md": "24px",
+                        "lg": "32px",
+                        "base": "4px",
+                        "xl": "48px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "label-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- NavigationDrawer Component -->
+<nav class="fixed left-0 top-0 h-full z-40 flex flex-col w-72 rounded-r-xl bg-surface-container-low shadow-sm shadow-primary/5 hidden md:flex">
+<div class="p-margin flex items-center gap-sm">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A small, stylized profile avatar for an administrator. The portrait should be modern, friendly, and well-lit, representing an eco-conscious manager. Soft natural tones and clear details are essential to convey professionalism in this user interface element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK60KFSgU23EfsgItZaVqHTfhkGHMrWwp66A_hnx5_WoF2pqALSjdcH4j5HutLxVZTMkwa7D2p-zF-97Q7iM3CLsicNwoCmoyn44t7gEU-0vVXZzwRFi8W6VStlLNVRtKb0zEKdziIlMeX3Mog_N4qnt_M1v4a4jO3hp-dBo1Iuvy2WQLn5Zuw0goH3Y1vnlPvSu1E9BVwCzlqv6vtTcmQAXroU3xa9laVLdF9Gj_0g_V-yXC3n7Ll"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary">EcoTrade Admin</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Super Admin Office</p>
+<span class="font-label-md text-label-md text-on-surface-variant opacity-75">v2.1.0</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto py-sm">
+<ul class="space-y-xs px-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">User Verification</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-label-md text-label-md">Community Auctions</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="workspace_premium" data-weight="fill" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="font-label-md text-label-md">Sustainability Rewards</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/50 transition-colors active:scale-95 transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">System Settings</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-72 flex flex-col min-h-screen">
+<!-- TopAppBar Component -->
+<header class="sticky top-0 w-full z-30 flex justify-between items-center px-margin py-sm bg-surface/80 backdrop-blur-md shadow-sm shadow-primary/5">
+<div class="flex items-center gap-sm">
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">EcoTrade Management</h1>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<div class="p-margin flex-1 flex flex-col gap-md">
+<div class="flex justify-between items-end mb-sm">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-background">Rewards &amp; Recognition</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">Acknowledge and incentivize sustainable actions within the community.</p>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Top Contributors Leaderboard -->
+<section class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-md shadow-sm shadow-primary/5">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-sm flex items-center gap-xs">
+<span class="material-symbols-outlined">leaderboard</span>
+                        Top Contributors
+                    </h3>
+<div class="space-y-sm">
+<!-- User Row 1 -->
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A friendly, modern profile picture of a young woman smiling. She is outdoors with a slight blur in the background suggesting a sunny park. This image represents an active community member in a sustainable exchange platform. The aesthetic is clean, bright, and neighborly, fitting a light-mode UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwRnQ3eX9pe9VdEugQqkG0O6x5vizvQSCz7Kpmwc5qfVBzQfzr4KBN1RQ_SDfkSRayugP-lHCZsVJc7GUl3UfMoNZSGdmmXRwvjU8tgiT0Nuk5aqUFBw_vqvvLv-yn-BKXPn4u8FplDr6g18HbGuprVBDKTxVL3yWyGjxOClCZJR1AordjwcgIo_YkOUBnjhplV7XhXWAM-oSnwaPGyT2MCCI7sjcjGk87ay9qb4u-3oasgviQXvxe"/>
+<div>
+<p class="font-body-md text-body-md font-bold text-on-surface">Elena Rodriguez</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex gap-3">
+<span><strong class="text-primary">120kg</strong> CO2 Offset</span>
+<span><strong class="text-primary">45 items</strong> Diverted</span>
+</p>
+</div>
+</div>
+<button class="px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-colors shadow-sm shadow-tertiary/20">
+                                Reward
+                            </button>
+</div>
+<!-- User Row 2 -->
+<div class="flex items-center justify-between p-sm bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A warm, approachable portrait of an older gentleman with a neat beard. He is wearing a casual green sweater. The background is softly out of focus, suggesting a community garden setting. This photo serves as a user avatar for a high-contributing member of an eco-friendly marketplace app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCI_pwgsu0StryNgIjPwXHvCSvhxzKJqZNFvT66RGvx6xLTIyn34jjRDlouSywyBjjoIc1N4mdBPF3OeL7EJetZEgmm78BUBG1XCeN4--zYr6KXz92odSUIScZwF23n-iXMFa74BBlDZ62UcweYKGByfAYb0io3JCbc-1PIqgCud-HPTkUHFBFYCRrYKcYM9twTbzi5D637I0GF88GKkEa0OU4UPhHLzYCk9asmQeMnPBcQSmbNoUW5"/>
+<div>
+<p class="font-body-md text-body-md font-bold text-on-surface">Marcus Thorne</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex gap-3">
+<span><strong class="text-primary">95kg</strong> CO2 Offset</span>
+<span><strong class="text-primary">32 items</strong> Diverted</span>
+</p>
+</div>
+</div>
+<button class="px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-colors shadow-sm shadow-tertiary/20">
+                                Reward
+                            </button>
+</div>
+</div>
+</section>
+<!-- Impact Summary Card (Glassmorphism inspired) -->
+<section class="bg-primary-container text-on-primary-container rounded-xl p-md shadow-sm relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -right-10 -top-10 opacity-20">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div class="relative z-10">
+<h3 class="font-headline-sm text-headline-sm mb-xs">Community Impact</h3>
+<p class="font-body-sm text-body-sm opacity-90 mb-md">Total contributions this month</p>
+<div class="space-y-sm">
+<div>
+<p class="font-label-md text-label-md opacity-80 uppercase tracking-widest">CO2 Prevented</p>
+<p class="font-display-lg text-display-lg mt-1">2,450 kg</p>
+</div>
+<div class="h-px w-full bg-on-primary-container/20"></div>
+<div>
+<p class="font-label-md text-label-md opacity-80 uppercase tracking-widest">Landfill Diverted</p>
+<p class="font-display-lg text-display-lg mt-1">842 items</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Reward History Section -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-sm shadow-primary/5 flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">history</span>
+                    Reward History
+                </h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 text-on-surface-variant font-label-md text-label-md">
+<th class="py-3 px-2 font-semibold">Date</th>
+<th class="py-3 px-2 font-semibold">Recipient</th>
+<th class="py-3 px-2 font-semibold">Reward Type</th>
+<th class="py-3 px-2 font-semibold">Reason</th>
+<th class="py-3 px-2 font-semibold text-right">Admin</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-2 text-on-surface-variant">Oct 24, 2023</td>
+<td class="py-3 px-2 font-medium">Sarah Jenkins</td>
+<td class="py-3 px-2">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-[10px]">
+                                        Eco-Points (500)
+                                    </span>
+</td>
+<td class="py-3 px-2 text-on-surface-variant">Milestone: 50 items shared</td>
+<td class="py-3 px-2 text-right text-on-surface-variant">System Auto</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-2 text-on-surface-variant">Oct 22, 2023</td>
+<td class="py-3 px-2 font-medium">David Cho</td>
+<td class="py-3 px-2">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-md text-[10px]">
+                                        Verified Pro Badge
+                                    </span>
+</td>
+<td class="py-3 px-2 text-on-surface-variant">Manual grant for exceptional repair workshop</td>
+<td class="py-3 px-2 text-right text-on-surface-variant">EcoTrade Admin</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</body></html>

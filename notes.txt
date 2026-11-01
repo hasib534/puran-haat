@@ -1,0 +1,2 @@
+  Session   Whole codebase exploration
+  Continue  opencode -s ses_eb1b69911ffe7bSDVBmJLYTxUI

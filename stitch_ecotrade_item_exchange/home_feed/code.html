@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EcoTrade - Discovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#bdcabe",
+                        "on-tertiary-fixed": "#3c0800",
+                        "on-surface-variant": "#42493e",
+                        "on-primary-container": "#9dd090",
+                        "on-tertiary-container": "#ffb09b",
+                        "secondary-fixed": "#d9e6da",
+                        "on-secondary-container": "#5b675e",
+                        "surface": "#fdfae7",
+                        "tertiary": "#6a210d",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "on-primary": "#ffffff",
+                        "outline": "#72796e",
+                        "inverse-on-surface": "#f4f1de",
+                        "surface-dim": "#dddbc8",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#002201",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e6e3d0",
+                        "primary": "#154212",
+                        "primary-container": "#2d5a27",
+                        "surface-container-highest": "#e6e3d0",
+                        "primary-fixed": "#bcf0ae",
+                        "secondary": "#556158",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "surface-tint": "#3b6934",
+                        "inverse-surface": "#313124",
+                        "on-surface": "#1c1c11",
+                        "on-background": "#1c1c11",
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface-container": "#f1eedb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#ece9d6",
+                        "tertiary-container": "#883721",
+                        "surface-container-low": "#f7f4e1",
+                        "primary-fixed-dim": "#a1d494",
+                        "outline-variant": "#c2c9bb",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "background": "#fdfae7",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#a1d494",
+                        "secondary-container": "#d9e6da",
+                        "surface-bright": "#fdfae7",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdbd2",
+                        "on-secondary-fixed": "#131e17"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin": "20px",
+                        "lg": "32px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "xl": "48px",
+                        "md": "24px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "display-lg": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-xl antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim w-full top-0 sticky shadow-sm dark:shadow-none z-40">
+<div class="flex items-center justify-between px-margin py-base w-full">
+<div class="flex items-center gap-xs text-primary dark:text-primary-fixed hover:bg-primary-container/10 transition-colors rounded-full p-2 active:scale-95 duration-150 cursor-pointer">
+<span class="material-symbols-outlined text-[24px]">location_on</span>
+</div>
+<h1 class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary dark:text-primary-fixed">EcoTrade</h1>
+<div class="w-[40px] h-[40px] rounded-full overflow-hidden bg-surface-variant flex-shrink-0 cursor-pointer active:scale-95 duration-150">
+<img alt="user profile picture" class="w-full h-full object-cover" data-alt="A small, circular avatar portrait of a young person smiling warmly in soft, natural outdoor lighting, conveying a friendly and approachable neighborly vibe in line with a sustainable community marketplace aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMdOHbZJnKjDiYlkRDgMUMbhsSQizunKiQhmlugNzrIPUqIIX_XZqJLO36RDkfKi6bFpgXvYvnbDmwVi8OzSP8tsBEKk6H0GjTq8ALmTVdF-vjU4JOdUGCNlvYXQwiRTEFXcvHgUCd_OAQZR1ihla1xlu2MYR0WmF2c3bECixn8YvXGATlJWyE4T8RTWdpNEI6xTDqtc_A3WcQ9Sf2lKDwQI1QPesatFl3BbUde6-nEfSOXjscvArL">
+</div>
+</div>
+</header>
+<main class="px-margin py-md space-y-lg max-w-4xl mx-auto">
+<!-- Search Bar -->
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-secondary/10 border-none rounded-full py-3 pl-12 pr-4 text-on-surface focus:ring-2 focus:ring-primary-container font-body-md shadow-sm outline-none placeholder:text-on-surface-variant/70" placeholder="Search items nearby..." type="text">
+</div>
+<!-- Category Carousel -->
+<section>
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Categories</h2>
+<div class="flex overflow-x-auto gap-sm pb-2 snap-x hide-scrollbar"><button class="snap-start flex-shrink-0 bg-primary-container/20 text-primary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-primary-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+Verified
+</button>
+<button class="snap-start flex-shrink-0 bg-primary-container/20 text-primary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-primary-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">kitchen</span>
+                    Kitchen
+                </button>
+<button class="snap-start flex-shrink-0 bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-secondary-container/80 transition-colors">
+<span class="material-symbols-outlined text-[18px]">chair</span>
+                    Furniture
+                </button>
+<button class="snap-start flex-shrink-0 bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-secondary-container/80 transition-colors">
+<span class="material-symbols-outlined text-[18px]">yard</span>
+                    Garden
+                </button>
+<button class="snap-start flex-shrink-0 bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-secondary-container/80 transition-colors">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+                    Books
+                </button>
+<button class="snap-start flex-shrink-0 bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:bg-secondary-container/80 transition-colors">
+<span class="material-symbols-outlined text-[18px]">checkroom</span>
+                    Clothing
+                </button>
+</div>
+</section>
+<!-- New Listings Grid -->
+<section>
+<div class="flex justify-between items-center mb-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">new_releases</span>
+                    New Listings
+                </h2>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">See all</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-gutter">
+<!-- Item Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(21,66,18,0.05)] flex flex-col hover:shadow-[0_4px_12px_rgba(21,66,18,0.08)] transition-shadow duration-200">
+<div class="relative h-32 md:h-40 w-full">
+<img alt="Wooden Chair" class="w-full h-full object-cover" data-alt="A beautifully crafted wooden dining chair, bathed in soft, warm afternoon sunlight, sitting on a natural fiber rug in a clean, minimalist interior setting. The lighting highlights the rich wood grain and the sustainable aesthetic of the piece." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ8LUvgTeavBxeYg4uM5OT5qJPlvggR7k47eLSy9BEC-wHT8PplEpbk0GKJgrHunluVS_JOjbkMjAbkMdmDUOa35aX56uJiMAzDRqfD94QK8IEmUkSSld_MOJzXlZMJ_e7hIYRCXqJujTwdDU2b6ohQEmv4hcHXiFgt0i6p9t7sTQRzow1VokJdrqkd9Labq01jiPlBlrW3Lw3l7-mQDHnb7q2DCE8WbzhQq_TWYfkrIwBuecLj-ub">
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full px-2 py-1 flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-md text-[10px] text-on-surface">High</span>
+</div>
+</div>
+<div class="p-sm flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface line-clamp-1">Vintage Oak Chair</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+                                0.8 km away
+                            </p><div class="flex items-center gap-1 mt-1 bg-primary-container/10 px-2 py-0.5 rounded-full w-fit"><span class="material-symbols-outlined text-[12px] text-primary">verified</span><span class="font-label-md text-[10px] text-primary">Verified Trader</span></div><div class="flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px] text-[#FFD700]" style="font-variation-settings: 'FILL' 1;">star</span><span class="font-label-md text-label-md text-on-surface-variant">4.8</span></div><div class="flex items-center gap-1 mt-1 bg-primary-container/10 px-2 py-0.5 rounded-full w-fit"><span class="material-symbols-outlined text-[12px] text-primary">verified</span><span class="font-label-md text-[10px] text-primary">Verified Trader</span></div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary-container bg-primary-container/10 px-2 py-1 rounded-md">Trade</span>
+<button class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(21,66,18,0.05)] flex flex-col hover:shadow-[0_4px_12px_rgba(21,66,18,0.08)] transition-shadow duration-200">
+<div class="relative h-32 md:h-40 w-full">
+<img alt="Plant Pots" class="w-full h-full object-cover" data-alt="A collection of terracotta plant pots stacked neatly on a rustic wooden table in a bright greenhouse, surrounded by lush green foliage. The natural lighting creates soft shadows, emphasizing a calm, eco-friendly gardening atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkHAYUnEVb23IKM9JbHAfPnw2718vjb-zwDKAYBbHB_IbFB-BrPaQ-6E5eQkXu5YyHO4x-1xbUmiLxeGALnQI9MVnf-jU7TD1QirrXDoQDK0FMIrUpKyV0i0UmQbJ_iaXnP0Gs8Rj98PJmiA6ptYjKrlM5Zq_lkANDbKgszHOE2dQjrOGRAORppGX_b52O0q9jiB6Oos7HHNm_PmvXbJdgR9CqRmcC_3JfGWzUERjGIZA8WkMKo6G6">
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full px-2 py-1 flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-md text-[10px] text-on-surface">Med</span>
+</div>
+</div>
+<div class="p-sm flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface line-clamp-1">Terracotta Pots (Set of 3)</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+                                1.2 km away
+                            </p><div class="flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px] text-[#FFD700]" style="font-variation-settings: 'FILL' 1;">star</span><span class="font-label-md text-label-md text-on-surface-variant">4.5</span></div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<span class="font-label-md text-label-md text-tertiary bg-tertiary/10 px-2 py-1 rounded-md">Free</span>
+<button class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(21,66,18,0.05)] flex flex-col hover:shadow-[0_4px_12px_rgba(21,66,18,0.08)] transition-shadow duration-200">
+<div class="relative h-32 md:h-40 w-full">
+<img alt="Books" class="w-full h-full object-cover" data-alt="A stack of well-loved hardcover books resting on a cozy knitted blanket next to a window. The soft, diffuse natural light highlights the texture of the book covers and conveys a quiet, intellectual, and sustainable sharing vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-kvvMZNLvXYc7l_qC_uxmUUW8rSIoWhnviX7vFp1quhbN-_32SdgkzV87HAH5MozO_PjZjyYIsBG7GdKQoGOnGvuDSMgEThUpWddAhIO4tEKPiJqesy1ehixAtpyh-ee6P_A2o9dMMOgCHXMdqoKikpoeJdS8UdVS0NZKgwaXFoVxUv_Hs0i-IcdKueyP86DY9D_TFl1QzWs3Bm8rh70clFNq3D7-VJ4-jfNm3l2AftseQrHwnm03">
+<div class="absolute top-2 right-2 bg-surface/90 rounded-full px-2 py-1 flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-md text-[10px] text-on-surface">High</span>
+</div>
+</div>
+<div class="p-sm flex flex-col flex-grow justify-between">
+<div>
+<h3 class="font-body-md text-body-md font-semibold text-on-surface line-clamp-1">Classic Novels Bundle</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+                                2.5 km away
+                            </p><div class="flex items-center gap-1 mt-1 bg-primary-container/10 px-2 py-0.5 rounded-full w-fit"><span class="material-symbols-outlined text-[12px] text-primary">verified</span><span class="font-label-md text-[10px] text-primary">Verified Trader</span></div><div class="flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px] text-[#FFD700]" style="font-variation-settings: 'FILL' 1;">star</span><span class="font-label-md text-label-md text-on-surface-variant">4.9</span></div><div class="flex items-center gap-1 mt-1 bg-primary-container/10 px-2 py-0.5 rounded-full w-fit"><span class="material-symbols-outlined text-[12px] text-primary">verified</span><span class="font-label-md text-[10px] text-primary">Verified Trader</span></div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary-container bg-primary-container/10 px-2 py-1 rounded-md">Trade</span>
+<button class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface-container dark:bg-surface-container-highest shadow-lg fixed bottom-0 w-full rounded-t-xl z-50 flex justify-around items-center px-4 pt-2 pb-6 shadow-[0_-4px_12px_rgba(21,66,18,0.06)]">
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1.5 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-md text-label-md mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200 relative -top-3" href="#">
+<div class="bg-tertiary text-on-tertiary w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[28px]">add_circle</span>
+</div>
+<span class="font-label-md text-label-md mt-1 text-tertiary">Trade</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">forum</span>
+<span class="font-label-md text-label-md mt-1">Chat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</a>
+</nav>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+
+</body></html>

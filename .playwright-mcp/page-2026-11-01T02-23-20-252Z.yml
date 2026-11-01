@@ -1,0 +1,37 @@
+- generic [ref=f7e3]:
+  - generic [ref=f7e4]:
+    - generic [aria-hidden] [ref=f7e6]:
+      - generic [ref=f7e7]: Loading
+      - progressbar [aria-hidden] [ref=f7e8]
+    - main [ref=f7e15]:
+      - generic [ref=f7e16]:
+        - generic [ref=f7e17]: Sign in with Google
+        - 'heading "Access blocked: This app''s request is invalid" [level=1] [ref=f7e23]'
+      - generic [ref=f7e31]:
+        - generic [ref=f7e32]:
+          - text: You can't sign in because this app sent an invalid request. You can try again later, or contact the developer about this issue.
+          - link "Learn more about this error (external, opens in a new window)" [ref=f7e33] [cursor=pointer]:
+            - /url: https://developers.google.com/identity/protocols/oauth2/web-server#authorization-errors-redirect-uri-mismatch
+            - text: Learn more about this error
+        - generic [ref=f7e34]:
+          - text: If you are a developer of this app, see
+          - button "error details" [ref=f7e35] [cursor=pointer]
+          - text: .
+        - generic [ref=f7e36]: "Error 400: redirect_uri_mismatch"
+  - contentinfo [ref=f7e40]:
+    - combobox "Change language English (United States)" [ref=f7e44] [cursor=pointer]:
+      - generic [aria-hidden]:
+        - generic: English (United States)
+    - list [ref=f7e46]:
+      - listitem [ref=f7e47]:
+        - link "Open Google Account Help Center (external, opens in a new window)" [ref=f7e48] [cursor=pointer]:
+          - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+          - text: Help
+      - listitem [ref=f7e49]:
+        - link "Privacy Policy (external, opens in a new window)" [ref=f7e50] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=BD&hl=en-US&privacy=true
+          - text: Privacy
+      - listitem [ref=f7e51]:
+        - link "Google Terms of Service (external, opens in a new window)" [ref=f7e52] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=BD&hl=en-US
+          - text: Terms

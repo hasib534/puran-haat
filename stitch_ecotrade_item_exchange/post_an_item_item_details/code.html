@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrade - Post Item Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e6e3d0",
+                        "surface": "#fdfae7",
+                        "on-background": "#1c1c11",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "surface-container-high": "#ece9d6",
+                        "background": "#fdfae7",
+                        "surface-container-low": "#f7f4e1",
+                        "on-tertiary-fixed": "#3c0800",
+                        "surface-dim": "#dddbc8",
+                        "on-surface-variant": "#42493e",
+                        "surface-container": "#f1eedb",
+                        "secondary": "#556158",
+                        "tertiary-fixed": "#ffdbd2",
+                        "secondary-fixed": "#d9e6da",
+                        "on-secondary-container": "#5b675e",
+                        "surface-tint": "#3b6934",
+                        "surface-variant": "#e6e3d0",
+                        "outline": "#72796e",
+                        "on-secondary-fixed": "#131e17",
+                        "inverse-on-surface": "#f4f1de",
+                        "primary": "#154212",
+                        "inverse-primary": "#a1d494",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#bcf0ae",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-bright": "#fdfae7",
+                        "on-surface": "#1c1c11",
+                        "on-tertiary-container": "#ffb09b",
+                        "primary-fixed-dim": "#a1d494",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#002201",
+                        "on-primary-fixed-variant": "#23501e",
+                        "tertiary": "#6a210d",
+                        "tertiary-container": "#883721",
+                        "outline-variant": "#c2c9bb",
+                        "on-primary-container": "#9dd090",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#2d5a27",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#313124",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "secondary-container": "#d9e6da"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "lg": "32px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "margin": "20px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Outfit"],
+                        "body-sm": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "body-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-xl">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim fixed top-0 w-full z-50 bg-surface-container-low dark:bg-surface-container shadow-sm flex justify-between items-center px-margin py-xs w-full">
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform duration-150 p-xs rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">EcoTrade</div>
+<button class="text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors active:scale-95 transition-transform duration-150 px-sm py-xs rounded-full">
+            Cancel
+        </button>
+</header>
+<!-- Main Content -->
+<main class="pt-[72px] px-margin md:max-w-2xl md:mx-auto">
+<!-- Progress Indicator -->
+<div class="mb-lg">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-md text-label-md text-primary">Step 2 of 3</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Item Details</span>
+</div>
+<div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3 rounded-full transition-all duration-300"></div>
+</div>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-background mb-md">What are you trading?</h1>
+<!-- Form Card -->
+<form class="bg-surface-container-lowest shadow-sm rounded-xl p-md border border-surface-container-low flex flex-col gap-md">
+<!-- Item Title -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="item-title">Item Title</label>
+<input class="bg-secondary-fixed text-on-secondary-fixed placeholder-outline rounded-lg border-none px-sm py-xs font-body-md focus:ring-2 focus:ring-primary focus:outline-none w-full shadow-inner transition-shadow" id="item-title" placeholder="e.g., Vintage Coffee Grinder" type="text"/>
+</div>
+<!-- Category -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="category">Category</label>
+<div class="relative">
+<select class="appearance-none bg-secondary-fixed text-on-secondary-fixed rounded-lg border-none px-sm py-xs font-body-md focus:ring-2 focus:ring-primary focus:outline-none w-full shadow-inner transition-shadow pr-[40px]" id="category">
+<option disabled="" selected="" value="">Select a category...</option>
+<option value="home">Home &amp; Garden</option>
+<option value="electronics">Electronics</option>
+<option value="clothing">Clothing &amp; Accessories</option>
+<option value="tools">Tools &amp; Hardware</option>
+<option value="other">Other</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Condition -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface">Condition</label>
+<div class="flex flex-wrap gap-xs">
+<label class="cursor-pointer">
+<input class="peer sr-only" name="condition" type="radio" value="new"/>
+<div class="px-sm py-xs rounded-full border border-outline text-outline peer-checked:bg-primary-fixed peer-checked:text-on-primary-fixed peer-checked:border-primary-fixed font-label-md text-label-md transition-colors hover:bg-surface-container-high">
+                            New
+                        </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="condition" type="radio" value="like-new"/>
+<div class="px-sm py-xs rounded-full border border-outline text-outline peer-checked:bg-primary-fixed peer-checked:text-on-primary-fixed peer-checked:border-primary-fixed font-label-md text-label-md transition-colors hover:bg-surface-container-high">
+                            Like New
+                        </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="condition" type="radio" value="good"/>
+<div class="px-sm py-xs rounded-full border border-outline text-outline peer-checked:bg-primary-fixed peer-checked:text-on-primary-fixed peer-checked:border-primary-fixed font-label-md text-label-md transition-colors hover:bg-surface-container-high">
+                            Good
+                        </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="condition" type="radio" value="fair"/>
+<div class="px-sm py-xs rounded-full border border-outline text-outline peer-checked:bg-primary-fixed peer-checked:text-on-primary-fixed peer-checked:border-primary-fixed font-label-md text-label-md transition-colors hover:bg-surface-container-high">
+                            Fair
+                        </div>
+</label>
+</div>
+</div>
+<!-- Description -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="description">Description</label>
+<textarea class="bg-secondary-fixed text-on-secondary-fixed placeholder-outline rounded-lg border-none px-sm py-xs font-body-md focus:ring-2 focus:ring-primary focus:outline-none w-full shadow-inner transition-shadow resize-y" id="description" placeholder="Describe the item, its history, or why you're trading it..." rows="4"></textarea>
+</div>
+</form>
+<!-- Navigation Buttons -->
+<div class="mt-lg flex justify-between items-center gap-sm">
+<button class="flex-1 py-sm px-md rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors active:scale-95 flex items-center justify-center gap-xs">
+                Back
+            </button>
+<button class="flex-1 py-sm px-md rounded-full bg-tertiary text-on-tertiary font-label-md text-label-md hover:opacity-90 transition-opacity shadow-md active:scale-95 flex items-center justify-center gap-xs">
+                Next Step
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

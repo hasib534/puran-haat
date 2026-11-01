@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EcoTrade - Messages</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#23501e",
+                        "surface": "#fdfae7",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f4f1de",
+                        "on-tertiary-fixed": "#3c0800",
+                        "background": "#fdfae7",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#6a210d",
+                        "secondary-fixed": "#d9e6da",
+                        "secondary": "#556158",
+                        "surface-container-high": "#ece9d6",
+                        "on-primary-fixed": "#002201",
+                        "on-primary-container": "#9dd090",
+                        "on-tertiary-container": "#ffb09b",
+                        "surface-bright": "#fdfae7",
+                        "surface-container": "#f1eedb",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#d9e6da",
+                        "tertiary-container": "#883721",
+                        "on-surface-variant": "#42493e",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#5b675e",
+                        "primary": "#154212",
+                        "outline-variant": "#c2c9bb",
+                        "surface-container-highest": "#e6e3d0",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "outline": "#72796e",
+                        "on-secondary-fixed": "#131e17",
+                        "primary-container": "#2d5a27",
+                        "on-surface": "#1c1c11",
+                        "secondary-fixed-dim": "#bdcabe",
+                        "surface-dim": "#dddbc8",
+                        "surface-variant": "#e6e3d0",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7c2e19",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f7f4e1",
+                        "inverse-primary": "#a1d494",
+                        "primary-fixed": "#bcf0ae",
+                        "on-secondary-fixed-variant": "#3e4a41",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1d494",
+                        "tertiary-fixed": "#ffdbd2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#3b6934",
+                        "inverse-surface": "#313124",
+                        "on-background": "#1c1c11"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "sm": "16px",
+                        "md": "24px",
+                        "lg": "32px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xl": "48px",
+                        "margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Outfit"],
+                        "label-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "body-lg": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-sm": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim w-full top-0 sticky shadow-sm dark:shadow-none flex items-center justify-between px-margin py-base z-40">
+<div class="flex items-center gap-sm">
+<button class="p-2 hover:bg-primary-container/10 transition-colors active:scale-95 duration-150 rounded-full flex items-center justify-center text-on-surface-variant dark:text-outline-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-sm-mobile text-headline-sm-mobile font-bold text-primary dark:text-primary-fixed">Messages</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant">
+<img alt="User profile picture" class="w-full h-full object-cover" data-alt="A close up portrait of a smiling young woman with short curly brown hair wearing a simple green t-shirt against a clean warm white background. The lighting is soft and natural creating a friendly and approachable mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5Zuu3hKGCwY8dCu5pK1R_6dUXlSuj9rsJBB4cjdYnycKEwlWXgdDNBsvpGjjsiwLeT5MdaoECCrWtfeIEIxy9DZpvDarO6pLSwcGESe5VeVXBT3BIxFha6UIr_tDCfv3uk-pvIBN38-O2UpIfJF-lLMW4G8IzhAqtyMWIQszyePyHQOK-P9WiD042g_0v8o-6-P2_737HviLWNVYrDPQx5DmvhKEYmw1mWrz2q2IYFtH9lEq2rzU7">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-margin pt-sm pb-24 max-w-2xl mx-auto w-full">
+<!-- Search Bar -->
+<div class="relative mb-md">
+<div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full bg-secondary-container text-on-surface border-none rounded-full py-3 pl-12 pr-4 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:outline-none placeholder-on-surface-variant/70 shadow-sm transition-shadow hover:shadow-md" placeholder="Search messages..." type="text">
+</div>
+<!-- Messages List -->
+<div class="space-y-sm"><!-- Message Item 1 -->
+<div class="bg-surface-lowest rounded-xl p-3 shadow-sm hover:bg-surface-container-low transition-colors cursor-pointer group flex items-start gap-sm relative overflow-hidden mb-2">
+<div class="relative flex-shrink-0">
+<img alt="Neighbor Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeeQK0Bs92rA6c9zBliBCsDOvn_GJdF2NdbKQSeA7GVulKDhxRy7H5nxoyVaqk8psSmqsie0ceHaYGLD-UoEjnNDbgJqOo5qzcXNkzut7BoTA7vi1Wn__nUzgF5lfvr8DYpFjLeZMukuTLV1vhhwgmSCK0ogptlg98AkttZcgZtCK3z2MF_YQNJorNkkdjjnCQ6cJO1EZM7buqPs3GAOzZQXO3aI7k4buuixKYm1-y5XbPaMW3uHAC">
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-primary-container border-2 border-surface-lowest rounded-full"></div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-1 min-w-0">
+<h3 class="font-bold text-body-md text-on-surface truncate">Elias Thorne</h3>
+<span class="material-symbols-outlined text-primary text-sm flex-shrink-0" title="Verified Trader">verified</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant whitespace-nowrap ml-2">10:42 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate pr-12 group-hover:text-on-surface transition-colors">I can bring the tools by around 3 PM if that works for you?</p>
+</div>
+<div class="flex-shrink-0 ml-auto w-12 h-12 rounded-lg overflow-hidden border border-outline-variant/30 shadow-sm">
+<img alt="Item discussed" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgc-KEtRR08G-9k9EM8coJu7sVE428zDoNY38yvTeTxvnvQXIYXvu5uF35C0N4Zpr6lBIcJiowhWca_koBPtnRfXmEuKPhNyuUauWlfdoE270PmF_1IqvLPkGyHoV6e2ui3T1AFSUEemBNLhSWJVHBBiLdn5whtrvCdbGicCKYJbqNk6pJNot8lAmEvvWegX7KpYQmC_MbOUro_HJg6W0zYC0F6MoXkJjjYJCyvAzWA8F1VznpQ266">
+</div>
+</div>
+<!-- Message Item 2 -->
+<div class="bg-surface-lowest rounded-xl p-3 shadow-sm hover:bg-surface-container-low transition-colors cursor-pointer group flex items-start gap-sm relative overflow-hidden mb-2">
+<div class="relative flex-shrink-0">
+<img alt="Neighbor Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMeyVIWGzsmxPV8rhEQqnVupyBQG-5cPYB3lW9og3V2lmBRHooeBf1uQBuH31twyetUhxn6u5UhuA5B3zXwvBrBG6PJAuc8TV4A3kr73ys2lQydjlJQBsqnIu1ivooCFoPqiZ0PvwVRMj66OYKdppKnza_9JYtGrvyT4d2u6vEJEthzPkUhF7RFKE3sovgp4mfUad-NygSOxpInpQajrXOqzdWZ28jSopMSkTHPVDbtD73AewyM03C">
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-body-md text-on-surface truncate">Sarah Jenkins</h3>
+<span class="font-label-md text-label-md text-on-surface-variant whitespace-nowrap ml-2">Yesterday</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate pr-12 group-hover:text-on-surface transition-colors">Thanks again for the seeds! The tomatoes are already sprouting.</p>
+</div>
+<div class="flex-shrink-0 ml-auto w-12 h-12 rounded-lg overflow-hidden border border-outline-variant/30 shadow-sm">
+<img alt="Item discussed" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC35SCi4gEFAt4wmJJDFpV-Wi-VOlAKNlETgMDPJ2PRIv-zoldvw5IaLXs_gU-SvQqlxUSnNKCDaqh-D8blndFC1H_RiTcoE_8Kr_jmGfgHwU1ZOD9EdA9sFJlMjsXidRrryLaoEtDM35r6CRg-BXRAWI1yoAndd5losnL0CQTScoSk1RvxeOBVYE1KRpyyH9FfjAcZtnIfYwyXFV-KQaFkCcFPGV3Fdv8T1qIM4yKHBAQ9ZUwMAcHt">
+</div>
+</div>
+<!-- Message Item 3 (Unread) -->
+<div class="bg-surface-lowest border-l-4 border-primary-container rounded-r-xl rounded-l-md p-3 shadow-md hover:bg-surface-container-low transition-colors cursor-pointer group flex items-start gap-sm relative overflow-hidden mb-2">
+<div class="relative flex-shrink-0">
+<img alt="Neighbor Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgIeWFk24s0V4YQP51fRi8GX-dOiQQfYPT6-PFCZbc5y1H6A0UJ4mKAoilCtCZ179YmTcKtCxBgamVQt4uHxjC8PsX0e3NV6UnCeREU2KmwGn6X7FHXMJIgzbLv8MKnqW4QoHtPqq5G5MRbY2JdupHB9p3ERBUffuvXKF9HW5EgPPtEj9-v_2734TWgphlRmQ5xzsIuVcJjzoFC_OXGtuREoZTdD8jaAQakFX92lEz1q7xEPr1saOQ">
+<div class="absolute -top-1 -right-1 w-4 h-4 bg-tertiary rounded-full border-2 border-surface flex items-center justify-center shadow-sm">
+<span class="text-[10px] text-on-tertiary font-bold leading-none">1</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-body-md text-on-surface truncate">Maya Patel</h3>
+<span class="font-label-md text-label-md text-primary font-bold whitespace-nowrap ml-2">Tuesday</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface font-medium truncate pr-12">Is the folding chair still available? I can pick it up tonight.</p>
+</div>
+<div class="flex-shrink-0 ml-auto w-12 h-12 rounded-lg overflow-hidden border border-outline-variant/30 shadow-sm">
+<img alt="Item discussed" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkFtbgnAuWfxtXSyjiJGCHjQqv3t9btYBwO2tskuSZeyFFWKzK6P5P8CWyAwZ--SixfjjumqWL0jNJTEv3294p6HWF5UvKUOHHF7QxMKXq4deCP3fn3mXPyq2UXcDsynoImRjXTvckKcbxUdGARLlJx5wta3cGlnlByhev0wtVpIa59ES_WVB19Uom_wHUYziye1v_O0LKjg7CCp9IJenzMMuU6IYT3RC4z6EzcCAyikYK431Z6GX2">
+</div>
+</div>
+<!-- Divider -->
+<div class="w-full h-px bg-primary/10 my-4"></div>
+<!-- Suggested Section -->
+<div class="mb-sm">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider">Suggested</h4>
+<div class="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+<button class="flex-shrink-0 bg-secondary-container hover:bg-secondary-fixed transition-colors rounded-full px-3 py-1.5 flex items-center gap-1.5 border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-secondary-container text-sm">history</span>
+<span class="font-label-md text-label-md text-on-secondary-container">Past Trades</span>
+</button>
+<button class="flex-shrink-0 bg-surface border border-outline-variant hover:bg-surface-variant transition-colors rounded-full px-3 py-1.5 flex items-center gap-1.5">
+<div class="w-4 h-4 rounded-full overflow-hidden bg-primary/20">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMUyIqkgySfC9zf6cBxWdGyFKd3OEuwM0YvNaddgXHe_Xb9RqbB9fpV3CvX7_ll7HdBE9Ap7NKtplpafxinLCBqGTCJ1XOiaP-IHaP1Pjfptf54E2Tw5jUGCpD38CshOhXMfe_xJpTJZT16UohjBE04nynLKF5Tz3cBGcrqNqtuEFmMAmIZb6Af4K5WC0XTfYDgMdLeN85mRJmaGCMWaafvcAaMMY5-4IniQtsLM33OqkErGRxrcOc">
+</div>
+<span class="font-label-md text-label-md text-on-surface">Alex B.</span>
+</button>
+<button class="flex-shrink-0 bg-surface border border-outline-variant hover:bg-surface-variant transition-colors rounded-full px-3 py-1.5 flex items-center gap-1.5">
+<div class="w-4 h-4 rounded-full overflow-hidden bg-primary/20">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2YIfQwm1ysq0W0UC8-UO9SG0u4uFkevRRH7OlM8FMeW1-f95OUanF3KUwq_CmFCbfiMwkTQaIZAyj2wOJlFCVxU9BqyAWfaOwLq0ND7mCc-u7HBhCCVL71r69P-6Uj_dDJRV6GXSSNIuTEflnuzqQ67GGgBW1qU2-Lzy-ReJbfHzNrCBWHzxOVKcctcVNEbN9iwi4GHQ7HUNeuF8pqzDP-OoOcEQ5fgTk3pA8UFcq2AVSHZaeySgR">
+</div>
+<span class="font-label-md text-label-md text-on-surface">Sam T.</span>
+</button>
+</div>
+</div></div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface-container dark:bg-surface-container-highest fixed bottom-0 w-full rounded-t-xl shadow-[0_-4px_12px_rgba(21,66,18,0.06)] z-50 flex justify-around items-center px-4 pt-2 pb-6">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200 w-16 group" href="#">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<!-- Search -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200 w-16 group" href="#">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform">search</span>
+<span class="font-label-md text-label-md">Search</span>
+</a>
+<!-- Trade -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200 w-16 group relative -top-3" href="#">
+<div class="bg-primary text-on-primary rounded-full p-3 shadow-lg group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<span class="font-label-md text-label-md mt-1">Trade</span>
+</a>
+<!-- Chat (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1.5 w-16 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="font-label-md text-label-md">Chat</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim opacity-70 hover:opacity-100 transition-opacity active:scale-90 transition-transform duration-200 w-16 group" href="#">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+<style>
+        /* Utility to hide scrollbar for horizontal lists */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+
+</body></html>
