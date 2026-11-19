@@ -11,6 +11,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
 import { showAlert } from '../../lib/alert';
+import { buildNotifications, unreadNotificationCount } from '../../lib/notifications';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../../constants/theme';
 import { TopHeader } from '../../components/layout/TopHeader';
@@ -19,15 +20,25 @@ import { CategoryChip } from '../../components/ui/CategoryChip';
 import { ItemCard } from '../../components/ui/ItemCard';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
 
 export default function HomeFeedTab() {
-  const { items, toggleFavorite } = useApp();
+  const { items, toggleFavorite, proposals, conversations } = useApp();
+  const { user } = useAuth();
   const { guard } = useAuthGuard();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [modeFilter, setModeFilter] = useState<'all' | 'trade' | 'free'>('all');
+
+  const unreadNotifications = useMemo(
+    () =>
+      unreadNotificationCount(
+        buildNotifications({ uid: user?.uid, proposals, conversations }),
+      ),
+    [conversations, proposals, user?.uid],
+  );
 
   const communityCo2 = useMemo(
     () => items.reduce((total, item) => total + (Number(item.co2_saved_kg) || 0), 0),
@@ -141,12 +152,13 @@ export default function HomeFeedTab() {
       {/* Top App Bar */}
       <TopHeader
         districtName="Dhanmondi, Dhaka"
-        unreadNotifications={0}
+        unreadNotifications={unreadNotifications}
+        avatarUrl={user?.photoURL || undefined}
         onPressLocation={() => {
           showAlert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
         }}
         onPressNotifications={() => {
-          showAlert('Notifications', '1. Tanvir accepted your barter proposal!\n2. 2 new vintage books listed nearby.');
+          router.push('/notifications' as never);
         }}
         onPressProfile={() => {
           router.push('/(tabs)/profile' as any);

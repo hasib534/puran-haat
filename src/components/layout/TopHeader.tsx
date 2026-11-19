@@ -16,7 +16,7 @@ interface TopHeaderProps {
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
   districtName = 'Dhanmondi, Dhaka',
-  avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+  avatarUrl,
   unreadNotifications = 0,
   onPressLocation,
   onPressNotifications,
@@ -53,7 +53,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <MaterialIcons name="notifications-none" size={22} color={Colors.primary} />
           {unreadNotifications > 0 && (
             <View style={styles.notificationDot}>
-              <Text style={styles.dotText}>{unreadNotifications}</Text>
+              <Text style={styles.dotText}>
+                {unreadNotifications > 9 ? '9+' : unreadNotifications}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
@@ -62,12 +64,15 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           style={styles.avatarButton}
           onPress={onPressProfile}
           activeOpacity={0.7}
+          accessibilityLabel="Open profile"
         >
-          <Image
-            source={{ uri: avatarUrl }}
-            style={styles.avatar}
-            contentFit="cover"
-          />
+          {avatarUrl ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+          ) : (
+            <View style={styles.avatarFallback}>
+              <MaterialIcons name="person" size={20} color={Colors.primary} />
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -155,5 +160,12 @@ const styles = StyleSheet.create({
   avatar: {
     width: '100%',
     height: '100%',
+  },
+  avatarFallback: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(21, 66, 18, 0.08)',
   },
 });

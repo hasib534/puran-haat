@@ -261,7 +261,10 @@ function mapProposal(record: FirestoreRecord): TradeProposal {
     cash_adjustment: Number(record.cash_adjustment || 0),
     note: record.note ? String(record.note) : undefined,
     status: (record.status as TradeProposal['status']) || 'pending',
-    created_at: String(record.created_at || ''),
+    created_at:
+      typeof record.created_at === 'number'
+        ? new Date(record.created_at).toISOString()
+        : String(record.created_at || ''),
     proposer: record.proposer ? (record.proposer as Profile) : undefined,
     receiver: record.receiver ? (record.receiver as Profile) : undefined,
     conversation_id: record.conversation_id ? String(record.conversation_id) : undefined,
