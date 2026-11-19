@@ -1,6 +1,6 @@
 # Puran Haat — Barter Marketplace App
 
-A **React Native / Expo** barter marketplace where users trade items locally — no cash required. Built with Firebase for authentication, real-time Firestore sync, and Cloud Storage for avatars/photos.
+A **React Native / Expo** barter marketplace where users trade items locally — no cash required. Built with Firebase for authentication, real-time Firestore sync, and optional Cloud Storage for profile photos.
 
 ---
 
@@ -14,7 +14,7 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 | **Post Items** | Category, condition, trade mode (barter / free gift), eco impact rating, CO₂ saved |
 | **Favorites** | Heart items, stored in `favorites` subcollection |
 | **Chat & Proposals** | Conversations with message subcollections; proposals with status flow (pending → accepted → completed) |
-| **Profile & Edit Profile** | Avatar upload to Firebase Storage (5 MB limit), bio, district, username |
+| **Profile & Edit Profile** | Avatar upload via Firebase Storage (optional — needs Blaze plan), bio, district, username |
 | **Eco Impact Tracking** | Per-user eco points, trade count, CO₂ savings |
 | **Security Rules** | Hardened Firestore + Storage rules with ownership, verified-email writes, immutable fields, and status guards |
 | **Tabs** | Home, Discover, Post, Chats, Profile |
@@ -28,7 +28,7 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 - **Backend**: Firebase
   - **Auth**: Email/Password + Google (web + native)
   - **Firestore**: Real-time subscriptions, compound indexes
-  - **Storage**: Avatars & item images
+  - **Storage**: Avatars (requires the Blaze plan; profile edits still save without it)
 - **State**: React Context + hooks (no Redux)
 - **UI**: `@expo/ui` native components (BottomSheet, Picker, Switch, etc.)
 - **Styling**: Custom theme tokens + StyleSheet
@@ -41,20 +41,20 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 ### Prerequisites
 
 - Node.js 20+
-- Bun (preferred) or npm
+- npm (a `package-lock.json` is committed)
 - Firebase project (see **Firebase Setup** below)
 
 ### Install & Run
 
 ```bash
 # Install dependencies
-bun install          # or: npm install / yarn
+npm install
 
 # Copy environment template and fill in your Firebase credentials
 cp .env.example .env.local
 
 # Start dev server
-bunx expo start      # or: npx expo start
+npx expo start
 ```
 
 Open in:
@@ -63,7 +63,7 @@ Open in:
 - **Android Emulator**: press `a`
 - **Expo Go**: scan QR (limited — no custom native modules)
 
-> ⚠️ Google Sign-In on native requires a **development build** (`bunx expo run:ios` / `bunx expo run:android`) — it will **not** work in Expo Go.
+> ⚠️ Google Sign-In on native requires a **development build** (`npx expo run:ios` / `npx expo run:android`) — it will **not** work in Expo Go.
 
 ---
 
@@ -71,7 +71,7 @@ Open in:
 
 1. **Create a Firebase project** (or use `puran-haat-app`):
    - Enable **Firestore** (region `asia-south1` recommended for South Asia)
-   - Enable **Storage**
+   - Enable **Storage** *(optional — Firebase now requires the Blaze plan. Skip it to run the app without avatar uploads; all other profile fields still save)*
    - Enable **Authentication** → Sign-in methods:
      - Email/Password
      - Google (add authorized domains: `localhost`, your production domain)
@@ -94,7 +94,12 @@ Open in:
 
 4. **Deploy security rules** (from repo root):
    ```bash
-   bunx firebase deploy --only firestore:rules,firestore:indexes,storage
+   npx firebase-tools deploy --only firestore:rules,firestore:indexes
+   ```
+
+   Deploy `storage.rules` separately only after Storage is provisioned on the Blaze plan:
+   ```bash
+   npx firebase-tools deploy --only storage
    ```
 
 ---
@@ -104,12 +109,15 @@ Open in:
 ```
 src/
 ├── app/                    # Expo Router screens
-│   ├── (tabs)/             # Tab screens: index, discover, post, messages, profile
+│   ├── (tabs)/             # Tab screens: index (Home), search (Discover), post, messages (Chats), profile
 │   ├── auth.tsx            # Sign in / up / Google
 │   ├── chat/[id].tsx       # Real-time chat with proposals
 │   ├── edit-profile.tsx    # Avatar picker + profile fields
+│   ├── help.tsx            # Help & FAQ
 │   ├── item/[id].tsx       # Item detail + propose
+│   ├── notifications.tsx   # Activity feed
 │   ├── proposal/[id].tsx   # Proposal detail + accept/decline
+│   ├── trust-safety.tsx    # Community guidelines
 │   └── _layout.tsx         # Root layout + providers
 ├── components/
 │   ├── auth/               # AuthGate, VerificationBanner
@@ -137,9 +145,9 @@ src/
 ## ✅ Quality Checks
 
 ```bash
-bunx tsc --noEmit        # TypeScript strict check
-bunx expo lint           # ESLint (Expo config)
-bunx expo-doctor         # Dependency / config health
+npx tsc --noEmit        # TypeScript strict check
+npx expo lint           # ESLint (Expo config)
+npx expo-doctor         # Dependency / config health
 ```
 
 ---
@@ -148,7 +156,7 @@ bunx expo-doctor         # Dependency / config health
 
 ```bash
 # Install EAS CLI
-bun add -g eas-cli
+npm install -g eas-cli
 
 # Configure project (first time)
 eas build:configure
@@ -169,7 +177,7 @@ eas submit --platform android
 ## 🌐 Web Deployment (Static SPA)
 
 ```bash
-bunx expo export --platform web   # outputs to dist/
+npx expo export --platform web   # outputs to dist/
 # Deploy dist/ to Firebase Hosting, Vercel, Netlify, etc.
 # SPA fallback rewrite required: /* → /index.html
 ```

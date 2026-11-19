@@ -125,13 +125,21 @@ function EditProfileForm() {
     }
     setSaving(true);
     try {
-      await updateProfile({
+      const { avatarUploadFailed } = await updateProfile({
         full_name: fullName.trim(),
         username: username.trim(),
         bio: bio.trim(),
         district: district.trim(),
         avatar_url: avatarUri,
       });
+      if (avatarUploadFailed) {
+        Alert.alert(
+          'Profile saved',
+          'Your details were saved, but the photo could not be uploaded. Photo uploads require Firebase Storage to be enabled for this project.',
+          [{ text: 'OK', onPress: () => router.back() }],
+        );
+        return;
+      }
       Alert.alert('Profile Updated', 'Your changes have been saved.', [
         { text: 'OK', onPress: () => router.back() },
       ]);

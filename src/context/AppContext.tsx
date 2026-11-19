@@ -86,7 +86,7 @@ interface AppContextValue {
   profile: Profile;
   ecoPoints: number;
   tradeCount: number;
-  updateProfile: (patch: Partial<Profile>) => Promise<void>;
+  updateProfile: (patch: Partial<Profile>) => Promise<{ avatarUploadFailed?: boolean }>;
 }
 
 const currentUser: Profile = {
@@ -451,26 +451,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [proposalState, user]);
 
   const updateProfile = useCallback(
-    async (patch: Partial<Profile>) => {
+    async (patch: Partial<Profile>): Promise<{ avatarUploadFailed?: boolean }> => {
       if (!isFirebaseConfigured) {
         setProfileState((prev) => ({ ...prev, ...patch }));
-        return;
+        return {};
       }
       if (!user) throw new Error('Sign in to update your profile.');
 
       let nextPatch = patch;
+      let avatarUploadFailed = false;
       if (patch.avatar_url && !/^https?:\/\//i.test(patch.avatar_url)) {
         // A picked image (file://, blob:, data:) must live in Storage before it
         // is written to Firestore so other devices can load it.
-        nextPatch = {
-          ...patch,
-          avatar_url: await uploadProfileAvatar(user.uid, patch.avatar_url),
-        };
+        try {
+          nextPatch = {
+            ...patch,
+            avatar_url: await uploadProfileAvatar(user.uid, patch.avatar_url),
+          };
+        } catch (error) {
+          // Storage may not be provisioned yet. Keep the existing photo rather
+          // than losing every other profile edit the user just made.
+          avatarUploadFailed = true;
+          nextPatch = { ...patch };
+          delete nextPatch.avatar_url;
+          console.warn('Profile photo upload failed:', error);
+        }
       }
 
       setProfileOwner(user.uid);
       setProfileState((prev) => ({ ...prev, ...nextPatch }));
       await saveUserProfile(user.uid, nextPatch);
+      return { avatarUploadFailed };
     },
     [user],
   );
