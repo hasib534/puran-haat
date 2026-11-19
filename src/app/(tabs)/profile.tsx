@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -17,6 +16,7 @@ import { router } from 'expo-router';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import { showAlert } from '../../lib/alert';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
 
 export default function ProfileTab() {
@@ -42,10 +42,6 @@ export default function ProfileTab() {
             <Text style={styles.meta}>{profile.district} • {profile.is_verified ? 'Verified Trader' : 'Member'}</Text>
             {user ? <Text style={styles.username}>{user.email}</Text> : null}
             {profile.bio ? <Text style={styles.bio} numberOfLines={2}>{profile.bio}</Text> : null}
-            <View style={styles.ratingRow}>
-              <MaterialIcons name="star" size={14} color={Colors.star} />
-              <Text style={styles.rating}>{profile.rating.toFixed(1)} rating</Text>
-            </View>
           </View>
         </View>
 
@@ -109,9 +105,9 @@ export default function ProfileTab() {
               onPress={async () => {
                 try {
                   await seedItems();
-                  Alert.alert('Done', 'Sample items seeded to Firebase.');
+                  showAlert('Done', 'Sample items seeded to Firebase.');
                 } catch (error) {
-                  Alert.alert('Could not seed data', (error as Error).message);
+                  showAlert('Could not seed data', (error as Error).message);
                 }
               }}
             >

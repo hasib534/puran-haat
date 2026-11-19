@@ -250,6 +250,8 @@ export interface ConversationDoc {
   unread: Record<string, number>;
   status: 'pending' | 'accepted' | 'declined';
   proposalId?: string;
+  proposer_id?: string;
+  receiver_id?: string;
   created_at: number;
 }
 
@@ -422,6 +424,47 @@ export async function saveConversation(id: string, conversation: ConversationDoc
   await setDoc(doc(db, 'conversations', id), clean(conversation));
 }
 
+/**
+ * Creates/replaces a proposal and updates the conversation in one atomic
+ * batch, so a declined retry cannot leave a half-written thread behind.
+ */
+export async function saveProposalWithConversation(params: {
+  conversationId: string;
+  proposalId: string;
+  proposal: ProposalDoc;
+  conversation: ConversationDoc;
+  conversationPatch?: Partial<ConversationDoc>;
+  isNewConversation: boolean;
+}): Promise<void> {
+  if (!db) return;
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'proposals', params.proposalId), clean(params.proposal));
+  if (params.isNewConversation) {
+    batch.set(doc(db, 'conversations', params.conversationId), clean(params.conversation));
+  } else {
+    batch.update(
+      doc(db, 'conversations', params.conversationId),
+      clean(params.conversationPatch || {}),
+    );
+  }
+  await batch.commit();
+}
+
+/** Accept/decline a proposal and its conversation atomically. */
+export async function respondToProposal(
+  conversationId: string,
+  proposalId: string | undefined,
+  status: 'accepted' | 'declined',
+): Promise<void> {
+  if (!db) return;
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'conversations', conversationId), { status });
+  if (proposalId) {
+    batch.update(doc(db, 'proposals', proposalId), { status });
+  }
+  await batch.commit();
+}
+
 export async function updateConversation(id: string, patch: Partial<ConversationDoc>): Promise<void> {
   if (!db) return;
   await updateDoc(doc(db, 'conversations', id), clean(patch));
@@ -437,19 +480,6 @@ export async function setConversationStatus(
 export async function clearConversationUnread(id: string, uid: string): Promise<void> {
   if (!db) return;
   await updateDoc(doc(db, 'conversations', id), { [`unread.${uid}`]: 0 });
-}
-
-export async function saveProposal(proposalId: string, proposal: ProposalDoc): Promise<void> {
-  if (!db) return;
-  await setDoc(doc(db, 'proposals', proposalId), clean(proposal));
-}
-
-export async function setProposalStatus(
-  proposalId: string,
-  status: ProposalDoc['status'],
-): Promise<void> {
-  if (!db) return;
-  await updateDoc(doc(db, 'proposals', proposalId), { status });
 }
 
 export async function sendMessage(
@@ -475,14 +505,6 @@ export async function sendMessage(
   }
   batch.update(doc(db, 'conversations', conversationId), updates);
   await batch.commit();
-}
-
-export async function incrementUserStats(uid: string, ecoPoints: number, trades: number): Promise<void> {
-  if (!db) return;
-  await updateDoc(doc(db, 'users', uid), {
-    eco_points: increment(ecoPoints),
-    trade_count: increment(trades),
-  });
 }
 
 /** Writes the sample listings to Firestore with the signed-in user as owner. */

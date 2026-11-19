@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { Colors } from '../../constants/colors';
 import { BorderRadius, Spacing, Typography } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../lib/alert';
 
 export function VerificationBanner() {
   const { user, resendVerification, refreshUser } = useAuth();
@@ -16,9 +17,9 @@ export function VerificationBanner() {
     setBusy(true);
     try {
       await resendVerification();
-      Alert.alert('Verification sent', `Check ${user.email} for the verification link.`);
+      showAlert('Verification sent', `Check ${user.email} for the verification link.`);
     } catch (error) {
-      Alert.alert('Could not send email', (error as Error).message);
+      showAlert('Could not send email', (error as Error).message);
     } finally {
       setBusy(false);
     }

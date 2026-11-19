@@ -67,13 +67,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onPress, onToggleFavor
               <Text style={styles.verifiedText}>Verified</Text>
             </View>
           )}
-
-          {item.user?.rating ? (
-            <View style={styles.ratingBadge}>
-              <MaterialIcons name="star" size={12} color={Colors.star} />
-              <Text style={styles.ratingText}>{item.user.rating.toFixed(1)}</Text>
-            </View>
-          ) : null}
         </View>
 
         {/* Bottom Bar: Mode + Favorite Button */}

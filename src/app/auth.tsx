@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +15,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
+import { showAlert } from '../lib/alert';
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
@@ -51,7 +51,7 @@ export default function AuthScreen() {
         await signInWithGooglePopup();
         router.back();
       } catch (e) {
-        Alert.alert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
+        showAlert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
       } finally {
         setSubmitting(false);
       }
@@ -63,7 +63,7 @@ export default function AuthScreen() {
       if (result.type === 'success') {
         const idToken = result.authentication?.idToken || result.params?.id_token;
         if (!idToken) {
-          Alert.alert(
+          showAlert(
             'Google sign-in incomplete',
             'Google did not return an ID token. Check that the OAuth redirect URI for this app is authorized in Google Cloud Console.',
           );
@@ -74,25 +74,25 @@ export default function AuthScreen() {
           await signInWithGoogle(idToken);
           router.back();
         } catch (e) {
-          Alert.alert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
+          showAlert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
         } finally {
           setSubmitting(false);
         }
       } else if (result.type === 'error') {
-        Alert.alert('Google sign-in error', result.error?.message || 'Unknown error');
+        showAlert('Google sign-in error', result.error?.message || 'Unknown error');
       }
     } catch (e) {
-      Alert.alert('Google sign-in error', (e as Error)?.message || 'Unknown error');
+      showAlert('Google sign-in error', (e as Error)?.message || 'Unknown error');
     }
   };
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Missing fields', 'Please enter email and password.');
+      showAlert('Missing fields', 'Please enter email and password.');
       return;
     }
     if (mode === 'signup' && password.length < 6) {
-      Alert.alert('Weak password', 'Use at least 6 characters.');
+      showAlert('Weak password', 'Use at least 6 characters.');
       return;
     }
     setSubmitting(true);
@@ -102,14 +102,14 @@ export default function AuthScreen() {
         router.back();
       } else {
         await signUp(email.trim(), password);
-        Alert.alert(
+        showAlert(
           'Verify your email',
           `Your account is ready. We sent a verification link to ${email.trim()}. Verify it to start posting and trading.`,
           [{ text: 'OK', onPress: () => router.back() }],
         );
       }
     } catch (e) {
-      Alert.alert('Auth error', (e as Error)?.message || 'Something went wrong.');
+      showAlert('Auth error', (e as Error)?.message || 'Something went wrong.');
     } finally {
       setSubmitting(false);
     }
@@ -117,14 +117,14 @@ export default function AuthScreen() {
 
   const handleForgotPassword = async () => {
     if (!email.trim()) {
-      Alert.alert('Enter your email', 'Type your account email above, then tap Forgot password.');
+      showAlert('Enter your email', 'Type your account email above, then tap Forgot password.');
       return;
     }
     try {
       await resetPassword(email.trim());
-      Alert.alert('Reset link sent', `Check ${email.trim()} for a password reset link.`);
+      showAlert('Reset link sent', `Check ${email.trim()} for a password reset link.`);
     } catch (e) {
-      Alert.alert('Could not send reset email', (e as Error)?.message || 'Try again.');
+      showAlert('Could not send reset email', (e as Error)?.message || 'Try again.');
     }
   };
 

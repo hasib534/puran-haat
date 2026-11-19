@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { Alert } from 'react-native';
 import { router } from 'expo-router';
 
 import { useAuth } from '../context/AuthContext';
+import { showAlert } from '../lib/alert';
 
 interface GuardOptions {
   requireVerified?: boolean;
@@ -16,7 +16,7 @@ export function useAuthGuard() {
       if (!configured) return true;
 
       if (!user) {
-        Alert.alert('Sign in required', `Sign in to ${action}.`, [
+        showAlert('Sign in required', `Sign in to ${action}.`, [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Sign In', onPress: () => router.push('/auth' as never) },
         ]);
@@ -24,7 +24,7 @@ export function useAuthGuard() {
       }
 
       if (options.requireVerified && !user.emailVerified) {
-        Alert.alert(
+        showAlert(
           'Verify your email',
           `Please verify ${user.email} before you ${action}.`,
           [
@@ -33,7 +33,7 @@ export function useAuthGuard() {
               text: 'Resend email',
               onPress: () => {
                 resendVerification().catch((error: Error) =>
-                  Alert.alert('Could not send email', error.message),
+                  showAlert('Could not send email', error.message),
                 );
               },
             },

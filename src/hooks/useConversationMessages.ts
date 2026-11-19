@@ -15,17 +15,18 @@ function formatMessageTime(createdAt: number): string {
 /**
  * Subscribes to a conversation's message subcollection in Firebase mode.
  * In demo mode it returns the in-memory messages from the shared context.
+ *
+ * Messages are tagged with the conversation they belong to so switching chats
+ * never shows the previous thread while the new snapshot loads.
  */
 export function useConversationMessages(conversationId?: string): ChatMessage[] {
   const { conversations } = useApp();
   const { user } = useAuth();
   const conversation = conversations.find((entry) => entry.id === conversationId);
-  const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([]);
+  const [live, setLive] = useState<{ id?: string; messages: ChatMessage[] }>({ messages: [] });
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !conversationId || !user || conversation?.pending) {
-      return;
-    }
+    if (!isFirebaseConfigured || !conversationId || !user || conversation?.pending) return;
     const uid = user.uid;
     return subscribeToMessages(
       conversationId,
@@ -42,7 +43,7 @@ export function useConversationMessages(conversationId?: string): ChatMessage[] 
             };
           })
           .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-        setLiveMessages(messages);
+        setLive({ id: conversationId, messages });
       },
       (error) => console.warn('Messages listener failed:', error.message),
     );
@@ -52,5 +53,6 @@ export function useConversationMessages(conversationId?: string): ChatMessage[] 
     return conversation?.messages ?? [];
   }
 
-  return liveMessages;
+  // Never leak a snapshot from a previously selected conversation.
+  return live.id === conversationId ? live.messages : [];
 }

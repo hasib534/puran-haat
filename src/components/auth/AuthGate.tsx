@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { BorderRadius, Spacing, Typography } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../lib/alert';
 
 interface AuthGateProps {
   children: React.ReactNode;
@@ -70,9 +70,9 @@ export function AuthGate({
       setBusy(true);
       try {
         await resendVerification();
-        Alert.alert('Verification sent', `Check ${user.email} for the verification link.`);
+        showAlert('Verification sent', `Check ${user.email} for the verification link.`);
       } catch (error) {
-        Alert.alert('Could not send email', (error as Error).message);
+        showAlert('Could not send email', (error as Error).message);
       } finally {
         setBusy(false);
       }
@@ -82,7 +82,7 @@ export function AuthGate({
       setBusy(true);
       try {
         await refreshUser();
-        Alert.alert('Still verifying?', 'If you already clicked the link, try again in a moment.');
+        showAlert('Still verifying?', 'If you already clicked the link, try again in a moment.');
       } finally {
         setBusy(false);
       }

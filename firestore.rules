@@ -28,12 +28,6 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    function isParticipant(resourceData) {
-      return isSignedIn()
-        && resourceData.participants is list
-        && request.auth.uid in resourceData.participants;
-    }
-
     function isNonEmptyString(value, maxLength) {
       return value is string && value.size() > 0 && value.size() <= maxLength;
     }
@@ -61,6 +55,12 @@ service cloud.firestore {
         && request.resource.data.user_id == request.auth.uid
         && request.resource.data.user is map
         && request.resource.data.user.id == request.auth.uid
+        // The seller badge is derived from the auth claim, not the client.
+        && request.resource.data.user.get('is_verified', false) == request.auth.token.email_verified
+        && isNonEmptyString(request.resource.data.user.full_name, 80)
+        && request.resource.data.user.get('rating', 0) is number
+        && request.resource.data.user.get('trade_count', 0) is int
+        && request.resource.data.user.get('eco_points', 0) is int
         && isNonEmptyString(request.resource.data.title, 120)
         && isOptionalString(request.resource.data.get('description', null), 2000)
         && isNonEmptyString(request.resource.data.category_id, 40)
@@ -83,6 +83,14 @@ service cloud.firestore {
         && request.resource.data.created_at == resource.data.created_at
         && isNonEmptyString(request.resource.data.title, 120)
         && isOptionalString(request.resource.data.get('description', null), 2000)
+        && isNonEmptyString(request.resource.data.category_id, 40)
+        && isOneOf(request.resource.data.condition, ['brand_new', 'like_new', 'gently_used', 'fair'])
+        && isOneOf(request.resource.data.trade_mode, ['trade', 'free', 'auction'])
+        && isOneOf(request.resource.data.eco_impact_rating, ['High', 'Med', 'Low'])
+        && request.resource.data.co2_saved_kg is number
+        && request.resource.data.co2_saved_kg >= 0
+        && isNonEmptyString(request.resource.data.location_name, 120)
+        && isOptionalNumber(request.resource.data.get('distance_km', null))
         && request.resource.data.images is list
         && request.resource.data.images.size() <= 5;
 
@@ -116,14 +124,13 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
         && request.resource.data.get('is_verified', false) == request.auth.token.email_verified
-        // Ratings are server-owned. Trade/eco counters may only move +1 / +50
-        // so a client cannot award itself arbitrary points.
+        // Ratings and counters are server-owned. Clients cannot inflate them.
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['rating'])
             || request.resource.data.rating == resource.data.rating)
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['trade_count'])
-            || request.resource.data.trade_count == resource.data.trade_count + 1)
+            || request.resource.data.trade_count == resource.data.trade_count)
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['eco_points'])
-            || request.resource.data.eco_points == resource.data.eco_points + 50);
+            || request.resource.data.eco_points == resource.data.eco_points);
 
       allow delete: if isSelf(userId);
     }
@@ -166,6 +173,14 @@ service cloud.firestore {
         && request.resource.data.unread is map
         && isOneOf(request.resource.data.status, ['pending', 'accepted', 'declined'])
         && isOptionalString(request.resource.data.get('proposalId', null), 128)
+        && isOptionalString(request.resource.data.get('proposer_id', null), 128)
+        && isOptionalString(request.resource.data.get('receiver_id', null), 128)
+        // When a proposal is attached, the creator must be its proposer and the
+        // receiver must be the other participant.
+        && (request.resource.data.get('proposalId', null) == null
+            || (request.resource.data.get('proposer_id', '') == request.auth.uid
+                && request.resource.data.get('receiver_id', '') in request.resource.data.participants
+                && request.resource.data.get('receiver_id', '') != request.auth.uid))
         && request.resource.data.created_at is number;
 
       allow update: if isVerified()
@@ -178,17 +193,31 @@ service cloud.firestore {
         && request.resource.data.itemTitle == resource.data.itemTitle
         && request.resource.data.get('itemImage', '') == resource.data.get('itemImage', '')
         && request.resource.data.created_at == resource.data.created_at
-        // A proposal may be attached once, then stays fixed.
+        // Proposal pointers are immutable, except when attaching the first
+        // proposal or replacing a declined one with a fresh proposal.
         && (request.resource.data.get('proposalId', null) == resource.data.get('proposalId', null)
-            || resource.data.get('proposalId', null) == null)
+            || (request.auth.uid == request.resource.data.get('proposer_id', '')
+                && request.resource.data.get('receiver_id', '') in request.resource.data.participants
+                && request.resource.data.get('receiver_id', '') != request.auth.uid
+                && request.resource.data.status == 'pending'
+                && (resource.data.get('proposalId', null) == null
+                    || resource.data.status == 'declined')))
+        && (request.resource.data.get('proposer_id', null) == resource.data.get('proposer_id', null)
+            || resource.data.get('proposer_id', null) == null)
+        && (request.resource.data.get('receiver_id', null) == resource.data.get('receiver_id', null)
+            || resource.data.get('receiver_id', null) == null)
         && request.resource.data.lastMessage is string
         && request.resource.data.lastMessage.size() <= 1000
         && request.resource.data.lastMessageAt is number
         && request.resource.data.unread is map
-        // Only valid status transitions are allowed.
+        // Only the receiver can accept or decline. A declined thread can be
+        // re-opened with a new proposal.
         && (request.resource.data.status == resource.data.status
             || (resource.data.status == 'pending'
-                && request.resource.data.status in ['accepted', 'declined']));
+                && request.resource.data.status in ['accepted', 'declined']
+                && request.auth.uid == resource.data.get('receiver_id', ''))
+            || (resource.data.status == 'declined'
+                && request.resource.data.status == 'pending'));
 
       // Chat history is kept; conversations are never deleted by clients.
       allow delete: if false;
@@ -250,12 +279,14 @@ service cloud.firestore {
         && request.resource.data.get('offered_item_id', null) == resource.data.get('offered_item_id', null)
         && request.resource.data.created_at == resource.data.created_at
         // Allowed lifecycle: pending -> accepted|declined|countered,
-        // countered -> accepted|declined, accepted -> completed.
+        // countered -> accepted|declined, accepted -> completed. Only the
+        // receiver can accept or decline a pending/countered proposal.
         && (request.resource.data.status == resource.data.status
-            || (resource.data.status == 'pending'
-                && request.resource.data.status in ['accepted', 'declined', 'countered'])
-            || (resource.data.status == 'countered'
-                && request.resource.data.status in ['accepted', 'declined'])
+            || (request.auth.uid == resource.data.receiver_id
+                && ((resource.data.status == 'pending'
+                        && request.resource.data.status in ['accepted', 'declined', 'countered'])
+                    || (resource.data.status == 'countered'
+                        && request.resource.data.status in ['accepted', 'declined'])))
             || (resource.data.status == 'accepted'
                 && request.resource.data.status == 'completed'));
 

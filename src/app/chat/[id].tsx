@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
+import { showAlert } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 import { useApp } from '../../context/AppContext';
@@ -66,7 +66,7 @@ function ChatView() {
       await sendMessage(conv.id, text);
     } catch (error) {
       setInputText(text);
-      Alert.alert('Message not sent', (error as Error).message);
+      showAlert('Message not sent', (error as Error).message);
     }
   };
 
@@ -75,22 +75,22 @@ function ChatView() {
     if (!guard('accept this trade', { requireVerified: true })) return;
     try {
       await acceptTrade(conv.id);
-      Alert.alert(
+      showAlert(
         'Trade Accepted! 🎉',
-        `You agreed to the barter swap with ${other?.full_name}! Both of you have earned +50 Eco-Points for keeping items circular.`,
+        `You agreed to the barter swap with ${other?.full_name}. This trade now counts toward both of your Eco-Points.`,
       );
     } catch (error) {
-      Alert.alert('Could not accept trade', (error as Error).message);
+      showAlert('Could not accept trade', (error as Error).message);
     }
   };
 
   const handleDeclineTrade = async () => {
     if (!conv) return;
-    if (!guard('decline this trade')) return;
+    if (!guard('decline this trade', { requireVerified: true })) return;
     try {
       await declineTrade(conv.id);
     } catch (error) {
-      Alert.alert('Could not decline trade', (error as Error).message);
+      showAlert('Could not decline trade', (error as Error).message);
     }
   };
 
@@ -123,13 +123,15 @@ function ChatView() {
           <Image source={{ uri: other?.avatar_url }} style={styles.traderAvatar} contentFit="cover" />
           <View>
             <Text style={styles.traderName}>{other?.full_name}</Text>
-            <Text style={styles.traderStatus}>Active now • Verified Trader</Text>
+            <Text style={styles.traderStatus}>
+              {other.district ? `Based in ${other.district}` : 'Puran Haat member'}
+            </Text>
           </View>
         </View>
 
         <TouchableOpacity
           style={styles.actionIcon}
-          onPress={() => Alert.alert('Report / Safety', 'Report suspicious activity or block user.')}
+          onPress={() => showAlert('Report / Safety', 'Report suspicious activity or block user.')}
         >
           <MaterialIcons name="more-vert" size={22} color={Colors.secondary} />
         </TouchableOpacity>
@@ -138,6 +140,7 @@ function ChatView() {
       {user && !user.emailVerified ? <VerificationBanner /> : null}
 
       {/* Pinned Trade Proposal Card */}
+      {conv.proposalId ? (
       <View style={[styles.tradeBar, Shadows.card]}>
         <View style={styles.tradeBarTop}>
           <Image
@@ -150,14 +153,27 @@ function ChatView() {
               {item?.title || conv.itemTitle || 'Barter item'}
             </Text>
             <Text style={styles.tradeBarMeta}>
-              Status: <Text style={tradeStatus === 'accepted' ? styles.statusAccepted : styles.statusPending}>
-                {tradeStatus === 'accepted' ? 'Accepted ✅' : 'Barter Proposal Pending'}
+              Status:{' '}
+              <Text
+                style={
+                  tradeStatus === 'accepted'
+                    ? styles.statusAccepted
+                    : tradeStatus === 'declined'
+                      ? styles.statusDeclined
+                      : styles.statusPending
+                }
+              >
+                {tradeStatus === 'accepted'
+                  ? 'Accepted ✅'
+                  : tradeStatus === 'declined'
+                    ? 'Declined'
+                    : 'Awaiting response'}
               </Text>
             </Text>
           </View>
         </View>
 
-        {tradeStatus === 'pending' && (
+        {tradeStatus === 'pending' && user?.uid === conv.receiverId && (
           <View style={styles.tradeActionRow}>
             <TouchableOpacity
               style={styles.declineButton}
@@ -175,7 +191,20 @@ function ChatView() {
             </TouchableOpacity>
           </View>
         )}
+
+        {tradeStatus === 'pending' && user?.uid === conv.proposerId && (
+          <Text style={styles.waitingText}>
+            Waiting for {other.full_name} to respond to your offer.
+          </Text>
+        )}
+
+        {tradeStatus === 'declined' && user?.uid === conv.proposerId && (
+          <Text style={styles.waitingText}>
+            Declined. Send a new proposal from the listing to try again.
+          </Text>
+        )}
       </View>
+      ) : null}
 
       {/* Messages Feed */}
       <KeyboardAvoidingView
@@ -215,7 +244,7 @@ function ChatView() {
         <View style={styles.inputBar}>
           <TouchableOpacity
             style={styles.attachButton}
-            onPress={() => Alert.alert('Attach Photo', 'Share photo of condition or meeting point.')}
+            onPress={() => showAlert('Attach Photo', 'Share photo of condition or meeting point.')}
           >
             <MaterialIcons name="add-photo-alternate" size={22} color={Colors.primary} />
           </TouchableOpacity>
@@ -364,6 +393,19 @@ const styles = StyleSheet.create({
   statusAccepted: {
     color: Colors.primary,
     fontWeight: '700',
+  },
+  statusDeclined: {
+    color: Colors.error,
+    fontWeight: '700',
+  },
+  waitingText: {
+    ...Typography.bodySm,
+    color: Colors.onSurfaceVariant,
+    fontSize: 11,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(21, 66, 18, 0.05)',
   },
   tradeActionRow: {
     flexDirection: 'row',

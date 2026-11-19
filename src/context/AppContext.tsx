@@ -12,24 +12,21 @@ import { Item, Profile, TradeProposal } from '../types';
 import { useAuth } from './AuthContext';
 import {
   clearConversationUnread,
-  incrementUserStats,
   isFirebaseConfigured,
   newDocId,
+  respondToProposal,
   saveConversation,
   saveFavorite,
   saveItem,
-  saveProposal,
+  saveProposalWithConversation,
   saveUserProfile,
   seedItemsToFirestore,
   sendMessage as sendMessageDoc,
-  setConversationStatus,
-  setProposalStatus,
   subscribeToConversations,
   subscribeToFavorites,
   subscribeToItems,
   subscribeToProposals,
   subscribeToUserProfile,
-  updateConversation,
   uploadProfileAvatar,
   type ConversationDoc,
   type FirestoreRecord,
@@ -56,6 +53,10 @@ export interface Conversation {
   status: 'pending' | 'accepted' | 'declined';
   messages: ChatMessage[];
   proposalId?: string;
+  /** Who sent the current proposal (only set once a proposal exists). */
+  proposerId?: string;
+  /** Who must accept/decline the current proposal. */
+  receiverId?: string;
   /** True while an optimistic conversation is still being written to Firestore. */
   pending?: boolean;
 }
@@ -244,6 +245,8 @@ function mapConversation(record: FirestoreRecord, uid: string): Conversation {
     status: (record.status as Conversation['status']) || 'pending',
     messages: [],
     proposalId: record.proposalId ? String(record.proposalId) : undefined,
+    proposerId: record.proposer_id ? String(record.proposer_id) : undefined,
+    receiverId: record.receiver_id ? String(record.receiver_id) : undefined,
     pending: false,
   };
 }
@@ -450,6 +453,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return proposalState.uid === user.uid ? proposalState.rows : [];
   }, [proposalState, user]);
 
+  // Stats are derived from accepted proposals instead of client-writable
+  // counters, so they cannot be farmed with a direct Firestore update. Both
+  // participants see the trade because the proposals query is participant-based.
+  const acceptedTradeCount = useMemo(
+    () => proposals.filter((proposal) => proposal.status === 'accepted' || proposal.status === 'completed').length,
+    [proposals],
+  );
+  const ecoPoints = isFirebaseConfigured ? acceptedTradeCount * 50 : profile.eco_points;
+  const tradeCount = isFirebaseConfigured ? acceptedTradeCount : profile.trade_count;
+
   const updateProfile = useCallback(
     async (patch: Partial<Profile>): Promise<{ avatarUploadFailed?: boolean }> => {
       if (!isFirebaseConfigured) {
@@ -628,7 +641,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             }));
             return sendMessageDoc(id, user.uid, [user.uid, other.id], message);
           })
-          .catch((error) => console.warn('Could not create conversation:', error.message));
+          .catch((error) => {
+            // Drop the optimistic thread so the chat screen shows its
+            // "conversation not found" state instead of a fake history.
+            setConversationState((prev) => ({
+              ...prev,
+              rows: prev.rows.filter((entry) => entry.id !== id),
+            }));
+            console.warn('Could not create conversation:', error.message);
+          });
       } else {
         setConversationState((prev) => ({
           ...prev,
@@ -646,8 +667,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const trimmed = text.trim();
       if (!trimmed) return;
       const conversation =
-        conversations.find((entry) => entry.id === convId || entry.itemId === convId) ||
-        conversations[0];
+        conversations.find((entry) => entry.id === convId) ||
+        conversations.find((entry) => entry.itemId === convId);
       if (!conversation) throw new Error('Conversation not found.');
 
       if (!isFirebaseConfigured) {
@@ -697,6 +718,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }));
 
       if (!isFirebaseConfigured || !user) return;
+      // Conversation updates are verified-write only; skip the request for
+      // unverified accounts instead of producing a silent permission error.
+      if (!user.emailVerified) return;
       try {
         await clearConversationUnread(convId, user.uid);
       } catch (error) {
@@ -709,15 +733,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const acceptTrade = useCallback(
     async (convId: string) => {
       const conversation = conversations.find((entry) => entry.id === convId);
-      if (!conversation) return;
+      if (!conversation) throw new Error('Conversation not found.');
+      if (isFirebaseConfigured) {
+        if (!user) throw new Error('Sign in to accept a trade.');
+        if (!conversation.proposalId) throw new Error('There is no proposal to accept.');
+        // The proposer must never be able to accept their own offer.
+        if (conversation.receiverId !== user.uid) {
+          throw new Error('Only the recipient can accept this proposal.');
+        }
+      }
+
+      const previousStatus = conversation.status;
+      setConversationState((prev) => ({
+        ...prev,
+        rows: prev.rows.map((entry) =>
+          entry.id === convId ? { ...entry, status: 'accepted' } : entry,
+        ),
+      }));
 
       if (!isFirebaseConfigured) {
-        setConversationState((prev) => ({
-          ...prev,
-          rows: prev.rows.map((entry) =>
-            entry.id === convId ? { ...entry, status: 'accepted' } : entry,
-          ),
-        }));
         setProfileState((prev) => ({
           ...prev,
           eco_points: prev.eco_points + 50,
@@ -726,20 +760,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
 
-      if (!user) throw new Error('Sign in to accept a trade.');
-
-      setConversationState((prev) => ({
-        ...prev,
-        rows: prev.rows.map((entry) =>
-          entry.id === convId ? { ...entry, status: 'accepted' } : entry,
-        ),
-      }));
-
-      await setConversationStatus(convId, 'accepted');
-      if (conversation.proposalId) {
-        await setProposalStatus(conversation.proposalId, 'accepted');
+      try {
+        await respondToProposal(convId, conversation.proposalId, 'accepted');
+      } catch (error) {
+        setConversationState((prev) => ({
+          ...prev,
+          rows: prev.rows.map((entry) =>
+            entry.id === convId ? { ...entry, status: previousStatus } : entry,
+          ),
+        }));
+        throw error;
       }
-      await incrementUserStats(user.uid, 50, 1);
     },
     [conversations, user],
   );
@@ -747,8 +778,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const declineTrade = useCallback(
     async (convId: string) => {
       const conversation = conversations.find((entry) => entry.id === convId);
-      if (!conversation) return;
+      if (!conversation) throw new Error('Conversation not found.');
+      if (isFirebaseConfigured) {
+        if (!user) throw new Error('Sign in to decline a trade.');
+        if (!conversation.proposalId) throw new Error('There is no proposal to decline.');
+        if (conversation.receiverId !== user.uid) {
+          throw new Error('Only the recipient can decline this proposal.');
+        }
+      }
 
+      const previousStatus = conversation.status;
       setConversationState((prev) => ({
         ...prev,
         rows: prev.rows.map((entry) =>
@@ -756,10 +795,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ),
       }));
 
-      if (!isFirebaseConfigured || !user) return;
-      await setConversationStatus(convId, 'declined');
-      if (conversation.proposalId) {
-        await setProposalStatus(conversation.proposalId, 'declined');
+      if (!isFirebaseConfigured) return;
+
+      try {
+        await respondToProposal(convId, conversation.proposalId, 'declined');
+      } catch (error) {
+        setConversationState((prev) => ({
+          ...prev,
+          rows: prev.rows.map((entry) =>
+            entry.id === convId ? { ...entry, status: previousStatus } : entry,
+          ),
+        }));
+        throw error;
       }
     },
     [conversations, user],
@@ -777,6 +824,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         (conversation) =>
           conversation.itemId === requestedItem.id && conversation.other.id === receiverId,
       );
+      // A thread can hold one live proposal at a time. Reject early with a
+      // readable message instead of letting Firestore return permission-denied.
+      if (existing?.proposalId) {
+        if (existing.status === 'pending') {
+          throw new Error(
+            'You already have a pending proposal for this item. Open the chat to continue the conversation.',
+          );
+        }
+        if (existing.status === 'accepted') {
+          throw new Error(
+            `This swap with ${receiver.full_name} is already accepted. Open your chat to coordinate the handover.`,
+          );
+        }
+      }
       const conversationId =
         existing?.id || (isFirebaseConfigured ? newDocId('conversations') : `c${Date.now()}`);
       const proposalId = isFirebaseConfigured ? newDocId('proposals') : `p${Date.now()}`;
@@ -815,6 +876,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         status: 'pending',
         messages: [],
         proposalId,
+        proposerId: user?.uid,
+        receiverId,
         pending: isFirebaseConfigured && Boolean(user),
       };
 
@@ -843,6 +906,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         unread: { [user.uid]: 0, [receiverId]: 0 },
         status: 'pending',
         proposalId,
+        proposer_id: user.uid,
+        receiver_id: receiverId,
         created_at: now,
       };
 
@@ -865,19 +930,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         created_at: now,
       };
 
-      if (existing) {
-        await updateConversation(conversationId, {
-          lastMessage: message,
-          lastMessageAt: now,
-          status: 'pending',
+      try {
+        await saveProposalWithConversation({
+          conversationId,
           proposalId,
-          unread: { [user.uid]: 0, [receiverId]: 1 },
+          proposal: proposalDoc,
+          conversation: conversationDoc,
+          conversationPatch: existing
+            ? {
+                lastMessage: message,
+                lastMessageAt: now,
+                status: 'pending',
+                proposalId,
+                proposer_id: user.uid,
+                receiver_id: receiverId,
+                unread: { [user.uid]: 0, [receiverId]: 1 },
+              }
+            : undefined,
+          isNewConversation: !existing,
         });
-      } else {
-        await saveConversation(conversationId, conversationDoc);
+        await sendMessageDoc(conversationId, user.uid, [user.uid, receiverId], message);
+      } catch (error) {
+        // Roll back the optimistic proposal/thread so a rejected write does not
+        // leave a ghost trade in the UI.
+        setProposalState((prev) => ({
+          ...prev,
+          rows: prev.rows.filter((entry) => entry.id !== proposalId),
+        }));
+        setConversationState((prev) => ({
+          ...prev,
+          rows: existing
+            ? prev.rows.map((entry) => (entry.id === conversationId ? existing : entry))
+            : prev.rows.filter((entry) => entry.id !== conversationId),
+        }));
+        throw error;
       }
-      await saveProposal(proposalId, proposalDoc);
-      await sendMessageDoc(conversationId, user.uid, [user.uid, receiverId], message);
       setConversationState((prev) => ({
         ...prev,
         rows: prev.rows.map((entry) =>
@@ -913,8 +1000,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     proposals,
     sendProposal,
     profile,
-    ecoPoints: profile.eco_points,
-    tradeCount: profile.trade_count,
+    ecoPoints,
+    tradeCount,
     updateProfile,
   };
 

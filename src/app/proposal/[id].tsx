@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -14,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
+import { showAlert } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 import { MOCK_ITEMS } from '../../data/mock-items';
@@ -95,11 +95,11 @@ function ProposalEditor({ requestedItem }: { requestedItem: Item }) {
 
   const handleSendProposal = async () => {
     if (requiresOffer && !selectedOfferItem) {
-      Alert.alert('No item to offer', 'Post an item first so you have something to trade.');
+      showAlert('No item to offer', 'Post an item first so you have something to trade.');
       return;
     }
     if (user && requestedItem.user_id === user.uid) {
-      Alert.alert('Your listing', 'You cannot propose a trade on your own item.');
+      showAlert('Your listing', 'You cannot propose a trade on your own item.');
       return;
     }
     setSubmitting(true);
@@ -107,10 +107,10 @@ function ProposalEditor({ requestedItem }: { requestedItem: Item }) {
       const conversationId = await sendProposal({
         requestedItem,
         offeredItem: selectedOfferItem,
-        cashAdjustment: Number(cashAdjustment) || 0,
+        cashAdjustment: Math.max(0, Number(cashAdjustment) || 0),
         note: proposalNote,
       });
-      Alert.alert(
+      showAlert(
         'Proposal Sent!',
         `Your barter exchange proposal has been delivered to ${requestedItem.user?.full_name}. You can chat in real time to finalize!`,
         [
@@ -126,7 +126,7 @@ function ProposalEditor({ requestedItem }: { requestedItem: Item }) {
         ],
       );
     } catch (error) {
-      Alert.alert('Could not send proposal', (error as Error).message);
+      showAlert('Could not send proposal', (error as Error).message);
     } finally {
       setSubmitting(false);
     }

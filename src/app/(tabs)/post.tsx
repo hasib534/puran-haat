@@ -6,13 +6,13 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
+import { showAlert } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
@@ -47,7 +47,7 @@ function PostItemForm() {
 
   const handleSubmitListing = async () => {
     if (!title.trim()) {
-      Alert.alert('Missing Title', 'Please enter a title for your item.');
+      showAlert('Missing Title', 'Please enter a title for your item.');
       return;
     }
 
@@ -78,7 +78,7 @@ function PostItemForm() {
     setSubmitting(true);
     try {
       await addItem(newItem);
-      Alert.alert(
+      showAlert(
         'Item Published!',
         `"${title}" is now live on Puran Haat! Nearby traders in ${locationName} will be able to see your listing.`,
         [
@@ -92,7 +92,7 @@ function PostItemForm() {
       setDescription('');
       setWishlist('');
     } catch (error) {
-      Alert.alert('Could not publish listing', (error as Error).message);
+      showAlert('Could not publish listing', (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -112,7 +112,7 @@ function PostItemForm() {
           <Text style={styles.label}>Photos (ছবি যুক্ত করুন)</Text>
           <TouchableOpacity
             style={styles.photoUploadBox}
-            onPress={() => Alert.alert('Add Photos', 'Choose from Camera or Photo Gallery.')}
+            onPress={() => showAlert('Add Photos', 'Choose from Camera or Photo Gallery.')}
             activeOpacity={0.8}
           >
             <View style={styles.cameraCircle}>

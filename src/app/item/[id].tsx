@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -18,6 +17,7 @@ import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/them
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
+import { showAlert } from '../../lib/alert';
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -65,18 +65,18 @@ export default function ItemDetailScreen() {
   const handleFavorite = () => {
     if (!guard('save favorites')) return;
     toggleFavorite(item.id).catch((error: Error) =>
-      Alert.alert('Could not update favorite', error.message),
+      showAlert('Could not update favorite', error.message),
     );
   };
 
   const handleChat = () => {
     if (isOwnListing) {
-      Alert.alert('Your listing', 'This is your own item. You can manage it from your profile.');
+      showAlert('Your listing', 'This is your own item. You can manage it from your profile.');
       return;
     }
     if (!guard('message this trader', { requireVerified: true })) return;
     if (!item.user) {
-      Alert.alert('Unavailable', 'This trader has no profile yet.');
+      showAlert('Unavailable', 'This trader has no profile yet.');
       return;
     }
     const conversationId = ensureConversation(item.id, item.user);
@@ -85,7 +85,7 @@ export default function ItemDetailScreen() {
 
   const handlePropose = () => {
     if (isOwnListing) {
-      Alert.alert('Your listing', 'You cannot propose a trade on your own item.');
+      showAlert('Your listing', 'You cannot propose a trade on your own item.');
       return;
     }
     if (!guard('send a barter proposal', { requireVerified: true })) return;
@@ -212,7 +212,9 @@ export default function ItemDetailScreen() {
                 )}
               </View>
               <Text style={styles.sellerMeta}>
-                ⭐ {item.user?.rating.toFixed(1)} rating • {item.user?.trade_count} successful haat trades
+                {item.user?.district
+                  ? `Based in ${item.user.district} • Community member`
+                  : 'Community member'}
               </Text>
             </View>
           </View>
@@ -246,7 +248,7 @@ export default function ItemDetailScreen() {
                 <Text style={styles.prefTitle}>Trader&apos;s Exchange Wishlist</Text>
               </View>
               <Text style={styles.prefText}>
-                Open to barter for vintage decor, books, study equipment, or gardening tools. Cash adjustments accepted.
+                This trader is open to barter offers. Send a proposal to suggest what you can offer in exchange.
               </Text>
             </View>
           )}

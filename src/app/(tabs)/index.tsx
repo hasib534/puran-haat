@@ -5,12 +5,12 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
+import { showAlert } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../../constants/theme';
 import { TopHeader } from '../../components/layout/TopHeader';
@@ -54,7 +54,7 @@ export default function HomeFeedTab() {
   const handleToggleFavorite = (itemId: string) => {
     if (!guard('save favorites')) return;
     toggleFavorite(itemId).catch((error: Error) =>
-      Alert.alert('Could not update favorite', error.message),
+      showAlert('Could not update favorite', error.message),
     );
   };
 
@@ -143,10 +143,10 @@ export default function HomeFeedTab() {
         districtName="Dhanmondi, Dhaka"
         unreadNotifications={0}
         onPressLocation={() => {
-          Alert.alert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
+          showAlert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
         }}
         onPressNotifications={() => {
-          Alert.alert('Notifications', '1. Tanvir accepted your barter proposal!\n2. 2 new vintage books listed nearby.');
+          showAlert('Notifications', '1. Tanvir accepted your barter proposal!\n2. 2 new vintage books listed nearby.');
         }}
         onPressProfile={() => {
           router.push('/(tabs)/profile' as any);

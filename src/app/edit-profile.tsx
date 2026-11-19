@@ -6,7 +6,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -17,6 +16,7 @@ import * as ImagePicker from 'expo-image-picker';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
+import { showAlert } from '../lib/alert';
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../constants/theme';
 import { useApp } from '../context/AppContext';
@@ -62,7 +62,7 @@ function EditProfileForm() {
 
   const handleBack = useCallback(() => {
     if (dirty) {
-      Alert.alert('Discard changes?', 'You have unsaved changes. Discard them?', [
+      showAlert('Discard changes?', 'You have unsaved changes. Discard them?', [
         { text: 'Keep Editing', style: 'cancel' },
         { text: 'Discard', style: 'destructive', onPress: () => router.back() },
       ]);
@@ -76,7 +76,7 @@ function EditProfileForm() {
       if (source === 'camera') {
         const perm = await ImagePicker.requestCameraPermissionsAsync();
         if (!perm.granted) {
-          Alert.alert('Permission needed', 'Camera permission is required.');
+          showAlert('Permission needed', 'Camera permission is required.');
           return;
         }
         const res = await ImagePicker.launchCameraAsync({
@@ -89,7 +89,7 @@ function EditProfileForm() {
       } else {
         const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!perm.granted) {
-          Alert.alert('Permission needed', 'Photo library permission is required.');
+          showAlert('Permission needed', 'Photo library permission is required.');
           return;
         }
         const res = await ImagePicker.launchImageLibraryAsync({
@@ -101,12 +101,12 @@ function EditProfileForm() {
         if (!res.canceled && res.assets?.[0]) setAvatarUri(res.assets[0].uri);
       }
     } catch {
-      Alert.alert('Error', 'Could not pick image.');
+      showAlert('Error', 'Could not pick image.');
     }
   }, []);
 
   const handleChangePhoto = useCallback(() => {
-    Alert.alert('Change Photo', 'Choose a source', [
+    showAlert('Change Photo', 'Choose a source', [
       { text: 'Camera', onPress: () => pickImage('camera') },
       { text: 'Photo Library', onPress: () => pickImage('library') },
       { text: 'Remove Photo', style: 'destructive', onPress: () => setAvatarUri('') },
@@ -116,11 +116,11 @@ function EditProfileForm() {
 
   const handleSave = useCallback(async () => {
     if (!nameValid) {
-      Alert.alert('Invalid Name', 'Full name must be at least 2 characters.');
+      showAlert('Invalid Name', 'Full name must be at least 2 characters.');
       return;
     }
     if (!usernameValid) {
-      Alert.alert('Invalid Username', 'Username must be 3-20 characters (letters, numbers, underscore).');
+      showAlert('Invalid Username', 'Username must be 3-20 characters (letters, numbers, underscore).');
       return;
     }
     setSaving(true);
@@ -133,18 +133,18 @@ function EditProfileForm() {
         avatar_url: avatarUri,
       });
       if (avatarUploadFailed) {
-        Alert.alert(
+        showAlert(
           'Profile saved',
           'Your details were saved, but the photo could not be uploaded. Photo uploads require Firebase Storage to be enabled for this project.',
           [{ text: 'OK', onPress: () => router.back() }],
         );
         return;
       }
-      Alert.alert('Profile Updated', 'Your changes have been saved.', [
+      showAlert('Profile Updated', 'Your changes have been saved.', [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error) {
-      Alert.alert('Could not save profile', (error as Error).message);
+      showAlert('Could not save profile', (error as Error).message);
     } finally {
       setSaving(false);
     }
@@ -298,7 +298,7 @@ function EditProfileForm() {
                 ) : (
                   <TouchableOpacity
                     style={styles.connectBtn}
-                    onPress={() => Alert.alert(s.name, 'OAuth connection coming soon.')}
+                    onPress={() => showAlert(s.name, 'OAuth connection coming soon.')}
                   >
                     <Text style={styles.connectText}>Connect</Text>
                   </TouchableOpacity>
@@ -311,7 +311,7 @@ function EditProfileForm() {
           <View style={styles.section}>
             <TouchableOpacity
               style={styles.dangerRow}
-              onPress={() => Alert.alert('Delete Account', 'This action is permanent. Contact support to proceed.')}
+              onPress={() => showAlert('Delete Account', 'This action is permanent. Contact support to proceed.')}
             >
               <MaterialIcons name="delete-outline" size={20} color={Colors.error} />
               <Text style={styles.dangerText}>Delete Account</Text>

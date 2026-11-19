@@ -9,18 +9,21 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /avatars/{userId}/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null
+      allow create, update: if request.auth != null
         && request.auth.uid == userId
         && request.resource.size < 5 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
+      // Deletes carry no request.resource, so they need their own rule.
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     match /items/{userId}/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null
+      allow create, update: if request.auth != null
         && request.auth.uid == userId
         && request.resource.size < 10 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     match /{allPaths=**} {

@@ -100,7 +100,10 @@ export default function SearchTab() {
                   <Image source={{ uri: item.images[0] }} style={styles.resultThumb} contentFit="cover" />
                   <View style={styles.resultBody}>
                     <Text style={styles.resultTitle} numberOfLines={1}>{item.title}</Text>
-                    <Text style={styles.resultMeta}>{item.location_name} • {item.distance_km} km</Text>
+                    <Text style={styles.resultMeta}>
+                      {item.location_name}
+                      {item.distance_km != null ? ` • ${item.distance_km} km` : ''}
+                    </Text>
                   </View>
                   <MaterialIcons name="chevron-right" size={20} color={Colors.outline} />
                 </TouchableOpacity>
