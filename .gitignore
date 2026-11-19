@@ -26,6 +26,9 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# browser automation artifacts
+.playwright-mcp/
+
 # macOS
 .DS_Store
 *.pem
