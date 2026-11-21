@@ -12,6 +12,7 @@ import { Item, Profile, TradeProposal } from '../types';
 import { useAuth } from './AuthContext';
 import {
   clearConversationUnread,
+  deleteItemDoc,
   isFirebaseConfigured,
   newDocId,
   respondToProposal,
@@ -68,12 +69,29 @@ export interface NewProposalInput {
   note: string;
 }
 
+/** Fields a seller may change on an existing listing. */
+export type EditableItemPatch = Partial<
+  Pick<
+    Item,
+    | 'title'
+    | 'description'
+    | 'category_id'
+    | 'condition'
+    | 'trade_mode'
+    | 'location_name'
+    | 'co2_saved_kg'
+    | 'eco_impact_rating'
+  >
+>;
+
 interface AppContextValue {
   items: Item[];
   itemsLoading: boolean;
   favorites: string[];
   toggleFavorite: (id: string) => Promise<void>;
   addItem: (item: Item) => Promise<void>;
+  updateItem: (id: string, patch: EditableItemPatch) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
   seedItems: () => Promise<void>;
   conversations: Conversation[];
   getConversation: (id: string) => Conversation | undefined;
@@ -257,7 +275,19 @@ function mapProposal(record: FirestoreRecord): TradeProposal {
     proposer_id: String(record.proposer_id || ''),
     receiver_id: String(record.receiver_id || ''),
     requested_item_id: String(record.requested_item_id || ''),
+    requested_item_title: record.requested_item_title
+      ? String(record.requested_item_title)
+      : undefined,
+    requested_item_image: record.requested_item_image
+      ? String(record.requested_item_image)
+      : undefined,
     offered_item_id: record.offered_item_id ? String(record.offered_item_id) : undefined,
+    offered_item_title: record.offered_item_title
+      ? String(record.offered_item_title)
+      : undefined,
+    offered_item_image: record.offered_item_image
+      ? String(record.offered_item_image)
+      : undefined,
     cash_adjustment: Number(record.cash_adjustment || 0),
     note: record.note ? String(record.note) : undefined,
     status: (record.status as TradeProposal['status']) || 'pending',
@@ -577,6 +607,83 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     },
     [profile, user],
+  );
+
+  const updateItem = useCallback(
+    async (id: string, patch: EditableItemPatch) => {
+      const existing = rawItems.find((entry) => entry.id === id);
+      if (!existing) throw new Error('Listing not found.');
+
+      if (isFirebaseConfigured) {
+        if (!user) throw new Error('Sign in to edit a listing.');
+        if (existing.user_id !== user.uid) {
+          throw new Error('You can only edit your own listings.');
+        }
+        if (!user.emailVerified) {
+          throw new Error('Verify your email before editing a listing.');
+        }
+      }
+
+      // Ownership, seller snapshot, and creation time are immutable in the
+      // rules; keep them from the existing document on every edit.
+      const nextItem: Item = {
+        ...existing,
+        ...patch,
+        id: existing.id,
+        user_id: existing.user_id,
+        user: existing.user,
+        created_at: existing.created_at,
+      };
+
+      setRawItems((prev) =>
+        prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
+      );
+
+      if (!isFirebaseConfigured) return;
+
+      try {
+        await saveItem(nextItem);
+      } catch (error) {
+        setRawItems((prev) =>
+          prev.map((entry) => (entry.id === id ? existing : entry)),
+        );
+        throw error;
+      }
+    },
+    [rawItems, user],
+  );
+
+  const deleteItem = useCallback(
+    async (id: string) => {
+      const existing = rawItems.find((entry) => entry.id === id);
+      if (!existing) throw new Error('Listing not found.');
+
+      if (isFirebaseConfigured) {
+        if (!user) throw new Error('Sign in to delete a listing.');
+        if (existing.user_id !== user.uid) {
+          throw new Error('You can only delete your own listings.');
+        }
+        if (!user.emailVerified) {
+          throw new Error('Verify your email before deleting a listing.');
+        }
+      }
+
+      setRawItems((prev) => prev.filter((entry) => entry.id !== id));
+
+      if (!isFirebaseConfigured) return;
+
+      try {
+        await deleteItemDoc(id);
+      } catch (error) {
+        setRawItems((prev) =>
+          [existing, ...prev].sort((a, b) =>
+            (b.created_at || '').localeCompare(a.created_at || ''),
+          ),
+        );
+        throw error;
+      }
+    },
+    [rawItems, user],
   );
 
   const ensureConversation = useCallback(
@@ -992,6 +1099,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     favorites: Array.from(favoriteIds),
     toggleFavorite,
     addItem,
+    updateItem,
+    deleteItem,
     seedItems,
     conversations,
     getConversation,

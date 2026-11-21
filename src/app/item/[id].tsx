@@ -21,7 +21,7 @@ import { showAlert } from '../../lib/alert';
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { items, itemsLoading, toggleFavorite, ensureConversation } = useApp();
+  const { items, itemsLoading, toggleFavorite, ensureConversation, deleteItem } = useApp();
   const { user } = useAuth();
   const { guard } = useAuthGuard();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -90,6 +90,36 @@ export default function ItemDetailScreen() {
     }
     if (!guard('send a barter proposal', { requireVerified: true })) return;
     router.push({ pathname: '/proposal/[id]', params: { id: item.id } } as never);
+  };
+
+  const handleEditListing = () => {
+    router.push({ pathname: '/edit-item/[id]', params: { id: item.id } } as never);
+  };
+
+  const handleDeleteListing = () => {
+    if (!guard('delete this listing', { requireVerified: true })) return;
+    showAlert(
+      'Delete listing?',
+      `"${item.title}" will be removed from the Haat. Existing chats keep their history.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            deleteItem(item.id)
+              .then(() => {
+                showAlert('Listing deleted', 'This item is no longer on the Haat.', [
+                  { text: 'OK', onPress: () => router.back() },
+                ]);
+              })
+              .catch((error: Error) =>
+                showAlert('Could not delete listing', error.message),
+              );
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -257,20 +287,50 @@ export default function ItemDetailScreen() {
 
       {/* Sticky Bottom Bar */}
       <View style={[styles.bottomBar, Shadows.tabBar]}>
-        <TouchableOpacity style={styles.chatButton} onPress={handleChat} activeOpacity={0.8}>
-          <MaterialIcons name="chat" size={22} color={Colors.primary} />
-        </TouchableOpacity>
+        {isOwnListing ? (
+          <>
+            <TouchableOpacity
+              style={[styles.chatButton, styles.deleteListingButton]}
+              onPress={handleDeleteListing}
+              activeOpacity={0.8}
+              accessibilityLabel="Delete listing"
+            >
+              <MaterialIcons name="delete-outline" size={22} color={Colors.error} />
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.proposeTradeButton}
-          onPress={handlePropose}
-          activeOpacity={0.88}
-        >
-          <MaterialIcons name="swap-calls" size={22} color={Colors.onPrimary} />
-          <Text style={styles.proposeTradeText}>
-            {isFree ? 'Claim Free Gift' : 'Propose Barter Exchange'}
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.proposeTradeButton}
+              onPress={handleEditListing}
+              activeOpacity={0.88}
+              accessibilityLabel="Edit listing"
+            >
+              <MaterialIcons name="edit" size={22} color={Colors.onPrimary} />
+              <Text style={styles.proposeTradeText}>Edit Listing</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.chatButton}
+              onPress={handleChat}
+              activeOpacity={0.8}
+              accessibilityLabel="Message the trader"
+            >
+              <MaterialIcons name="chat" size={22} color={Colors.primary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.proposeTradeButton}
+              onPress={handlePropose}
+              activeOpacity={0.88}
+            >
+              <MaterialIcons name="swap-calls" size={22} color={Colors.onPrimary} />
+              <Text style={styles.proposeTradeText}>
+                {isFree ? 'Claim Free Gift' : 'Propose Barter Exchange'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -590,6 +650,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(21, 66, 18, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  deleteListingButton: {
+    backgroundColor: Colors.errorContainer,
   },
   proposeTradeButton: {
     flex: 1,

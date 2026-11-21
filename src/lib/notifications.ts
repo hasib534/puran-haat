@@ -57,6 +57,7 @@ export function buildNotifications(params: {
 
     const conversationId = proposal.conversation_id;
     const itemTitle =
+      proposal.requested_item_title ||
       proposal.requested_item?.title ||
       (conversationId ? conversationById.get(conversationId)?.itemTitle : undefined);
     const counterpart = nameOf(isReceiver ? proposal.proposer : proposal.receiver);

@@ -45,7 +45,11 @@ export interface TradeProposal {
   proposer_id: string;
   receiver_id: string;
   requested_item_id: string;
+  requested_item_title?: string;
+  requested_item_image?: string;
   offered_item_id?: string;
+  offered_item_title?: string;
+  offered_item_image?: string;
   cash_adjustment?: number;
   note?: string;
   status: ProposalStatusType;

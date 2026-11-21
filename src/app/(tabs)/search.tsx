@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -17,33 +17,105 @@ import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { ItemCard } from '../../components/ui/ItemCard';
+import {
+  loadRecentSearches,
+  mergeRecentSearch,
+  saveRecentSearches,
+} from '../../lib/recent-searches';
+
+type Radius = '1km' | '5km' | '10km' | 'all';
+
+const RADIUS_OPTIONS: Radius[] = ['1km', '5km', '10km', 'all'];
+const CATEGORY_NAME_BY_ID = new Map(
+  MOCK_CATEGORIES.map((category) => [category.id, category.name]),
+);
 
 export default function SearchTab() {
   const { items } = useApp();
+  const { user } = useAuth();
   const [searchText, setSearchText] = useState('');
-  const [selectedRadius, setSelectedRadius] = useState<'1km' | '5km' | '10km' | 'all'>('5km');
-  const [recentSearches, setRecentSearches] = useState(['Vintage chair', 'Clay pots', 'Poetry books', 'Desk lamp']);
+  const [selectedRadius, setSelectedRadius] = useState<Radius>('5km');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  const trendingItems = items.slice(0, 4);
+  useEffect(() => {
+    let cancelled = false;
+    loadRecentSearches(user?.uid).then((terms) => {
+      if (!cancelled) setRecentSearches(terms);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
 
-  const filteredResults = searchText.trim()
-    ? items.filter((it) => {
-        const q = searchText.toLowerCase();
-        return it.title.toLowerCase().includes(q) || it.description?.toLowerCase().includes(q) || it.location_name.toLowerCase().includes(q);
-      })
-    : [];
+  const persistRecentSearches = useCallback(
+    (next: string[]) => {
+      setRecentSearches(next);
+      void saveRecentSearches(user?.uid, next);
+    },
+    [user?.uid],
+  );
+
+  const rememberSearch = useCallback(
+    (term: string) => {
+      const next = mergeRecentSearch(recentSearches, term);
+      if (next === recentSearches) return;
+      persistRecentSearches(next);
+    },
+    [persistRecentSearches, recentSearches],
+  );
+
+  const query = searchText.trim().toLowerCase();
+  const isFiltering = query.length > 0 || selectedCategory !== 'all';
+  const maxDistance = selectedRadius === 'all' ? null : Number.parseInt(selectedRadius, 10);
+
+  const filteredResults = useMemo(() => {
+    if (!isFiltering) return [];
+    return items.filter((item) => {
+      if (selectedCategory !== 'all' && item.category_id !== selectedCategory) return false;
+      if (
+        maxDistance != null &&
+        (item.distance_km == null || item.distance_km > maxDistance)
+      ) {
+        return false;
+      }
+      if (!query) return true;
+      return (
+        item.title.toLowerCase().includes(query) ||
+        Boolean(item.description?.toLowerCase().includes(query)) ||
+        item.location_name.toLowerCase().includes(query)
+      );
+    });
+  }, [isFiltering, items, maxDistance, query, selectedCategory]);
+
+  const trendingItems = useMemo(
+    () =>
+      [...items]
+        .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+        .slice(0, 4),
+    [items],
+  );
+
+  const clearFilters = () => {
+    setSearchText('');
+    setSelectedCategory('all');
+  };
+
+  const openItem = (itemId: string) => {
+    if (query) rememberSearch(searchText);
+    router.push({ pathname: '/item/[id]', params: { id: itemId } } as never);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* Top Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Discover Haat</Text>
         <Text style={styles.headerSubtitle}>খুঁজুন ও অদলবদল করুন</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Search Bar Input */}
         <View style={styles.searchBarWrapper}>
           <MaterialIcons name="search" size={22} color={Colors.outline} style={styles.searchIcon} />
           <TextInput
@@ -52,50 +124,79 @@ export default function SearchTab() {
             placeholderTextColor="rgba(66, 73, 62, 0.6)"
             value={searchText}
             onChangeText={setSearchText}
+            onSubmitEditing={() => rememberSearch(searchText)}
+            returnKeyType="search"
+            accessibilityLabel="Search listings"
           />
           {searchText.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchText('')}>
+            <TouchableOpacity
+              onPress={() => setSearchText('')}
+              accessibilityLabel="Clear search text"
+              hitSlop={8}
+            >
               <MaterialIcons name="cancel" size={18} color={Colors.outline} />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Distance Radius Filter Pills */}
         <View style={styles.radiusRow}>
           <Text style={styles.radiusLabel}>Distance:</Text>
-          {(['1km', '5km', '10km', 'all'] as const).map((rad) => (
-            <TouchableOpacity
-              key={rad}
-              style={[
-                styles.radiusPill,
-                selectedRadius === rad && styles.radiusPillActive,
-              ]}
-              onPress={() => setSelectedRadius(rad)}
-            >
-              <Text
-                style={[
-                  styles.radiusText,
-                  selectedRadius === rad && styles.radiusTextActive,
-                ]}
+          {RADIUS_OPTIONS.map((radius) => {
+            const active = selectedRadius === radius;
+            return (
+              <TouchableOpacity
+                key={radius}
+                style={[styles.radiusPill, active && styles.radiusPillActive]}
+                onPress={() => setSelectedRadius(radius)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
               >
-                {rad === 'all' ? 'All Dhaka' : `< ${rad}`}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[styles.radiusText, active && styles.radiusTextActive]}>
+                  {radius === 'all' ? 'All Dhaka' : `< ${radius}`}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {/* Search Results */}
-        {searchText.trim().length > 0 && (
+        {isFiltering && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Results ({filteredResults.length})</Text>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Results ({filteredResults.length})</Text>
+              <TouchableOpacity onPress={clearFilters} accessibilityRole="button">
+                <Text style={styles.clearAllText}>CLEAR FILTERS</Text>
+              </TouchableOpacity>
+            </View>
+
+            {selectedCategory !== 'all' && (
+              <View style={styles.activeFilterRow}>
+                <View style={styles.activeFilterChip}>
+                  <MaterialIcons name="filter-list" size={14} color={Colors.primary} />
+                  <Text style={styles.activeFilterText}>
+                    {CATEGORY_NAME_BY_ID.get(selectedCategory) || selectedCategory}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setSelectedCategory('all')}
+                    accessibilityLabel="Clear category filter"
+                    hitSlop={8}
+                  >
+                    <MaterialIcons name="close" size={14} color={Colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
             {filteredResults.length === 0 ? (
-              <Text style={styles.emptyText}>No items match your search.</Text>
+              <Text style={styles.emptyText}>
+                No items match these filters. Try a wider distance or another category.
+              </Text>
             ) : (
               filteredResults.map((item) => (
                 <TouchableOpacity
                   key={item.id}
                   style={[styles.resultRow, Shadows.card]}
-                  onPress={() => router.push({ pathname: '/item/[id]', params: { id: item.id } } as any)}
+                  onPress={() => openItem(item.id)}
+                  accessibilityLabel={`Open ${item.title}`}
                 >
                   <Image source={{ uri: item.images[0] }} style={styles.resultThumb} contentFit="cover" />
                   <View style={styles.resultBody}>
@@ -112,75 +213,91 @@ export default function SearchTab() {
           </View>
         )}
 
-        {/* Recent Searches */}
         {recentSearches.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Recent Searches</Text>
-              <TouchableOpacity onPress={() => setRecentSearches([])}>
+              <TouchableOpacity
+                onPress={() => persistRecentSearches([])}
+                accessibilityRole="button"
+              >
                 <Text style={styles.clearAllText}>CLEAR ALL</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.recentTagsWrapper}>
-              {recentSearches.map((term, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={styles.recentTag}
-                  onPress={() => setSearchText(term)}
-                >
-                  <MaterialIcons name="history" size={16} color={Colors.outline} />
-                  <Text style={styles.recentTagText}>{term}</Text>
+              {recentSearches.map((term) => (
+                <View key={term} style={styles.recentTag}>
                   <TouchableOpacity
-                    onPress={() => setRecentSearches((prev) => prev.filter((_, i) => i !== idx))}
+                    style={styles.recentTagMain}
+                    onPress={() => {
+                      setSearchText(term);
+                      rememberSearch(term);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Search for ${term}`}
+                  >
+                    <MaterialIcons name="history" size={16} color={Colors.outline} />
+                    <Text style={styles.recentTagText}>{term}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      persistRecentSearches(recentSearches.filter((entry) => entry !== term))
+                    }
+                    accessibilityLabel={`Remove ${term} from recent searches`}
+                    hitSlop={8}
                   >
                     <MaterialIcons name="close" size={14} color={Colors.outline} />
                   </TouchableOpacity>
-                </TouchableOpacity>
+                </View>
               ))}
             </View>
           </View>
         )}
 
-        {/* Browse Categories Grid */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Browse Categories</Text>
           <View style={styles.catGrid}>
-            {MOCK_CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                style={[styles.catCard, Shadows.card]}
-                onPress={() => setSearchText(cat.name)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.catIconCircle}>
-                  <MaterialIcons name={cat.icon as any} size={24} color={Colors.primary} />
-                </View>
-                <Text style={styles.catName} numberOfLines={1}>{cat.name}</Text>
-              </TouchableOpacity>
-            ))}
+            {MOCK_CATEGORIES.filter((category) => category.id !== 'all').map((category) => {
+              const active = selectedCategory === category.id;
+              return (
+                <TouchableOpacity
+                  key={category.id}
+                  style={[styles.catCard, Shadows.card, active && styles.catCardActive]}
+                  onPress={() =>
+                    setSelectedCategory(active ? 'all' : category.id)
+                  }
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                >
+                  <View style={[styles.catIconCircle, active && styles.catIconCircleActive]}>
+                    <MaterialIcons
+                      name={category.icon as never}
+                      size={24}
+                      color={active ? Colors.onPrimary : Colors.primary}
+                    />
+                  </View>
+                  <Text style={styles.catName} numberOfLines={1}>{category.name}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
-        {/* Trending Near You */}
         <View style={styles.section}>
           <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Trending Near You (জনপ্রিয় জিনিস)</Text>
+            <Text style={styles.sectionTitle}>Fresh Listings (নতুন জিনিস)</Text>
           </View>
           <FlatList
             horizontal
             nestedScrollEnabled
             showsHorizontalScrollIndicator={false}
             data={trendingItems}
-            keyExtractor={(it) => it.id}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={styles.trendingList}
             renderItem={({ item }) => (
               <View style={styles.trendingCardWrap}>
-                <ItemCard
-                  item={item}
-                  onPress={() => {
-                    router.push({ pathname: '/item/[id]', params: { id: item.id } } as any);
-                  }}
-                />
+                <ItemCard item={item} onPress={() => openItem(item.id)} />
               </View>
             )}
           />
@@ -277,6 +394,23 @@ const styles = StyleSheet.create({
     ...Typography.labelSm,
     color: Colors.primary,
   },
+  activeFilterRow: {
+    flexDirection: 'row',
+    marginBottom: Spacing.sm,
+  },
+  activeFilterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.secondaryContainer,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: BorderRadius.full,
+  },
+  activeFilterText: {
+    ...Typography.labelSm,
+    color: Colors.primary,
+  },
   recentTagsWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -285,11 +419,16 @@ const styles = StyleSheet.create({
   recentTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
     backgroundColor: Colors.surfaceContainer,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: BorderRadius.full,
+  },
+  recentTagMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   recentTagText: {
     ...Typography.bodySm,
@@ -311,6 +450,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(21, 66, 18, 0.05)',
   },
+  catCardActive: {
+    borderColor: Colors.primary,
+  },
   catIconCircle: {
     width: 44,
     height: 44,
@@ -319,6 +461,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+  },
+  catIconCircleActive: {
+    backgroundColor: Colors.primary,
   },
   catName: {
     ...Typography.labelSm,

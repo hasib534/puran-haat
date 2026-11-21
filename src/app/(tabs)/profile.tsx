@@ -23,6 +23,9 @@ export default function ProfileTab() {
   const { profile, ecoPoints, tradeCount, items, seedItems } = useApp();
   const { user, signOut } = useAuth();
   const favCount = items.filter((i) => i.is_favorite).length;
+  const myListingCount = items.filter((i) =>
+    isFirebaseConfigured ? Boolean(user && i.user_id === user.uid) : i.user_id === 'me',
+  ).length;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -35,7 +38,13 @@ export default function ProfileTab() {
         <VerificationBanner />
 
         <View style={[styles.profileCard, Shadows.card]}>
-          <Image source={{ uri: profile.avatar_url }} style={styles.avatar} contentFit="cover" />
+          {profile.avatar_url ? (
+            <Image source={{ uri: profile.avatar_url }} style={styles.avatar} contentFit="cover" />
+          ) : (
+            <View style={[styles.avatar, styles.avatarFallback]}>
+              <MaterialIcons name="person" size={30} color={Colors.primary} />
+            </View>
+          )}
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{profile.full_name}</Text>
             {profile.username ? <Text style={styles.username}>@{profile.username}</Text> : null}
@@ -76,6 +85,7 @@ export default function ProfileTab() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
           {[
+            { icon: 'inventory-2', label: `My Listings (${myListingCount})`, route: '/my-listings' },
             { icon: 'person', label: 'Edit Profile', route: '/edit-profile' },
             { icon: 'notifications', label: 'Notifications', route: '/notifications' },
             { icon: 'shield', label: 'Trust & Safety', route: '/trust-safety' },
@@ -129,6 +139,11 @@ const styles = StyleSheet.create({
   headerSubtitle: { ...Typography.bodySm, color: Colors.primaryContainer, fontWeight: '600' },
   profileCard: { flexDirection: 'row', gap: 12, backgroundColor: Colors.surfaceContainerLowest, padding: Spacing.md, borderRadius: BorderRadius.lg, marginTop: Spacing.md, borderWidth: 1, borderColor: 'rgba(21,66,18,0.05)' },
   avatar: { width: 64, height: 64, borderRadius: BorderRadius.full },
+  avatarFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(21,66,18,0.08)',
+  },
   profileInfo: { flex: 1, justifyContent: 'center' },
   name: { ...Typography.headlineSm, color: Colors.onSurface },
   username: { ...Typography.bodySm, color: Colors.primary, marginTop: 2, fontWeight: '600' },

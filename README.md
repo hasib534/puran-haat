@@ -14,6 +14,9 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 | **Post Items** | Category, condition, trade mode (barter / free gift), eco impact rating, CO₂ saved |
 | **Favorites** | Heart items, stored in `favorites` subcollection |
 | **Chat & Proposals** | Conversations with message subcollections; proposals with status flow (pending → accepted → completed) |
+| **Proposal Inbox** | Chats tab splits into conversations and real proposals, highlighting offers that need your response |
+| **Listing Management** | My Listings screen to edit or delete your own items; owner actions also appear on item detail |
+| **Search Filters** | Discover filters by text, category, and distance; recent searches persist per user |
 | **Profile & Edit Profile** | Avatar upload via Firebase Storage (optional — needs Blaze plan), bio, district, username |
 | **Eco Impact Tracking** | Per-user eco points, trade count, CO₂ savings |
 | **Security Rules** | Hardened Firestore + Storage rules with ownership, verified-email writes, immutable fields, and status guards |
@@ -94,7 +97,7 @@ Open in:
 
 4. **Deploy security rules** (from repo root):
    ```bash
-   npx firebase-tools deploy --only firestore:rules,firestore:indexes
+   npx firebase-tools deploy --only firestore:rules,firestore:indexes --project puran-haat-app
    ```
 
    Deploy `storage.rules` separately only after Storage is provisioned on the Blaze plan:
@@ -112,11 +115,13 @@ src/
 │   ├── (tabs)/             # Tab screens: index (Home), search (Discover), post, messages (Chats), profile
 │   ├── auth.tsx            # Sign in / up / Google
 │   ├── chat/[id].tsx       # Real-time chat with proposals
+│   ├── edit-item/[id].tsx  # Owner-only listing edit form
 │   ├── edit-profile.tsx    # Avatar picker + profile fields
 │   ├── help.tsx            # Help & FAQ
 │   ├── item/[id].tsx       # Item detail + propose
+│   ├── my-listings.tsx     # Manage your own listings
 │   ├── notifications.tsx   # Activity feed
-│   ├── proposal/[id].tsx   # Proposal detail + accept/decline
+│   ├── proposal/[id].tsx   # Create a trade proposal for an item
 │   ├── trust-safety.tsx    # Community guidelines
 │   └── _layout.tsx         # Root layout + providers
 ├── components/
@@ -130,7 +135,9 @@ src/
 │   ├── useAuthGuard.ts     # Gate features behind auth+verification
 │   └── useConversationMessages.ts
 ├── lib/
-│   └── firebase.ts         # Firebase SDK init, helpers, uploadProfileAvatar
+│   ├── firebase.ts         # Firebase SDK init, helpers, uploadProfileAvatar
+│   ├── notifications.ts    # Derives the activity feed from proposals + chats
+│   └── recent-searches.ts  # AsyncStorage-backed recent searches per user
 ├── constants/
 │   ├── colors.ts
 │   └── theme.ts
