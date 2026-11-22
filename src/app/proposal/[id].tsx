@@ -16,12 +16,14 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { showAlert } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
-import { MOCK_ITEMS } from '../../data/mock-items';
+import { MOCK_CATEGORIES, MOCK_ITEMS } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthGate } from '../../components/auth/AuthGate';
 import { isFirebaseConfigured } from '../../lib/firebase';
-import { Item } from '../../types';
+import type { Item } from '../../types';
+
+const CATEGORY_NAMES = new Map(MOCK_CATEGORIES.map((category) => [category.id, category.name]));
 
 export default function ExchangeProposalScreen() {
   return (
@@ -72,7 +74,7 @@ function ProposalForm() {
 }
 
 function ProposalEditor({ requestedItem }: { requestedItem: Item }) {
-  const { items, sendProposal } = useApp();
+  const { items, sendProposal, profile } = useApp();
   const { user } = useAuth();
 
   // Only the signed-in user's own listings can be offered.
@@ -136,183 +138,224 @@ function ProposalEditor({ requestedItem }: { requestedItem: Item }) {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+          accessibilityLabel="Go back"
+        >
+          <MaterialIcons name="arrow-back" size={23} color={Colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Barter Proposal</Text>
-        <View style={{ width: 38 }} />
+        <Text style={styles.headerTitle}>Puran Haat</Text>
+        <TouchableOpacity
+          style={styles.avatarButton}
+          onPress={() => router.push('/(tabs)/profile' as never)}
+          accessibilityLabel="Open profile"
+        >
+          {profile.avatar_url ? (
+            <Image source={{ uri: profile.avatar_url }} style={styles.headerAvatar} contentFit="cover" />
+          ) : (
+            <View style={[styles.headerAvatar, styles.avatarFallback]}>
+              <MaterialIcons name="person" size={18} color={Colors.primary} />
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.pageSubtitle}>
-          Trade items directly without cash, or balance with a small adjustment!
-        </Text>
+        {/* Requested item */}
+        <Text style={styles.pageTitle}>You are requesting</Text>
+        <Text style={styles.pageSubtitle}>Review the item details before sending your proposal.</Text>
 
-        {/* 2-Sided Exchange Card */}
-        <View style={[styles.exchangeCard, Shadows.card]}>
-          {/* Top: Requested Item */}
-          <View style={styles.itemSlot}>
-            <Text style={styles.slotLabel}>YOU RECEIVE (আপনি চান)</Text>
-            <View style={styles.slotItemRow}>
-              <Image source={{ uri: requestedItem.images[0] }} style={styles.slotImage} contentFit="cover" />
-              <View style={styles.slotDetails}>
-                <Text style={styles.slotTitle} numberOfLines={1}>{requestedItem.title}</Text>
-                <Text style={styles.slotOwner}>Owner: {requestedItem.user?.full_name}</Text>
-                <View style={styles.ecoTag}>
-                  <MaterialIcons name="eco" size={12} color={Colors.primary} />
-                  <Text style={styles.ecoTagText}>{requestedItem.eco_impact_rating} Eco-Score</Text>
-                </View>
+        <View style={[styles.targetCard, Shadows.card]}>
+          <Image source={{ uri: requestedItem.images[0] }} style={styles.targetImage} contentFit="cover" />
+          <View style={styles.targetBody}>
+            <View style={styles.targetTitleRow}>
+              <Text style={styles.targetTitle} numberOfLines={2}>{requestedItem.title}</Text>
+              <View style={styles.categoryPill}>
+                <Text style={styles.categoryPillText}>
+                  {CATEGORY_NAMES.get(requestedItem.category_id) || 'Item'}
+                </Text>
               </View>
             </View>
-          </View>
-
-          {/* Swap Indicator Pill */}
-          <View style={styles.swapDivider}>
-            <View style={styles.swapIconCircle}>
-              <MaterialIcons name="swap-vert" size={24} color={Colors.onPrimary} />
-            </View>
-          </View>
-
-          {/* Bottom: Offered Item */}
-          <View style={styles.itemSlot}>
-            <Text style={styles.slotLabel}>
-              {requiresOffer ? 'YOU OFFER (বিনিময়ে আপনি দিচ্ছেন)' : 'YOU OFFER (optional for free gifts)'}
+            <Text style={styles.targetDesc} numberOfLines={3}>
+              {requestedItem.description || 'No description provided by the trader.'}
             </Text>
-            <View style={styles.slotItemRow}>
-              {selectedOfferItem ? (
-                <Image source={{ uri: selectedOfferItem.images[0] }} style={styles.slotImage} contentFit="cover" />
+            <View style={styles.ownerRow}>
+              {requestedItem.user?.avatar_url ? (
+                <Image
+                  source={{ uri: requestedItem.user.avatar_url }}
+                  style={styles.ownerAvatar}
+                  contentFit="cover"
+                />
               ) : (
-                <View style={[styles.slotImage, styles.emptySlot]}>
-                  <MaterialIcons name="add-photo-alternate" size={22} color={Colors.outline} />
+                <View style={[styles.ownerAvatar, styles.avatarFallback]}>
+                  <MaterialIcons name="person" size={14} color={Colors.primary} />
                 </View>
               )}
-              <View style={styles.slotDetails}>
-                <Text style={styles.slotTitle} numberOfLines={1}>
-                  {selectedOfferItem?.title ?? 'No item to offer yet'}
-                </Text>
-                <Text style={styles.slotOwner}>
-                  {selectedOfferItem ? 'From your inventory' : 'Post an item first to trade'}
-                </Text>
-                {selectedOfferItem ? (
-                  <Text style={styles.conditionText}>
-                    Condition: {selectedOfferItem.condition.toUpperCase()}
-                  </Text>
-                ) : null}
-              </View>
+              <Text style={styles.ownerText}>
+                Offered by <Text style={styles.ownerName}>{requestedItem.user?.full_name || 'Trader'}</Text>
+              </Text>
+              {requestedItem.user?.is_verified && (
+                <MaterialIcons name="verified" size={13} color={Colors.primary} />
+              )}
             </View>
           </View>
         </View>
 
-        {/* Selector: Choose which of your items to offer */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Select Item to Trade</Text>
-          {myItems.length === 0 ? (
-            <Text style={styles.emptyOfferText}>
-              {requiresOffer
-                ? 'You have no other listings yet. Post an item from the Post tab to offer it here.'
-                : 'This is a free gift — no item is required to claim it.'}
-            </Text>
-          ) : null}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pickerList}>
-            {myItems.map((myIt) => {
-              const isSelected = selectedOfferId === myIt.id;
-              return (
-                <TouchableOpacity
-                  key={myIt.id}
-                  style={[styles.pickerItem, isSelected && styles.pickerItemSelected]}
-                  onPress={() => setSelectedOfferId(myIt.id)}
-                  activeOpacity={0.8}
-                >
-                  <Image source={{ uri: myIt.images[0] }} style={styles.pickerThumb} contentFit="cover" />
-                  <Text style={styles.pickerTitle} numberOfLines={1}>{myIt.title}</Text>
-                  {isSelected && (
-                    <View style={styles.checkedCircle}>
-                      <MaterialIcons name="check" size={14} color={Colors.onPrimary} />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+        {/* Your offer */}
+        <Text style={styles.sectionTitle}>Your Offer</Text>
+        <Text style={styles.sectionHint}>Select an item from your inventory to trade.</Text>
+
+        {myItems.length === 0 ? (
+          <Text style={styles.emptyOfferText}>
+            {requiresOffer
+              ? 'You have no other listings yet. Post an item from the Trade tab to offer it here.'
+              : 'This is a free gift — no item is required to claim it.'}
+          </Text>
+        ) : null}
+
+        <View style={styles.offerGrid}>
+          {myItems.map((myIt) => {
+            const isSelected = selectedOfferId === myIt.id;
+            return (
+              <TouchableOpacity
+                key={myIt.id}
+                style={[styles.offerCard, isSelected && styles.offerCardSelected]}
+                onPress={() => setSelectedOfferId(myIt.id)}
+                activeOpacity={0.85}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isSelected }}
+              >
+                <Image source={{ uri: myIt.images[0] }} style={styles.offerImage} contentFit="cover" />
+                <Text style={styles.offerTitle} numberOfLines={2}>{myIt.title}</Text>
+                {isSelected && (
+                  <View style={styles.checkedCircle}>
+                    <MaterialIcons name="check" size={14} color={Colors.onPrimary} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+
+          <TouchableOpacity
+            style={[styles.offerCard, styles.addNewCard]}
+            onPress={() => router.push('/(tabs)/post' as never)}
+            accessibilityRole="button"
+            accessibilityLabel="Add a new item to your inventory"
+          >
+            <View style={styles.addNewIcon}>
+              <MaterialIcons name="add" size={24} color={Colors.primary} />
+            </View>
+            <Text style={styles.addNewText}>Add New Item</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Cash Adjustment (Optional) */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cash Adjustment (ঐচ্ছিক টাকা সমন্বয়)</Text>
-          <Text style={styles.sectionSubtext}>Add cash if your item is of different value (৳ BDT)</Text>
-          <View style={styles.cashInputRow}>
-            <Text style={styles.currencySymbol}>৳</Text>
-            <TextInput
-              style={styles.cashInput}
-              keyboardType="numeric"
-              value={cashAdjustment}
-              onChangeText={setCashAdjustment}
-              placeholder="0"
-              placeholderTextColor={Colors.outline}
-            />
+        {/* Message */}
+        <Text style={styles.sectionTitle}>Message to Owner (Optional)</Text>
+        <TextInput
+          style={styles.noteInput}
+          multiline
+          numberOfLines={3}
+          value={proposalNote}
+          onChangeText={setProposalNote}
+          placeholder="Hi! I have a healthy Monstera that might look great on that table..."
+          placeholderTextColor="rgba(66, 73, 62, 0.55)"
+          accessibilityLabel="Message to the owner"
+        />
+
+        {/* Cash adjustment */}
+        {requiresOffer && (
+          <>
+            <Text style={styles.sectionTitle}>Cash Adjustment (Optional)</Text>
+            <Text style={styles.sectionHint}>Add cash if the items differ in value (৳ BDT).</Text>
+            <View style={styles.cashInputRow}>
+              <Text style={styles.currencySymbol}>৳</Text>
+              <TextInput
+                style={styles.cashInput}
+                keyboardType="numeric"
+                value={cashAdjustment}
+                onChangeText={setCashAdjustment}
+                placeholder="0"
+                placeholderTextColor={Colors.outline}
+                accessibilityLabel="Cash adjustment in BDT"
+              />
+            </View>
+          </>
+        )}
+
+        {/* Trade preview */}
+        <View style={styles.previewCard}>
+          <View style={styles.previewHeader}>
+            <Text style={styles.previewLabel}>Trade Preview</Text>
+            <MaterialIcons name="swap-horiz" size={19} color={Colors.primary} />
           </View>
-        </View>
 
-        {/* Proposal Note */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Message to Trader</Text>
-          <TextInput
-            style={styles.noteInput}
-            multiline
-            numberOfLines={3}
-            value={proposalNote}
-            onChangeText={setProposalNote}
-            placeholder="Suggest meetup place or terms..."
-            placeholderTextColor={Colors.outline}
-          />
+          <View style={styles.previewRow}>
+            <View style={styles.previewItem}>
+              {selectedOfferItem?.images[0] ? (
+                <Image
+                  source={{ uri: selectedOfferItem.images[0] }}
+                  style={styles.previewThumb}
+                  contentFit="cover"
+                />
+              ) : (
+                <View style={[styles.previewThumb, styles.avatarFallback]}>
+                  <MaterialIcons name="inventory-2" size={16} color={Colors.primary} />
+                </View>
+              )}
+              <Text style={styles.previewItemText} numberOfLines={1}>
+                {selectedOfferItem?.title || 'No item selected'}
+              </Text>
+            </View>
+
+            <Text style={styles.previewFor}>for</Text>
+
+            <View style={[styles.previewItem, styles.previewItemRight]}>
+              <Text style={[styles.previewItemText, styles.previewItemTextRight]} numberOfLines={1}>
+                {requestedItem.title}
+              </Text>
+              <Image
+                source={{ uri: requestedItem.images[0] }}
+                style={styles.previewThumb}
+                contentFit="cover"
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (submitting || (requiresOffer && !selectedOfferItem)) && styles.submitButtonDisabled,
+            ]}
+            onPress={handleSendProposal}
+            disabled={submitting || (requiresOffer && !selectedOfferItem)}
+            activeOpacity={0.88}
+          >
+            {submitting ? (
+              <ActivityIndicator color={Colors.onPrimary} />
+            ) : (
+              <>
+                <Text style={styles.submitButtonText}>
+                  {requiresOffer ? 'Send Proposal' : 'Claim Free Gift'}
+                </Text>
+                <MaterialIcons
+                  name={requiresOffer ? 'send' : 'volunteer-activism'}
+                  size={18}
+                  color={Colors.onPrimary}
+                />
+              </>
+            )}
+          </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Submit Button */}
-      <View style={[styles.bottomBar, Shadows.tabBar]}>
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            (submitting || (requiresOffer && !selectedOfferItem)) && { opacity: 0.65 },
-          ]}
-          onPress={handleSendProposal}
-          disabled={submitting || (requiresOffer && !selectedOfferItem)}
-          activeOpacity={0.88}
-        >
-          {submitting ? (
-            <ActivityIndicator color={Colors.onPrimary} />
-          ) : (
-            <MaterialIcons name={requiresOffer ? 'send' : 'volunteer-activism'} size={20} color={Colors.onPrimary} />
-          )}
-          <Text style={styles.submitButtonText}>
-            {submitting
-              ? 'Sending…'
-              : requiresOffer
-                ? 'Send Barter Proposal'
-                : 'Claim Free Gift'}
-          </Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  stateScreen: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: Spacing.xl,
-  },
-  stateTitle: {
-    ...Typography.headlineSm,
-    color: Colors.onSurface,
-    marginTop: Spacing.md,
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  stateScreen: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl },
+  stateTitle: { ...Typography.headlineSm, color: Colors.onSurface, marginTop: Spacing.md },
   stateText: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
@@ -332,171 +375,153 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
   },
   backButton: {
     width: 38,
     height: 38,
     borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(21, 66, 18, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
-    ...Typography.headlineSm,
-    color: Colors.primary,
-    fontWeight: '700',
+  headerTitle: { ...Typography.headlineSm, color: Colors.primary, fontWeight: '700' },
+  avatarButton: { width: 38, height: 38, borderRadius: BorderRadius.full, overflow: 'hidden' },
+  headerAvatar: { width: '100%', height: '100%' },
+  avatarFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.secondaryContainer,
   },
-  scrollContent: {
-    paddingHorizontal: Spacing.margin,
-    paddingTop: Spacing.xs,
-    paddingBottom: 100,
+  scrollContent: { paddingHorizontal: Spacing.margin, paddingBottom: Spacing.xl },
+  pageTitle: {
+    ...Typography.headlineMd,
+    color: Colors.onSurface,
+    fontWeight: '700',
+    marginTop: Spacing.sm,
   },
   pageSubtitle: {
     ...Typography.bodySm,
     color: Colors.onSurfaceVariant,
-    marginBottom: Spacing.md,
+    marginTop: 2,
+    marginBottom: Spacing.sm,
   },
-  exchangeCard: {
+  targetCard: {
     backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: BorderRadius.xl,
-    padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(21, 66, 18, 0.06)',
+    overflow: 'hidden',
     marginBottom: Spacing.lg,
   },
-  itemSlot: {
-    padding: Spacing.xs,
-  },
-  slotLabel: {
-    ...Typography.labelSm,
-    color: Colors.primaryContainer,
-    marginBottom: 8,
-  },
-  slotItemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  slotImage: {
-    width: 64,
-    height: 64,
-    borderRadius: BorderRadius.md,
+  targetImage: {
+    width: '100%',
+    height: 170,
     backgroundColor: Colors.surfaceContainer,
   },
-  slotDetails: {
+  targetBody: { padding: Spacing.md },
+  targetTitleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  targetTitle: {
+    ...Typography.headlineSm,
+    color: Colors.onSurface,
+    fontWeight: '700',
     flex: 1,
   },
-  emptySlot: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: Colors.outlineVariant,
+  categoryPill: {
+    backgroundColor: Colors.secondaryContainer,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+  },
+  categoryPillText: { ...Typography.labelSm, color: Colors.onSecondaryContainer, fontSize: 10 },
+  targetDesc: {
+    ...Typography.bodySm,
+    color: Colors.onSurfaceVariant,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+  ownerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: Spacing.sm },
+  ownerAvatar: { width: 24, height: 24, borderRadius: BorderRadius.full },
+  ownerText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
+  ownerName: { fontWeight: '700', color: Colors.primary },
+  sectionTitle: {
+    ...Typography.labelLg,
+    color: Colors.onSurface,
+    fontWeight: '700',
+    marginTop: Spacing.sm,
+  },
+  sectionHint: {
+    ...Typography.bodySm,
+    color: Colors.onSurfaceVariant,
+    marginTop: 2,
+    marginBottom: Spacing.sm,
   },
   emptyOfferText: {
     ...Typography.bodySm,
     color: Colors.onSurfaceVariant,
     marginBottom: Spacing.sm,
   },
-  slotTitle: {
-    ...Typography.labelLg,
-    color: Colors.onSurface,
-  },
-  slotOwner: {
-    ...Typography.bodySm,
-    color: Colors.onSurfaceVariant,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  ecoTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    backgroundColor: 'rgba(45, 90, 39, 0.1)',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: BorderRadius.full,
-    marginTop: 4,
-  },
-  ecoTagText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  conditionText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.secondary,
-    marginTop: 3,
-  },
-  swapDivider: {
-    alignItems: 'center',
-    marginVertical: 4,
-  },
-  swapIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: BorderRadius.full,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  section: {
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    ...Typography.labelLg,
-    color: Colors.onSurface,
-    marginBottom: 4,
-  },
-  sectionSubtext: {
-    ...Typography.bodySm,
-    color: Colors.onSurfaceVariant,
-    fontSize: 11,
-    marginBottom: 8,
-  },
-  pickerList: {
-    gap: 12,
-    paddingVertical: 4,
-  },
-  pickerItem: {
-    width: 100,
+  offerGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  offerCard: {
+    width: '48%',
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.lg,
     padding: 8,
     borderWidth: 2,
     borderColor: 'transparent',
-    alignItems: 'center',
     position: 'relative',
   },
-  pickerItemSelected: {
+  offerCardSelected: {
     borderColor: Colors.primary,
     backgroundColor: 'rgba(45, 90, 39, 0.05)',
   },
-  pickerThumb: {
-    width: 80,
-    height: 60,
+  offerImage: {
+    width: '100%',
+    height: 92,
     borderRadius: BorderRadius.sm,
-    marginBottom: 6,
+    backgroundColor: Colors.surfaceContainer,
   },
-  pickerTitle: {
-    ...Typography.labelSm,
-    color: Colors.onSurface,
-    textAlign: 'center',
-  },
+  offerTitle: { ...Typography.labelSm, color: Colors.onSurface, marginTop: 6 },
   checkedCircle: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 18,
-    height: 18,
+    top: 13,
+    right: 13,
+    width: 20,
+    height: 20,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.surfaceContainerLowest,
+  },
+  addNewCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 128,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(21, 66, 18, 0.25)',
+    backgroundColor: 'rgba(45, 90, 39, 0.03)',
+  },
+  addNewIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.secondaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  addNewText: { ...Typography.labelSm, color: Colors.primary, fontWeight: '700' },
+  noteInput: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(21, 66, 18, 0.12)',
+    ...Typography.bodyMd,
+    color: Colors.onSurface,
+    minHeight: 82,
+    textAlignVertical: 'top',
   },
   cashInputRow: {
     flexDirection: 'row',
@@ -505,42 +530,40 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.outlineVariant,
+    borderColor: 'rgba(21, 66, 18, 0.12)',
   },
-  currencySymbol: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.primary,
-    marginRight: 8,
-  },
+  currencySymbol: { fontSize: 20, fontWeight: '700', color: Colors.primary, marginRight: 8 },
   cashInput: {
     flex: 1,
     paddingVertical: 10,
     ...Typography.bodyLg,
     color: Colors.onSurface,
   },
-  noteInput: {
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: BorderRadius.md,
+  previewCard: {
+    backgroundColor: Colors.secondaryContainer,
+    borderRadius: BorderRadius.xl,
     padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    ...Typography.bodyMd,
-    color: Colors.onSurface,
-    minHeight: 70,
-    textAlignVertical: 'top',
+    marginTop: Spacing.lg,
   },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(21, 66, 18, 0.08)',
+  previewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.sm,
   },
+  previewLabel: { ...Typography.labelLg, color: Colors.primary, fontWeight: '700' },
+  previewRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  previewItem: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 },
+  previewItemRight: { justifyContent: 'flex-end' },
+  previewThumb: {
+    width: 32,
+    height: 32,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.surfaceContainer,
+  },
+  previewItemText: { ...Typography.labelSm, color: Colors.onSecondaryContainer, flexShrink: 1 },
+  previewItemTextRight: { textAlign: 'right' },
+  previewFor: { ...Typography.labelSm, color: Colors.outline, fontSize: 10 },
   submitButton: {
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.full,
@@ -549,9 +572,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    marginTop: Spacing.md,
   },
-  submitButtonText: {
-    ...Typography.labelLg,
-    color: Colors.onPrimary,
-  },
+  submitButtonDisabled: { opacity: 0.65 },
+  submitButtonText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },
 });

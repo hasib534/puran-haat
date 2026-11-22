@@ -2,12 +2,12 @@ import { Category, Item } from '../types';
 
 export const MOCK_CATEGORIES: Category[] = [
   { id: 'all', name: 'All Items', icon: 'storefront' },
-  { id: 'verified', name: 'Verified Only', icon: 'verified' },
-  { id: 'furniture', name: 'Furniture', icon: 'chair' },
-  { id: 'books', name: 'Books', icon: 'menu-book' },
+  { id: 'verified', name: 'Verified', icon: 'verified' },
   { id: 'kitchen', name: 'Kitchen', icon: 'kitchen' },
-  { id: 'clothing', name: 'Clothing', icon: 'checkroom' },
+  { id: 'furniture', name: 'Furniture', icon: 'chair' },
   { id: 'garden', name: 'Garden', icon: 'yard' },
+  { id: 'books', name: 'Books', icon: 'menu-book' },
+  { id: 'clothing', name: 'Clothing', icon: 'checkroom' },
   { id: 'electronics', name: 'Electronics', icon: 'devices' },
 ];
 

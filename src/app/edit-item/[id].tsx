@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -25,6 +26,7 @@ import { MOCK_CATEGORIES } from '../../data/mock-items';
 import type { ConditionType, Item, TradeModeType } from '../../types';
 
 const CATEGORY_OPTIONS = MOCK_CATEGORIES.filter((category) => category.id !== 'all');
+const MAX_PHOTOS = 5;
 
 const CONDITION_OPTIONS: { value: ConditionType; label: string }[] = [
   { value: 'brand_new', label: 'Brand new' },
@@ -102,14 +104,73 @@ function EditListingGate() {
 }
 
 function EditListingForm({ item }: { item: Item }) {
-  const { updateItem } = useApp();
+  const { updateItem, canUploadPhotos, uploadListingImages } = useApp();
   const [title, setTitle] = useState(item.title);
   const [description, setDescription] = useState(item.description || '');
   const [categoryId, setCategoryId] = useState(item.category_id);
   const [condition, setCondition] = useState<ConditionType>(item.condition);
   const [tradeMode, setTradeMode] = useState<TradeModeType>(item.trade_mode);
   const [locationName, setLocationName] = useState(item.location_name);
+  const [photos, setPhotos] = useState<string[]>(item.images || []);
   const [saving, setSaving] = useState(false);
+
+  const remainingSlots = Math.max(0, MAX_PHOTOS - photos.length);
+
+  const pickPhotos = async (fromCamera = false) => {
+    if (remainingSlots <= 0) {
+      showAlert('Photo limit reached', `You can keep up to ${MAX_PHOTOS} photos.`);
+      return;
+    }
+    try {
+      if (fromCamera) {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if (!permission.granted) {
+          showAlert('Camera permission needed', 'Allow camera access to take a photo.');
+          return;
+        }
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
+        if (!result.canceled && result.assets?.[0]) {
+          setPhotos((prev) => [...prev, result.assets[0].uri].slice(0, MAX_PHOTOS));
+        }
+        return;
+      }
+
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        showAlert('Photo permission needed', 'Allow photo access to add pictures.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        selectionLimit: remainingSlots,
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets?.length) {
+        const picked = result.assets.map((asset) => asset.uri);
+        setPhotos((prev) => [...prev, ...picked].slice(0, MAX_PHOTOS));
+      }
+    } catch {
+      showAlert('Could not add photo', 'Something went wrong while picking an image.');
+    }
+  };
+
+  const handleAddPhoto = () => {
+    showAlert('Add Photo', 'Choose a source', [
+      { text: 'Camera', onPress: () => pickPhotos(true) },
+      { text: 'Photo Library', onPress: () => pickPhotos(false) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  const removePhoto = (uri: string) => {
+    setPhotos((prev) => prev.filter((entry) => entry !== uri));
+  };
 
   const handleSave = async () => {
     const trimmedTitle = title.trim();
@@ -121,9 +182,14 @@ function EditListingForm({ item }: { item: Item }) {
       showAlert('Title too long', 'Keep the title under 120 characters.');
       return;
     }
+    if (photos.length === 0) {
+      showAlert('Add a photo', 'Keep at least one photo on your listing.');
+      return;
+    }
 
     setSaving(true);
     try {
+      const uploadedPhotos = await uploadListingImages(photos);
       await updateItem(item.id, {
         title: trimmedTitle,
         description: description.trim(),
@@ -131,6 +197,7 @@ function EditListingForm({ item }: { item: Item }) {
         condition,
         trade_mode: tradeMode,
         location_name: locationName.trim() || 'Dhaka',
+        images: uploadedPhotos,
       });
       showAlert('Listing updated', 'Your changes are live on the Haat.', [
         { text: 'OK', onPress: () => router.back() },
@@ -166,17 +233,64 @@ function EditListingForm({ item }: { item: Item }) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={[styles.photoCard, Shadows.card]}>
-            <Image
-              source={{ uri: item.images[0] }}
-              style={styles.photo}
-              contentFit="cover"
-            />
-            <View style={styles.photoInfo}>
-              <Text style={styles.photoTitle}>Listing photo</Text>
-              <Text style={styles.photoHint}>
-                Photo editing will be available once image storage is enabled.
-              </Text>
+            <View style={styles.galleryHeader}>
+              <View style={styles.galleryHeaderBody}>
+                <Text style={styles.photoTitle}>Listing photos</Text>
+                <Text style={styles.photoHint}>
+                  {photos.length} of {MAX_PHOTOS} · first photo is the main one
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.addPhotoButton}
+                onPress={handleAddPhoto}
+                accessibilityRole="button"
+                accessibilityLabel="Add photo"
+              >
+                <MaterialIcons name="add-a-photo" size={16} color={Colors.onPrimary} />
+                <Text style={styles.addPhotoText}>Add</Text>
+              </TouchableOpacity>
             </View>
+
+            <View style={styles.galleryGrid}>
+              {photos.map((uri, index) => (
+                <View key={`photo-${uri}`} style={styles.galleryItem}>
+                  <Image source={{ uri }} style={styles.galleryImage} contentFit="cover" />
+                  {index === 0 && (
+                    <View style={styles.mainBadge}>
+                      <Text style={styles.mainBadgeText}>Main</Text>
+                    </View>
+                  )}
+                  <TouchableOpacity
+                    style={styles.galleryRemove}
+                    onPress={() => removePhoto(uri)}
+                    accessibilityLabel={`Remove photo ${index + 1}`}
+                    hitSlop={8}
+                  >
+                    <MaterialIcons name="close" size={14} color={Colors.onSurface} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              {remainingSlots > 0 && (
+                <TouchableOpacity
+                  style={styles.galleryAddSlot}
+                  onPress={handleAddPhoto}
+                  accessibilityLabel="Add another photo"
+                >
+                  <MaterialIcons name="add" size={24} color={Colors.outline} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {!canUploadPhotos && (
+              <View style={styles.configWarning}>
+                <MaterialIcons name="cloud-off" size={16} color={Colors.tertiary} />
+                <Text style={styles.configWarningText}>
+                  Photo uploads need Cloudinary. Add EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME and
+                  EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET to .env.local, then restart Expo.
+                </Text>
+              </View>
+            )}
           </View>
 
           <Text style={styles.label}>Title</Text>
@@ -333,24 +447,89 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
   },
   photoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: BorderRadius.lg,
-    padding: Spacing.xs,
+    padding: Spacing.sm,
     borderWidth: 1,
     borderColor: 'rgba(21,66,18,0.05)',
   },
-  photo: {
-    width: 72,
-    height: 72,
-    borderRadius: BorderRadius.sm,
-    backgroundColor: Colors.surfaceContainer,
+  galleryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: Spacing.xs,
   },
-  photoInfo: { flex: 1 },
+  galleryHeaderBody: { flex: 1 },
   photoTitle: { ...Typography.labelLg, color: Colors.onSurface },
   photoHint: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginTop: 2 },
+  addPhotoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  addPhotoText: { ...Typography.labelSm, color: Colors.onPrimary, fontWeight: '700' },
+  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: Spacing.xs },
+  galleryItem: {
+    width: '31%',
+    aspectRatio: 1,
+    borderRadius: BorderRadius.md,
+    overflow: 'hidden',
+    backgroundColor: Colors.surfaceContainer,
+  },
+  galleryImage: { width: '100%', height: '100%' },
+  mainBadge: {
+    position: 'absolute',
+    left: 5,
+    bottom: 5,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  mainBadgeText: { fontSize: 9, fontWeight: '700', color: Colors.onPrimary },
+  galleryRemove: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: BorderRadius.full,
+    backgroundColor: 'rgba(253, 250, 231, 0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  galleryAddSlot: {
+    width: '31%',
+    aspectRatio: 1,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(21, 66, 18, 0.2)',
+    backgroundColor: Colors.surfaceContainerLow,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  configWarning: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(106, 33, 13, 0.08)',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  configWarningText: {
+    ...Typography.bodySm,
+    color: Colors.tertiary,
+    flex: 1,
+    lineHeight: 18,
+    fontSize: 11,
+  },
   label: {
     ...Typography.labelLg,
     color: Colors.onSurface,

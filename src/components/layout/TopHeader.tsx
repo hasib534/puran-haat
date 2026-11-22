@@ -9,71 +9,70 @@ interface TopHeaderProps {
   districtName?: string;
   avatarUrl?: string;
   unreadNotifications?: number;
+  showNotifications?: boolean;
   onPressLocation?: () => void;
   onPressNotifications?: () => void;
   onPressProfile?: () => void;
 }
 
+/**
+ * Puran Haat app bar.
+ *
+ * The home mockup keeps the brand centred with the location picker on the
+ * left and the signed-in trader's avatar on the right. Discover swaps the
+ * avatar for the notification bell, so both arrangements are supported here.
+ */
 export const TopHeader: React.FC<TopHeaderProps> = ({
   districtName = 'Dhanmondi, Dhaka',
   avatarUrl,
   unreadNotifications = 0,
+  showNotifications = false,
   onPressLocation,
   onPressNotifications,
   onPressProfile,
 }) => {
   return (
     <View style={styles.header}>
-      {/* Location Picker Pill */}
       <TouchableOpacity
-        style={styles.locationButton}
+        style={styles.iconButton}
         onPress={onPressLocation}
         activeOpacity={0.7}
+        accessibilityLabel={`Change location, currently ${districtName}`}
       >
-        <MaterialIcons name="location-on" size={18} color={Colors.primary} />
-        <Text style={styles.locationText} numberOfLines={1}>
-          {districtName}
-        </Text>
-        <MaterialIcons name="keyboard-arrow-down" size={16} color={Colors.primary} />
+        <MaterialIcons name="location-on" size={23} color={Colors.primary} />
       </TouchableOpacity>
 
-      {/* Brand Title in Center */}
-      <View style={styles.brandContainer}>
-        <Text style={styles.brandTitle}>Puran Haat</Text>
-        <Text style={styles.brandSubtitle}>পুরান হাট</Text>
-      </View>
+      <Text style={styles.brandTitle} numberOfLines={1}>
+        Puran Haat
+      </Text>
 
-      {/* Right Controls: Notifications & Profile */}
-      <View style={styles.rightActions}>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={onPressNotifications}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="notifications-none" size={22} color={Colors.primary} />
-          {unreadNotifications > 0 && (
-            <View style={styles.notificationDot}>
-              <Text style={styles.dotText}>
-                {unreadNotifications > 9 ? '9+' : unreadNotifications}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.avatarButton}
-          onPress={onPressProfile}
-          activeOpacity={0.7}
-          accessibilityLabel="Open profile"
-        >
-          {avatarUrl ? (
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
-          ) : (
-            <View style={styles.avatarFallback}>
-              <MaterialIcons name="person" size={20} color={Colors.primary} />
-            </View>
-          )}
-        </TouchableOpacity>
+      <View style={styles.rightSlot}>
+        {showNotifications ? (
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={onPressNotifications}
+            activeOpacity={0.7}
+            accessibilityLabel="Open notifications"
+          >
+            <MaterialIcons name="notifications-none" size={23} color={Colors.primary} />
+            {unreadNotifications > 0 && <View style={styles.notificationDot} />}
+          </TouchableOpacity>
+        ) : onPressProfile ? (
+          <TouchableOpacity
+            style={styles.avatarButton}
+            onPress={onPressProfile}
+            activeOpacity={0.7}
+            accessibilityLabel="Open profile"
+          >
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <MaterialIcons name="person" size={21} color={Colors.primary} />
+              </View>
+            )}
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );
@@ -83,79 +82,48 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
   },
-  locationButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(21, 66, 18, 0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: BorderRadius.full,
-    maxWidth: 130,
-  },
-  locationText: {
-    ...Typography.labelMd,
-    color: Colors.primary,
-    fontSize: 11,
-  },
-  brandContainer: {
-    alignItems: 'center',
-  },
-  brandTitle: {
-    ...Typography.headlineSm,
-    color: Colors.primary,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  brandSubtitle: {
-    fontSize: 10,
-    color: Colors.primaryContainer,
-    fontWeight: '600',
-    marginTop: -2,
-  },
-  rightActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   iconButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: BorderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(21, 66, 18, 0.06)',
     position: 'relative',
+  },
+  brandTitle: {
+    flex: 1,
+    textAlign: 'center',
+    ...Typography.headlineSm,
+    color: Colors.primary,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  rightSlot: {
+    width: 40,
+    height: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   notificationDot: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: Colors.tertiary,
+    top: 9,
+    right: 9,
+    width: 8,
+    height: 8,
     borderRadius: BorderRadius.full,
-    minWidth: 16,
-    height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 2,
-  },
-  dotText: {
-    color: Colors.onTertiary,
-    fontSize: 9,
-    fontWeight: '700',
+    backgroundColor: Colors.tertiary,
+    borderWidth: 1.5,
+    borderColor: Colors.surface,
   },
   avatarButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: BorderRadius.full,
     overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: Colors.primaryFixed,
   },
   avatar: {
     width: '100%',
@@ -166,6 +134,6 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(21, 66, 18, 0.08)',
+    backgroundColor: Colors.secondaryContainer,
   },
 });

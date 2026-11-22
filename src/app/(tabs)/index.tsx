@@ -45,11 +45,16 @@ export default function HomeFeedTab() {
     [items],
   );
 
-  // Filter items based on category, search text, and trade mode
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
       if (selectedCategory === 'verified' && !item.user?.is_verified) return false;
-      if (selectedCategory !== 'all' && selectedCategory !== 'verified' && item.category_id !== selectedCategory) return false;
+      if (
+        selectedCategory !== 'all' &&
+        selectedCategory !== 'verified' &&
+        item.category_id !== selectedCategory
+      ) {
+        return false;
+      }
       if (modeFilter !== 'all' && item.trade_mode !== modeFilter) return false;
       if (searchQuery.trim().length > 0) {
         const query = searchQuery.toLowerCase();
@@ -73,22 +78,14 @@ export default function HomeFeedTab() {
     <View style={styles.listHeaderContainer}>
       <VerificationBanner />
 
-      {/* Search Input */}
       <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholder="Search vintage items, books, pots..."
-        onPressFilter={() => {
-          router.push('/(tabs)/search' as any);
-        }}
+        placeholder="Search items nearby..."
       />
 
-      {/* Categories Horizontal Carousel */}
       <View style={styles.categoriesSection}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <Text style={styles.sectionSubtitle}>ক্যাটাগরি</Text>
-        </View>
+        <Text style={styles.sectionTitle}>Categories</Text>
         <FlatList
           horizontal
           nestedScrollEnabled
@@ -106,30 +103,13 @@ export default function HomeFeedTab() {
         />
       </View>
 
-      {/* Eco Impact Community Banner */}
-      <View style={styles.impactCard}>
-        <View style={styles.impactIconBadge}>
-          <MaterialIcons name="eco" size={24} color={Colors.primary} />
-        </View>
-        <View style={styles.impactTextGroup}>
-          <Text style={styles.impactTitle}>Community Haat Impact</Text>
-          <Text style={styles.impactDesc}>
-            🌱 <Text style={styles.impactBold}>{communityCo2.toFixed(1)} kg CO₂</Text> potential savings in current listings
-          </Text>
-        </View>
-      </View>
-
-      {/* Trade Mode Quick Filters (All / Trade / Free) */}
       <View style={styles.filterRow}>
         <View style={styles.filterTabs}>
           {(['all', 'trade', 'free'] as const).map((mode) => (
             <TouchableOpacity
               key={mode}
               onPress={() => setModeFilter(mode)}
-              style={[
-                styles.modeTabButton,
-                modeFilter === mode && styles.modeTabButtonActive,
-              ]}
+              style={[styles.modeTabButton, modeFilter === mode && styles.modeTabButtonActive]}
             >
               <Text
                 style={[
@@ -137,19 +117,47 @@ export default function HomeFeedTab() {
                   modeFilter === mode && styles.modeTabButtonTextActive,
                 ]}
               >
-                {mode === 'all' ? 'All Haat' : mode === 'trade' ? 'Direct Swap' : 'Free Gift'}
+                {mode === 'all' ? 'All' : mode === 'trade' ? 'Trade' : 'Free'}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
         <Text style={styles.itemCountText}>{filteredItems.length} items</Text>
       </View>
+
+      <View style={styles.listingsHeader}>
+        <View style={styles.listingsTitleRow}>
+          <MaterialIcons name="new-releases" size={18} color={Colors.primary} />
+          <Text style={styles.listingsTitle}>New Listings</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push('/(tabs)/search' as never)}
+          accessibilityRole="button"
+          accessibilityLabel="See all listings"
+        >
+          <Text style={styles.seeAllText}>See all</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const renderFooter = () => (
+    <View style={styles.impactCard}>
+      <View style={styles.impactIconBadge}>
+        <MaterialIcons name="eco" size={24} color={Colors.primary} />
+      </View>
+      <View style={styles.impactTextGroup}>
+        <Text style={styles.impactTitle}>Community Haat Impact</Text>
+        <Text style={styles.impactDesc}>
+          <Text style={styles.impactBold}>{communityCo2.toFixed(1)} kg CO₂</Text> potential
+          savings in current listings
+        </Text>
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* Top App Bar */}
       <TopHeader
         districtName="Dhanmondi, Dhaka"
         unreadNotifications={unreadNotifications}
@@ -165,7 +173,6 @@ export default function HomeFeedTab() {
         }}
       />
 
-      {/* Main Grid List */}
       <FlatList
         data={filteredItems}
         keyExtractor={(item) => item.id}
@@ -173,11 +180,14 @@ export default function HomeFeedTab() {
         contentContainerStyle={styles.listContent}
         columnWrapperStyle={styles.columnWrapper}
         ListHeaderComponent={renderHeader}
+        ListFooterComponent={filteredItems.length > 0 ? renderFooter : null}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <MaterialIcons name="inventory-2" size={48} color={Colors.outline} />
             <Text style={styles.emptyTitle}>No items found</Text>
-            <Text style={styles.emptyDesc}>Try searching for different keywords or clear filters</Text>
+            <Text style={styles.emptyDesc}>
+              Try searching for different keywords or clear filters
+            </Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -202,34 +212,88 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   listContent: {
-    paddingBottom: 90, // Leave clearance for bottom tab bar
+    paddingBottom: 110,
   },
   listHeaderContainer: {
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   categoriesSection: {
-    marginTop: Spacing.xs,
-    marginBottom: Spacing.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-    paddingHorizontal: Spacing.margin,
+    marginTop: Spacing.sm,
     marginBottom: Spacing.xs,
   },
   sectionTitle: {
     ...Typography.headlineSm,
     color: Colors.onSurface,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.primaryContainer,
+    paddingHorizontal: Spacing.margin,
+    marginBottom: Spacing.xs,
   },
   categoryList: {
     paddingHorizontal: Spacing.margin,
     paddingVertical: 4,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.margin,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  filterTabs: {
+    flexDirection: 'row',
+    backgroundColor: Colors.secondaryContainer,
+    borderRadius: BorderRadius.full,
+    padding: 3,
+  },
+  modeTabButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.full,
+  },
+  modeTabButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  modeTabButtonText: {
+    ...Typography.labelSm,
+    color: Colors.onSecondaryContainer,
+  },
+  modeTabButtonTextActive: {
+    color: Colors.onPrimary,
+  },
+  itemCountText: {
+    ...Typography.labelSm,
+    color: Colors.outline,
+  },
+  listingsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.margin,
+    marginBottom: Spacing.sm,
+  },
+  listingsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  listingsTitle: {
+    ...Typography.headlineSm,
+    color: Colors.onSurface,
+    fontWeight: '700',
+  },
+  seeAllText: {
+    ...Typography.labelMd,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  columnWrapper: {
+    paddingHorizontal: Spacing.margin,
+    gap: Spacing.gutter,
+    marginBottom: Spacing.gutter,
+  },
+  cardWrapper: {
+    flex: 1,
+    maxWidth: '50%',
   },
   impactCard: {
     flexDirection: 'row',
@@ -237,13 +301,14 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: Colors.secondaryContainer,
     marginHorizontal: Spacing.margin,
-    marginVertical: Spacing.xs,
-    padding: Spacing.sm,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
     borderRadius: BorderRadius.lg,
   },
   impactIconBadge: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.surface,
     alignItems: 'center',
@@ -264,48 +329,6 @@ const styles = StyleSheet.create({
   impactBold: {
     fontWeight: '700',
     color: Colors.primary,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.margin,
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.xs,
-  },
-  filterTabs: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(85, 97, 88, 0.12)',
-    borderRadius: BorderRadius.full,
-    padding: 3,
-  },
-  modeTabButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: BorderRadius.full,
-  },
-  modeTabButtonActive: {
-    backgroundColor: Colors.primary,
-  },
-  modeTabButtonText: {
-    ...Typography.labelSm,
-    color: Colors.onSurfaceVariant,
-  },
-  modeTabButtonTextActive: {
-    color: Colors.onPrimary,
-  },
-  itemCountText: {
-    ...Typography.labelSm,
-    color: Colors.outline,
-  },
-  columnWrapper: {
-    paddingHorizontal: Spacing.margin,
-    gap: Spacing.gutter,
-    marginBottom: Spacing.gutter,
-  },
-  cardWrapper: {
-    flex: 1,
-    maxWidth: '50%',
   },
   emptyContainer: {
     alignItems: 'center',

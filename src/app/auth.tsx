@@ -8,31 +8,38 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 import { showAlert } from '../lib/alert';
 import { Colors } from '../constants/colors';
-import { Typography, BorderRadius, Spacing } from '../constants/theme';
+import { Typography, BorderRadius, Spacing, Shadows } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { GoogleSignInUnavailableError, signInWithGoogleNative } from '../lib/google-signin';
 
+type AuthMode = 'signin' | 'signup';
+
 export default function AuthScreen() {
-  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, resetPassword, configured } = useAuth();
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, resetPassword, configured } =
+    useAuth();
+  const [mode, setMode] = useState<AuthMode>('signin');
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  const isSignup = mode === 'signup';
 
   const handleGooglePress = async () => {
-    // On web, use Firebase's popup flow. It goes through the Firebase auth
-    // handler that is already registered as an authorized Google OAuth
-    // redirect, so localhost and future production domains work without
-    // editing the OAuth client for every origin.
     if (Platform.OS === 'web') {
       setSubmitting(true);
       try {
@@ -49,7 +56,7 @@ export default function AuthScreen() {
     setSubmitting(true);
     try {
       const idToken = await signInWithGoogleNative(webClientId);
-      if (!idToken) return; // User closed the account picker.
+      if (!idToken) return;
       await signInWithGoogle(idToken);
       router.back();
     } catch (e) {
@@ -63,22 +70,41 @@ export default function AuthScreen() {
     }
   };
 
+  const handleApplePress = () => {
+    showAlert('Apple Sign-In', 'Apple Sign-In is not available yet. Use email or Google to continue.');
+  };
+
   const handleSubmit = async () => {
+    if (isSignup) {
+      if (fullName.trim().length < 2) {
+        showAlert('Missing name', 'Enter your full name so neighbors know who they are trading with.');
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username.trim())) {
+        showAlert('Choose a username', 'Use 3-20 letters, numbers, or underscores.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        showAlert('Passwords do not match', 'Re-enter the same password in both fields.');
+        return;
+      }
+    }
     if (!email.trim() || !password.trim()) {
       showAlert('Missing fields', 'Please enter email and password.');
       return;
     }
-    if (mode === 'signup' && password.length < 6) {
+    if (isSignup && password.length < 6) {
       showAlert('Weak password', 'Use at least 6 characters.');
       return;
     }
+
     setSubmitting(true);
     try {
       if (mode === 'signin') {
         await signIn(email.trim(), password);
         router.back();
       } else {
-        await signUp(email.trim(), password);
+        await signUp(email.trim(), password, fullName.trim(), username.trim());
         showAlert(
           'Verify your email',
           `Your account is ready. We sent a verification link to ${email.trim()}. Verify it to start posting and trading.`,
@@ -108,92 +134,213 @@ export default function AuthScreen() {
   const googleUnavailable =
     !configured || (Platform.OS !== 'web' && !webClientId) || submitting;
 
+  const inputStyle = (key: string) => [styles.inputShell, focusedField === key && styles.inputShellFocused];
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{mode === 'signin' ? 'Sign In' : 'Create Account'}</Text>
-          <View style={{ width: 38 }} />
-        </View>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <View style={styles.backdropTop} />
+      <View style={styles.backdropBottom} />
 
-        <View style={styles.body}>
-          {!configured && (
-            <View style={styles.warning}>
-              <MaterialIcons name="warning" size={20} color={Colors.tertiary} />
-              <Text style={styles.warningText}>
-                Firebase is not configured. Set EXPO_PUBLIC_FIREBASE_API_KEY and EXPO_PUBLIC_FIREBASE_PROJECT_ID in .env.local.
-              </Text>
+      <TouchableOpacity style={styles.closeButton} onPress={() => router.back()} accessibilityLabel="Close">
+        <MaterialIcons name="close" size={22} color={Colors.primary} />
+      </TouchableOpacity>
+
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.card}>
+            <View style={styles.brandBlock}>
+              <View style={styles.brandMark}>
+                <MaterialIcons name="sync-alt" size={26} color={Colors.onPrimary} />
+              </View>
+              <Text style={styles.brandTitle}>Puran Haat</Text>
+              <Text style={styles.brandSubtitle}>Connect, trade, and sustain.</Text>
             </View>
-          )}
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              placeholderTextColor={Colors.outline}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-          </View>
+            <View style={styles.segment} accessibilityRole="tablist">
+              {(['signin', 'signup'] as const).map((value) => {
+                const active = mode === value;
+                return (
+                  <TouchableOpacity
+                    key={value}
+                    style={[styles.segmentButton, active && styles.segmentButtonActive]}
+                    onPress={() => setMode(value)}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: active }}
+                  >
+                    <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
+                      {value === 'signin' ? 'Login' : 'Sign Up'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="At least 6 characters"
-              placeholderTextColor={Colors.outline}
-              secureTextEntry
-            />
-            {mode === 'signin' && (
-              <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotButton}>
-                <Text style={styles.forgotText}>Forgot password?</Text>
+            {!configured && (
+              <View style={styles.warning}>
+                <MaterialIcons name="warning" size={20} color={Colors.tertiary} />
+                <Text style={styles.warningText}>
+                  Firebase is not configured. Set EXPO_PUBLIC_FIREBASE_API_KEY and
+                  EXPO_PUBLIC_FIREBASE_PROJECT_ID in .env.local.
+                </Text>
+              </View>
+            )}
+
+            {isSignup && (
+              <>
+                <Text style={styles.label}>Full Name</Text>
+                <View style={inputStyle('name')}>
+                  <MaterialIcons name="person" size={20} color={Colors.outline} />
+                  <TextInput
+                    style={styles.input}
+                    value={fullName}
+                    onChangeText={setFullName}
+                    onFocus={() => setFocusedField('name')}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="Jane Doe"
+                    placeholderTextColor="rgba(66, 73, 62, 0.5)"
+                    autoCapitalize="words"
+                    textContentType="name"
+                  />
+                </View>
+
+                <Text style={styles.label}>Username</Text>
+                <View style={inputStyle('username')}>
+                  <MaterialIcons name="alternate-email" size={20} color={Colors.outline} />
+                  <TextInput
+                    style={styles.input}
+                    value={username}
+                    onChangeText={setUsername}
+                    onFocus={() => setFocusedField('username')}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="janedoe"
+                    placeholderTextColor="rgba(66, 73, 62, 0.5)"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              </>
+            )}
+
+            <Text style={styles.label}>Email Address</Text>
+            <View style={inputStyle('email')}>
+              <MaterialIcons name="mail-outline" size={20} color={Colors.outline} />
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="you@example.com"
+                placeholderTextColor="rgba(66, 73, 62, 0.5)"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+              />
+            </View>
+
+            <View style={styles.passwordLabelRow}>
+              <Text style={styles.labelInline}>Password</Text>
+              {!isSignup && (
+                <TouchableOpacity onPress={handleForgotPassword}>
+                  <Text style={styles.forgotText}>Forgot Password?</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={inputStyle('password')}>
+              <MaterialIcons name="lock-outline" size={20} color={Colors.outline} />
+              <TextInput
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="••••••••"
+                placeholderTextColor="rgba(66, 73, 62, 0.5)"
+                secureTextEntry={!showPassword}
+                textContentType={isSignup ? 'newPassword' : 'password'}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword((value) => !value)}
+                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                hitSlop={8}
+              >
+                <MaterialIcons
+                  name={showPassword ? 'visibility' : 'visibility-off'}
+                  size={20}
+                  color={Colors.outline}
+                />
               </TouchableOpacity>
+            </View>
+
+            {isSignup && (
+              <>
+                <Text style={styles.label}>Confirm Password</Text>
+                <View style={inputStyle('confirm')}>
+                  <MaterialIcons name="lock-reset" size={20} color={Colors.outline} />
+                  <TextInput
+                    style={styles.input}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    onFocus={() => setFocusedField('confirm')}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="••••••••"
+                    placeholderTextColor="rgba(66, 73, 62, 0.5)"
+                    secureTextEntry={!showPassword}
+                    textContentType="newPassword"
+                  />
+                </View>
+              </>
             )}
+
+            <TouchableOpacity
+              style={[styles.button, submitting && styles.buttonDisabled]}
+              onPress={handleSubmit}
+              disabled={submitting || !configured}
+              activeOpacity={0.88}
+            >
+              {submitting ? (
+                <ActivityIndicator color={Colors.onPrimary} />
+              ) : (
+                <Text style={styles.buttonText}>{isSignup ? 'Create Account' : 'Login'}</Text>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>Or continue with</Text>
+              <View style={styles.divider} />
+            </View>
+
+            <View style={styles.socialRow}>
+              <TouchableOpacity
+                style={[styles.socialButton, googleUnavailable && styles.socialButtonDisabled]}
+                onPress={handleGooglePress}
+                disabled={googleUnavailable}
+                activeOpacity={0.85}
+              >
+                <FontAwesome name="google" size={19} color="#4285F4" />
+                <Text style={styles.socialText}>Google</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.socialButton, submitting && styles.socialButtonDisabled]}
+                onPress={handleApplePress}
+                disabled={submitting}
+                activeOpacity={0.85}
+              >
+                <FontAwesome name="apple" size={21} color={Colors.onSurface} />
+                <Text style={styles.socialText}>Apple</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <TouchableOpacity
-            style={[styles.button, submitting && { opacity: 0.7 }]}
-            onPress={handleSubmit}
-            disabled={submitting || !configured}
-            activeOpacity={0.88}
-          >
-            {submitting ? (
-              <ActivityIndicator color={Colors.onPrimary} />
-            ) : (
-              <Text style={styles.buttonText}>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.dividerRow}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.divider} />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.googleButton, googleUnavailable && { opacity: 0.5 }]}
-            onPress={handleGooglePress}
-            disabled={googleUnavailable}
-            activeOpacity={0.88}
-          >
-            <MaterialIcons name="g-translate" size={20} color={Colors.onSurface} />
-            <Text style={styles.googleText}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setMode(mode === 'signin' ? 'signup' : 'signin')} style={styles.toggle}>
-            <Text style={styles.toggleText}>
-              {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -201,24 +348,197 @@ export default function AuthScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.margin, paddingVertical: Spacing.sm, backgroundColor: Colors.surface },
-  backButton: { width: 38, height: 38, borderRadius: BorderRadius.full, backgroundColor: 'rgba(21,66,18,0.08)', alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...Typography.headlineSm, color: Colors.primary, fontWeight: '700' },
-  body: { flex: 1, paddingHorizontal: Spacing.margin, paddingTop: Spacing.lg },
-  warning: { flexDirection: 'row', gap: 8, backgroundColor: Colors.tertiaryFixed, padding: Spacing.sm, borderRadius: BorderRadius.md, marginBottom: Spacing.md },
+  flex: { flex: 1 },
+  backdropTop: {
+    position: 'absolute',
+    top: -130,
+    right: -90,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(45, 90, 39, 0.07)',
+  },
+  backdropBottom: {
+    position: 'absolute',
+    bottom: -140,
+    left: -110,
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(106, 33, 13, 0.05)',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: Spacing.md,
+    left: Spacing.margin,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.full,
+    backgroundColor: 'rgba(21, 66, 18, 0.07)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.margin,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.xl,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(253, 250, 231, 0.92)',
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    ...Shadows.card,
+  },
+  brandBlock: {
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  brandMark: {
+    width: 54,
+    height: 54,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.sm,
+  },
+  brandTitle: {
+    ...Typography.headlineMd,
+    color: Colors.primary,
+    fontWeight: '700',
+    letterSpacing: -0.4,
+  },
+  brandSubtitle: {
+    ...Typography.bodyMd,
+    color: Colors.onSurfaceVariant,
+    marginTop: 2,
+  },
+  segment: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surfaceContainerHigh,
+    borderRadius: BorderRadius.full,
+    padding: 4,
+    marginBottom: Spacing.lg,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center',
+  },
+  segmentButtonActive: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    ...Shadows.card,
+  },
+  segmentText: {
+    ...Typography.labelLg,
+    color: Colors.onSurfaceVariant,
+  },
+  segmentTextActive: {
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  warning: {
+    flexDirection: 'row',
+    gap: 8,
+    backgroundColor: Colors.tertiaryFixed,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+  },
   warningText: { ...Typography.bodySm, color: Colors.tertiary, flex: 1 },
-  field: { marginBottom: Spacing.md },
-  label: { ...Typography.labelMd, color: Colors.onSurface, marginBottom: 6 },
-  input: { backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, borderWidth: 1, borderColor: Colors.outlineVariant, paddingHorizontal: Spacing.md, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
-  button: { backgroundColor: Colors.primary, borderRadius: BorderRadius.full, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: Spacing.sm },
-  buttonText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },
-  forgotButton: { alignSelf: 'flex-end', marginTop: 6 },
-  forgotText: { ...Typography.labelSm, color: Colors.primary, fontWeight: '600' },
-  toggle: { marginTop: Spacing.md, alignItems: 'center' },
-  toggleText: { ...Typography.bodySm, color: Colors.primary, fontWeight: '600' },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: Spacing.lg, marginBottom: Spacing.sm },
+  label: {
+    ...Typography.labelMd,
+    color: Colors.onSurface,
+    marginBottom: 6,
+  },
+  labelInline: {
+    ...Typography.labelMd,
+    color: Colors.onSurface,
+  },
+  passwordLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.sm,
+    marginBottom: 6,
+  },
+  forgotText: {
+    ...Typography.labelSm,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  inputShell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    borderWidth: 1.5,
+    borderColor: 'rgba(21, 66, 18, 0.12)',
+    marginBottom: Spacing.sm,
+  },
+  inputShellFocused: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.surface,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 13,
+    ...Typography.bodyMd,
+    color: Colors.onSurface,
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.md,
+  },
+  buttonDisabled: { opacity: 0.7 },
+  buttonText: {
+    ...Typography.labelLg,
+    color: Colors.onPrimary,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
   divider: { flex: 1, height: 1, backgroundColor: Colors.outlineVariant },
-  dividerText: { ...Typography.labelSm, color: Colors.outline },
-  googleButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.full, paddingVertical: 14, borderWidth: 1, borderColor: Colors.outlineVariant },
-  googleText: { ...Typography.labelLg, color: Colors.onSurface, fontWeight: '600' },
+  dividerText: { ...Typography.bodySm, color: Colors.outline },
+  socialRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  socialButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 9,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: BorderRadius.full,
+    paddingVertical: 13,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+  },
+  socialButtonDisabled: { opacity: 0.5 },
+  socialText: {
+    ...Typography.labelLg,
+    color: Colors.onSurface,
+    fontWeight: '600',
+  },
 });

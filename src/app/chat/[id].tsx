@@ -94,6 +94,15 @@ function ChatView() {
     }
   };
 
+  const openProposalItem = () => {
+    const targetId = item?.id || conv?.itemId;
+    if (!targetId) {
+      showAlert('Listing unavailable', 'This listing is no longer on the Haat.');
+      return;
+    }
+    router.push({ pathname: '/item/[id]', params: { id: targetId } } as never);
+  };
+
   if (!conv || !other) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -111,104 +120,141 @@ function ChatView() {
     );
   }
 
+  const ratingLabel =
+    other.rating > 0
+      ? `${other.rating.toFixed(1)} (${other.trade_count} ${other.trade_count === 1 ? 'trade' : 'trades'})`
+      : 'New trader';
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => router.back()}
+          accessibilityLabel="Go back"
+        >
+          <MaterialIcons name="arrow-back" size={23} color={Colors.primary} />
         </TouchableOpacity>
 
         <View style={styles.headerTraderInfo}>
-          <Image source={{ uri: other?.avatar_url }} style={styles.traderAvatar} contentFit="cover" />
-          <View>
-            <Text style={styles.traderName}>{other?.full_name}</Text>
-            <Text style={styles.traderStatus}>
-              {other.district ? `Based in ${other.district}` : 'Puran Haat member'}
-            </Text>
+          <View style={styles.avatarWrap}>
+            {other.avatar_url ? (
+              <Image source={{ uri: other.avatar_url }} style={styles.traderAvatar} contentFit="cover" />
+            ) : (
+              <View style={[styles.traderAvatar, styles.imageFallback]}>
+                <MaterialIcons name="person" size={20} color={Colors.primary} />
+              </View>
+            )}
+            {other.is_verified && (
+              <View style={styles.verifiedBadge}>
+                <MaterialIcons name="verified" size={10} color={Colors.onPrimary} />
+              </View>
+            )}
+          </View>
+          <View style={styles.headerText}>
+            <Text style={styles.traderName} numberOfLines={1}>{other.full_name}</Text>
+            <View style={styles.ratingRow}>
+              <MaterialIcons name="star" size={12} color={Colors.star} />
+              <Text style={styles.ratingText}>{ratingLabel}</Text>
+            </View>
           </View>
         </View>
 
         <TouchableOpacity
-          style={styles.actionIcon}
-          onPress={() => showAlert('Report / Safety', 'Report suspicious activity or block user.')}
+          style={styles.iconButton}
+          onPress={() =>
+            showAlert('Conversation options', 'Report suspicious activity or block this trader.', [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Report trader',
+                style: 'destructive',
+                onPress: () => showAlert('Report sent', 'Our safety team will review this conversation.'),
+              },
+            ])
+          }
+          accessibilityLabel="Conversation options"
         >
-          <MaterialIcons name="more-vert" size={22} color={Colors.secondary} />
+          <MaterialIcons name="more-vert" size={22} color={Colors.primary} />
         </TouchableOpacity>
       </View>
 
       {user && !user.emailVerified ? <VerificationBanner /> : null}
 
-      {/* Pinned Trade Proposal Card */}
+      {/* Proposed trade context */}
       {conv.proposalId ? (
-      <View style={[styles.tradeBar, Shadows.card]}>
-        <View style={styles.tradeBarTop}>
-          <Image
-            source={{ uri: item?.images[0] || conv.itemImage }}
-            style={styles.tradeThumb}
-            contentFit="cover"
-          />
-          <View style={styles.tradeBarInfo}>
-            <Text style={styles.tradeBarTitle} numberOfLines={1}>
-              {item?.title || conv.itemTitle || 'Barter item'}
-            </Text>
-            <Text style={styles.tradeBarMeta}>
-              Status:{' '}
-              <Text
-                style={
-                  tradeStatus === 'accepted'
-                    ? styles.statusAccepted
-                    : tradeStatus === 'declined'
-                      ? styles.statusDeclined
-                      : styles.statusPending
-                }
-              >
-                {tradeStatus === 'accepted'
-                  ? 'Accepted ✅'
-                  : tradeStatus === 'declined'
-                    ? 'Declined'
-                    : 'Awaiting response'}
+        <View style={[styles.tradeCard, Shadows.card]}>
+          <View style={styles.tradeCardTop}>
+            <Image
+              source={{ uri: item?.images[0] || conv.itemImage }}
+              style={styles.tradeThumb}
+              contentFit="cover"
+            />
+            <View style={styles.tradeInfo}>
+              <Text style={styles.tradeEyebrow}>Proposed Trade</Text>
+              <Text style={styles.tradeTitle} numberOfLines={1}>
+                {item?.title || conv.itemTitle || 'Barter item'}
               </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.viewDetailsButton}
+              onPress={openProposalItem}
+              accessibilityRole="button"
+            >
+              <Text style={styles.viewDetailsText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tradeStatusRow}>
+            <Text style={styles.tradeStatusLabel}>Status</Text>
+            <Text
+              style={[
+                styles.tradeStatusValue,
+                tradeStatus === 'accepted'
+                  ? styles.statusAccepted
+                  : tradeStatus === 'declined'
+                    ? styles.statusDeclined
+                    : styles.statusPending,
+              ]}
+            >
+              {tradeStatus === 'accepted'
+                ? 'Accepted'
+                : tradeStatus === 'declined'
+                  ? 'Declined'
+                  : 'Awaiting response'}
             </Text>
           </View>
+
+          {tradeStatus === 'pending' && user?.uid === conv.receiverId && (
+            <View style={styles.tradeActionRow}>
+              <TouchableOpacity style={styles.declineButton} onPress={handleDeclineTrade}>
+                <Text style={styles.declineButtonText}>Decline</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.acceptButton} onPress={handleAcceptTrade}>
+                <MaterialIcons name="handshake" size={17} color={Colors.onPrimary} />
+                <Text style={styles.acceptButtonText}>Accept Swap</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {tradeStatus === 'pending' && user?.uid === conv.proposerId && (
+            <Text style={styles.waitingText}>
+              Waiting for {other.full_name} to respond to your offer.
+            </Text>
+          )}
+
+          {tradeStatus === 'declined' && user?.uid === conv.proposerId && (
+            <Text style={styles.waitingText}>
+              Declined. Send a new proposal from the listing to try again.
+            </Text>
+          )}
         </View>
-
-        {tradeStatus === 'pending' && user?.uid === conv.receiverId && (
-          <View style={styles.tradeActionRow}>
-            <TouchableOpacity
-              style={styles.declineButton}
-              onPress={handleDeclineTrade}
-            >
-              <Text style={styles.declineButtonText}>Decline</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.acceptButton}
-              onPress={handleAcceptTrade}
-            >
-              <MaterialIcons name="handshake" size={18} color={Colors.onPrimary} />
-              <Text style={styles.acceptButtonText}>Accept Swap</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {tradeStatus === 'pending' && user?.uid === conv.proposerId && (
-          <Text style={styles.waitingText}>
-            Waiting for {other.full_name} to respond to your offer.
-          </Text>
-        )}
-
-        {tradeStatus === 'declined' && user?.uid === conv.proposerId && (
-          <Text style={styles.waitingText}>
-            Declined. Send a new proposal from the listing to try again.
-          </Text>
-        )}
-      </View>
       ) : null}
 
-      {/* Messages Feed */}
+      {/* Messages */}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
@@ -216,8 +262,20 @@ function ChatView() {
           data={messages}
           keyExtractor={(msg) => msg.id}
           contentContainerStyle={styles.messagesList}
+          ListHeaderComponent={
+            messages.length > 0 ? (
+              <View style={styles.dateDivider}>
+                <View style={styles.dateLine} />
+                <Text style={styles.dateText}>Today</Text>
+                <View style={styles.dateLine} />
+              </View>
+            ) : null
+          }
           ListEmptyComponent={
             <View style={styles.emptyMessages}>
+              <View style={styles.emptyIcon}>
+                <MaterialIcons name="waving-hand" size={26} color={Colors.primary} />
+              </View>
               <Text style={styles.emptyMessagesText}>
                 No messages yet. Say hello and suggest a meetup spot.
               </Text>
@@ -227,44 +285,86 @@ function ChatView() {
             const isMe = msg.sender === 'me';
             return (
               <View style={[styles.msgRow, isMe ? styles.msgRowMe : styles.msgRowOther]}>
-                <View style={[styles.msgBubble, isMe ? styles.msgBubbleMe : styles.msgBubbleOther]}>
-                  <Text style={[styles.msgText, isMe ? styles.msgTextMe : styles.msgTextOther]}>
-                    {msg.text}
-                  </Text>
-                  <Text style={[styles.msgTime, isMe ? styles.msgTimeMe : styles.msgTimeOther]}>
-                    {msg.time}
-                  </Text>
+                {!isMe && (
+                  <View style={styles.bubbleAvatarWrap}>
+                    {other.avatar_url ? (
+                      <Image source={{ uri: other.avatar_url }} style={styles.bubbleAvatar} contentFit="cover" />
+                    ) : (
+                      <View style={[styles.bubbleAvatar, styles.imageFallback]}>
+                        <MaterialIcons name="person" size={14} color={Colors.primary} />
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                <View style={styles.bubbleColumn}>
+                  <View style={[styles.msgBubble, isMe ? styles.msgBubbleMe : styles.msgBubbleOther]}>
+                    <Text style={[styles.msgText, isMe ? styles.msgTextMe : styles.msgTextOther]}>
+                      {msg.text}
+                    </Text>
+                  </View>
+                  <View style={[styles.metaRow, isMe ? styles.metaRowMe : styles.metaRowOther]}>
+                    <Text style={styles.msgTime}>{msg.time}</Text>
+                    {isMe && (
+                      <MaterialIcons
+                        name="done-all"
+                        size={13}
+                        color={Colors.primary}
+                        style={styles.readIcon}
+                      />
+                    )}
+                  </View>
                 </View>
               </View>
             );
           }}
         />
 
-        {/* Input Bar */}
+        {/* Composer */}
         <View style={styles.inputBar}>
           <TouchableOpacity
             style={styles.attachButton}
-            onPress={() => showAlert('Attach Photo', 'Share photo of condition or meeting point.')}
+            onPress={() =>
+              showAlert(
+                'Attach Photo',
+                'Photo attachments in chat are coming soon. For now, describe the item in a message.',
+              )
+            }
+            accessibilityLabel="Attach a photo"
           >
-            <MaterialIcons name="add-photo-alternate" size={22} color={Colors.primary} />
+            <MaterialIcons name="add-photo-alternate" size={21} color={Colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.attachButton}
+            onPress={() =>
+              showAlert(
+                'Share Location',
+                'Meet in a public place like a cafe or community center. Live location sharing is coming soon.',
+              )
+            }
+            accessibilityLabel="Share a meeting location"
+          >
+            <MaterialIcons name="location-on" size={20} color={Colors.primary} />
           </TouchableOpacity>
 
           <TextInput
             style={styles.inputField}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Type your message..."
-            placeholderTextColor={Colors.outline}
+            placeholder="Type a message..."
+            placeholderTextColor="rgba(66, 73, 62, 0.55)"
             returnKeyType="send"
             onSubmitEditing={handleSend}
+            accessibilityLabel="Message"
           />
 
           <TouchableOpacity
             style={[styles.sendButton, inputText.trim().length > 0 && styles.sendButtonActive]}
             onPress={handleSend}
             disabled={inputText.trim().length === 0}
+            accessibilityLabel="Send message"
           >
-            <MaterialIcons name="send" size={20} color={Colors.onPrimary} />
+            <MaterialIcons name="send" size={19} color={Colors.onPrimary} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -273,21 +373,10 @@ function ChatView() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  missingState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: Spacing.xl,
-  },
-  missingTitle: {
-    ...Typography.headlineSm,
-    color: Colors.onSurface,
-    marginTop: Spacing.md,
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  flex: { flex: 1 },
+  missingState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl },
+  missingTitle: { ...Typography.headlineSm, color: Colors.onSurface, marginTop: Spacing.md },
   missingText: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
@@ -302,58 +391,46 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   missingButtonText: { ...Typography.labelLg, color: Colors.onPrimary },
-  emptyMessages: {
-    paddingVertical: Spacing.xl,
-    alignItems: 'center',
-  },
-  emptyMessagesText: {
-    ...Typography.bodySm,
-    color: Colors.onSurfaceVariant,
-    textAlign: 'center',
-    maxWidth: 260,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(21, 66, 18, 0.05)',
   },
-  backButton: {
+  iconButton: {
     width: 38,
     height: 38,
     borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(21, 66, 18, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
   },
-  headerTraderInfo: {
-    flexDirection: 'row',
+  headerTraderInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  avatarWrap: { position: 'relative' },
+  traderAvatar: { width: 40, height: 40, borderRadius: BorderRadius.full },
+  imageFallback: {
     alignItems: 'center',
-    gap: 10,
-    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: Colors.secondaryContainer,
   },
-  traderAvatar: {
-    width: 40,
-    height: 40,
+  verifiedBadge: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    width: 16,
+    height: 16,
     borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.surface,
   },
-  traderName: {
-    ...Typography.labelLg,
-    color: Colors.onSurface,
-  },
-  traderStatus: {
-    ...Typography.bodySm,
-    color: Colors.primaryContainer,
-    fontSize: 11,
-  },
-  actionIcon: {
-    padding: 6,
-  },
-  tradeBar: {
+  headerText: { flex: 1 },
+  traderName: { ...Typography.labelLg, color: Colors.onSurface, fontWeight: '700' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 1 },
+  ratingText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
+  tradeCard: {
     backgroundColor: Colors.surfaceContainerLowest,
     marginHorizontal: Spacing.margin,
     marginTop: Spacing.xs,
@@ -362,58 +439,53 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(21, 66, 18, 0.08)',
   },
-  tradeBarTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
+  tradeCardTop: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   tradeThumb: {
-    width: 46,
-    height: 46,
+    width: 44,
+    height: 44,
     borderRadius: BorderRadius.sm,
     backgroundColor: Colors.surfaceContainer,
   },
-  tradeBarInfo: {
-    flex: 1,
-  },
-  tradeBarTitle: {
-    ...Typography.labelMd,
-    color: Colors.onSurface,
-  },
-  tradeBarMeta: {
-    ...Typography.bodySm,
-    fontSize: 11,
-    color: Colors.onSurfaceVariant,
-    marginTop: 2,
-  },
-  statusPending: {
+  tradeInfo: { flex: 1 },
+  tradeEyebrow: {
+    ...Typography.labelSm,
     color: Colors.tertiary,
     fontWeight: '700',
+    fontSize: 9,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
-  statusAccepted: {
-    color: Colors.primary,
-    fontWeight: '700',
+  tradeTitle: { ...Typography.labelMd, color: Colors.onSurface, fontWeight: '700', marginTop: 1 },
+  viewDetailsButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.primary,
   },
-  statusDeclined: {
-    color: Colors.error,
-    fontWeight: '700',
-  },
+  viewDetailsText: { ...Typography.labelSm, color: Colors.primary, fontWeight: '700', fontSize: 10 },
+  tradeStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
+  tradeStatusLabel: { ...Typography.labelSm, color: Colors.outline, fontSize: 10 },
+  tradeStatusValue: { ...Typography.labelSm, fontSize: 10, fontWeight: '700' },
+  statusPending: { color: Colors.tertiary },
+  statusAccepted: { color: Colors.primary },
+  statusDeclined: { color: Colors.error },
   waitingText: {
     ...Typography.bodySm,
     color: Colors.onSurfaceVariant,
     fontSize: 11,
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: 7,
+    paddingTop: 7,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(21, 66, 18, 0.05)',
+    borderTopColor: 'rgba(21, 66, 18, 0.06)',
   },
   tradeActionRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
+    gap: 9,
+    marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(21, 66, 18, 0.05)',
+    borderTopColor: 'rgba(21, 66, 18, 0.06)',
   },
   declineButton: {
     flex: 1,
@@ -424,10 +496,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  declineButtonText: {
-    ...Typography.labelSm,
-    color: Colors.onSurfaceVariant,
-  },
+  declineButtonText: { ...Typography.labelSm, color: Colors.onSurfaceVariant, fontWeight: '600' },
   acceptButton: {
     flex: 2,
     paddingVertical: 8,
@@ -438,77 +507,72 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  acceptButtonText: {
-    ...Typography.labelSm,
-    color: Colors.onPrimary,
-  },
+  acceptButtonText: { ...Typography.labelSm, color: Colors.onPrimary, fontWeight: '700' },
   messagesList: {
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.sm,
     gap: 12,
   },
-  msgRow: {
+  dateDivider: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: Spacing.xs,
   },
-  msgRowMe: {
-    justifyContent: 'flex-end',
+  dateLine: { flex: 1, height: 1, backgroundColor: 'rgba(21, 66, 18, 0.09)' },
+  dateText: { ...Typography.labelSm, color: Colors.outline, fontSize: 10 },
+  emptyMessages: { paddingVertical: Spacing.xl, alignItems: 'center', gap: 8 },
+  emptyIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.secondaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  msgRowOther: {
-    justifyContent: 'flex-start',
+  emptyMessagesText: {
+    ...Typography.bodySm,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    maxWidth: 260,
   },
-  msgBubble: {
-    maxWidth: '78%',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: BorderRadius.lg,
-  },
-  msgBubbleMe: {
-    backgroundColor: Colors.primary,
-    borderBottomRightRadius: 2,
-  },
+  msgRow: { flexDirection: 'row', gap: 7 },
+  msgRowMe: { justifyContent: 'flex-end' },
+  msgRowOther: { justifyContent: 'flex-start' },
+  bubbleAvatarWrap: { alignSelf: 'flex-end', marginBottom: 16 },
+  bubbleAvatar: { width: 26, height: 26, borderRadius: BorderRadius.full },
+  bubbleColumn: { maxWidth: '78%' },
+  msgBubble: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: BorderRadius.lg },
+  msgBubbleMe: { backgroundColor: Colors.primary, borderBottomRightRadius: 4 },
   msgBubbleOther: {
     backgroundColor: Colors.surfaceContainerLow,
-    borderBottomLeftRadius: 2,
+    borderBottomLeftRadius: 4,
     borderWidth: 1,
     borderColor: 'rgba(21, 66, 18, 0.05)',
   },
-  msgText: {
-    ...Typography.bodyMd,
-    lineHeight: 20,
-  },
-  msgTextMe: {
-    color: Colors.onPrimary,
-  },
-  msgTextOther: {
-    color: Colors.onSurface,
-  },
-  msgTime: {
-    fontSize: 9,
-    marginTop: 4,
-  },
-  msgTimeMe: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'right',
-  },
-  msgTimeOther: {
-    color: Colors.outline,
-    textAlign: 'left',
-  },
+  msgText: { ...Typography.bodyMd, lineHeight: 20 },
+  msgTextMe: { color: Colors.onPrimary },
+  msgTextOther: { color: Colors.onSurface },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 3 },
+  metaRowMe: { justifyContent: 'flex-end' },
+  metaRowOther: { justifyContent: 'flex-start' },
+  msgTime: { fontSize: 9, color: Colors.outline },
+  readIcon: { marginLeft: 1 },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     paddingHorizontal: Spacing.margin,
     paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(21, 66, 18, 0.05)',
+    borderTopColor: 'rgba(21, 66, 18, 0.06)',
   },
   attachButton: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(21, 66, 18, 0.08)',
+    backgroundColor: 'rgba(21, 66, 18, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -522,14 +586,12 @@ const styles = StyleSheet.create({
     color: Colors.onSurface,
   },
   sendButton: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendButtonActive: {
-    backgroundColor: Colors.primary,
-  },
+  sendButtonActive: { backgroundColor: Colors.primary },
 });

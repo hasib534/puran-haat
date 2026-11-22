@@ -75,11 +75,11 @@ function MyListingsView() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={styles.iconButton}
           onPress={() => router.back()}
           accessibilityLabel="Go back"
         >
-          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+          <MaterialIcons name="arrow-back" size={23} color={Colors.primary} />
         </TouchableOpacity>
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>My Listings</Text>
@@ -92,7 +92,7 @@ function MyListingsView() {
           onPress={() => router.push('/(tabs)/post' as never)}
           accessibilityLabel="Post a new item"
         >
-          <MaterialIcons name="add" size={24} color={Colors.primary} />
+          <MaterialIcons name="add" size={22} color={Colors.onPrimary} />
         </TouchableOpacity>
       </View>
 
@@ -101,9 +101,19 @@ function MyListingsView() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          myItems.length > 0 ? (
+            <View style={styles.introRow}>
+              <View style={styles.liveDot} />
+              <Text style={styles.introText}>Live and visible to nearby traders</Text>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <MaterialIcons name="inventory-2" size={48} color={Colors.outline} />
+            <View style={styles.emptyIconWrap}>
+              <MaterialIcons name="inventory-2" size={42} color={Colors.primary} />
+            </View>
             <Text style={styles.emptyTitle}>No listings yet</Text>
             <Text style={styles.emptyText}>
               Post something you no longer need and trade it for something useful.
@@ -128,41 +138,67 @@ function MyListingsView() {
               }
               accessibilityLabel={`Open ${item.title}`}
             >
-              <Image
-                source={{ uri: item.images[0] }}
-                style={styles.thumb}
-                contentFit="cover"
-              />
+              <View style={styles.thumbWrap}>
+                <Image source={{ uri: item.images[0] }} style={styles.thumb} contentFit="cover" />
+                <View style={styles.modeBadge}>
+                  <MaterialIcons
+                    name={item.trade_mode === 'free' ? 'volunteer-activism' : 'swap-horiz'}
+                    size={11}
+                    color={Colors.onPrimary}
+                  />
+                  <Text style={styles.modeBadgeText}>{tradeModeLabel(item)}</Text>
+                </View>
+              </View>
+
               <View style={styles.cardBody}>
-                <Text style={styles.cardTitle} numberOfLines={1}>
+                <Text style={styles.cardTitle} numberOfLines={2}>
                   {item.title}
                 </Text>
-                <Text style={styles.cardMeta} numberOfLines={1}>
-                  {CATEGORY_NAMES.get(item.category_id) || item.category_id} •{' '}
-                  {tradeModeLabel(item)}
-                </Text>
-                <Text style={styles.cardDate}>
-                  Listed {formatListingDate(item.created_at)}
-                </Text>
+                <View style={styles.metaRow}>
+                  <MaterialIcons name="category" size={12} color={Colors.onSurfaceVariant} />
+                  <Text style={styles.cardMeta} numberOfLines={1}>
+                    {CATEGORY_NAMES.get(item.category_id) || item.category_id}
+                  </Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <MaterialIcons name="schedule" size={12} color={Colors.outline} />
+                  <Text style={styles.cardDate}>Listed {formatListingDate(item.created_at)}</Text>
+                </View>
               </View>
             </TouchableOpacity>
 
-            <View style={styles.actions}>
+            <View style={styles.divider} />
+
+            <View style={styles.actionsRow}>
               <TouchableOpacity
-                style={styles.actionButton}
+                style={styles.secondaryAction}
                 onPress={() =>
                   router.push({ pathname: '/edit-item/[id]', params: { id: item.id } } as never)
                 }
                 accessibilityLabel={`Edit ${item.title}`}
               >
-                <MaterialIcons name="edit" size={19} color={Colors.primary} />
+                <MaterialIcons name="edit" size={16} color={Colors.primary} />
+                <Text style={styles.secondaryActionText}>Edit</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
-                style={[styles.actionButton, styles.deleteButton]}
+                style={styles.secondaryAction}
+                onPress={() =>
+                  router.push({ pathname: '/item/[id]', params: { id: item.id } } as never)
+                }
+                accessibilityLabel={`View ${item.title}`}
+              >
+                <MaterialIcons name="visibility" size={16} color={Colors.primary} />
+                <Text style={styles.secondaryActionText}>View</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.secondaryAction, styles.deleteAction]}
                 onPress={() => handleDelete(item)}
                 accessibilityLabel={`Delete ${item.title}`}
               >
-                <MaterialIcons name="delete-outline" size={19} color={Colors.error} />
+                <MaterialIcons name="delete-outline" size={16} color={Colors.error} />
+                <Text style={[styles.secondaryActionText, styles.deleteActionText]}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -179,10 +215,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(21,66,18,0.05)',
   },
-  backButton: {
+  iconButton: {
     width: 38,
     height: 38,
     borderRadius: BorderRadius.full,
@@ -197,7 +235,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(21,66,18,0.08)',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -205,40 +243,75 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.margin,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.xxl,
-    gap: 10,
+    gap: 12,
     flexGrow: 1,
   },
-  card: {
+  introRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
+    marginBottom: 2,
+  },
+  liveDot: {
+    width: 7,
+    height: 7,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
+  },
+  introText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
+  card: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: 'rgba(21,66,18,0.05)',
+    borderColor: 'rgba(21,66,18,0.06)',
     padding: Spacing.xs,
   },
-  cardMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  cardMain: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  thumbWrap: { position: 'relative' },
   thumb: {
-    width: 62,
-    height: 62,
-    borderRadius: BorderRadius.sm,
+    width: 84,
+    height: 84,
+    borderRadius: BorderRadius.lg,
     backgroundColor: Colors.surfaceContainer,
   },
-  cardBody: { flex: 1, gap: 2 },
-  cardTitle: { ...Typography.labelLg, color: Colors.onSurface },
-  cardMeta: { ...Typography.bodySm, color: Colors.primary },
-  cardDate: { ...Typography.bodySm, color: Colors.outline, fontSize: 11 },
-  actions: { gap: 6 },
-  actionButton: {
-    width: 36,
-    height: 36,
+  modeBadge: {
+    position: 'absolute',
+    left: 5,
+    bottom: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: Colors.primary,
     borderRadius: BorderRadius.full,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  modeBadgeText: { fontSize: 9, fontWeight: '700', color: Colors.onPrimary },
+  cardBody: { flex: 1, gap: 4 },
+  cardTitle: { ...Typography.labelLg, color: Colors.onSurface, fontWeight: '700' },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  cardMeta: { ...Typography.bodySm, color: Colors.primary, fontSize: 11 },
+  cardDate: { ...Typography.bodySm, color: Colors.outline, fontSize: 11 },
+  divider: {
+    height: 1,
     backgroundColor: 'rgba(21,66,18,0.06)',
+    marginTop: Spacing.xs,
+    marginBottom: 6,
+  },
+  actionsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  secondaryAction: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 5,
+    paddingVertical: 8,
+    borderRadius: BorderRadius.full,
+    backgroundColor: 'rgba(21,66,18,0.06)',
   },
-  deleteButton: { backgroundColor: Colors.errorContainer },
+  secondaryActionText: { ...Typography.labelSm, color: Colors.primary, fontWeight: '700' },
+  deleteAction: { backgroundColor: Colors.errorContainer },
+  deleteActionText: { color: Colors.error },
   empty: {
     flex: 1,
     alignItems: 'center',
@@ -247,7 +320,16 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 60,
   },
-  emptyTitle: { ...Typography.headlineSm, color: Colors.onSurface },
+  emptyIconWrap: {
+    width: 84,
+    height: 84,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.secondaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  emptyTitle: { ...Typography.headlineSm, color: Colors.onSurface, fontWeight: '700' },
   emptyText: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
@@ -261,7 +343,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
+    paddingVertical: 11,
     borderRadius: BorderRadius.full,
   },
   emptyButtonText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },

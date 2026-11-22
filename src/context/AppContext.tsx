@@ -28,11 +28,16 @@ import {
   subscribeToItems,
   subscribeToProposals,
   subscribeToUserProfile,
-  uploadProfileAvatar,
   type ConversationDoc,
   type FirestoreRecord,
   type ProposalDoc,
 } from '../lib/firebase';
+import {
+  cloudinaryConfigHint,
+  isCloudinaryConfigured,
+  uploadImageToCloudinary,
+  uploadImagesToCloudinary,
+} from '../lib/cloudinary';
 
 export interface ChatMessage {
   id: string;
@@ -79,6 +84,7 @@ export type EditableItemPatch = Partial<
     | 'condition'
     | 'trade_mode'
     | 'location_name'
+    | 'images'
     | 'co2_saved_kg'
     | 'eco_impact_rating'
   >
@@ -106,6 +112,10 @@ interface AppContextValue {
   ecoPoints: number;
   tradeCount: number;
   updateProfile: (patch: Partial<Profile>) => Promise<{ avatarUploadFailed?: boolean }>;
+  /** True when Cloudinary is configured and photo uploads can run. */
+  canUploadPhotos: boolean;
+  /** Uploads local listing photo URIs and resolves to their public URLs. */
+  uploadListingImages: (uris: string[]) => Promise<string[]>;
 }
 
 const currentUser: Profile = {
@@ -507,16 +517,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       let nextPatch = patch;
       let avatarUploadFailed = false;
       if (patch.avatar_url && !/^https?:\/\//i.test(patch.avatar_url)) {
-        // A picked image (file://, blob:, data:) must live in Storage before it
-        // is written to Firestore so other devices can load it.
+        // A picked image (file://, blob:, data:) must be uploaded before it is
+        // written to Firestore so other devices can load it.
         try {
           nextPatch = {
             ...patch,
-            avatar_url: await uploadProfileAvatar(user.uid, patch.avatar_url),
+            avatar_url: await uploadImageToCloudinary(patch.avatar_url, {
+              folder: process.env.EXPO_PUBLIC_CLOUDINARY_FOLDER || 'puran-haat',
+            }),
           };
         } catch (error) {
-          // Storage may not be provisioned yet. Keep the existing photo rather
-          // than losing every other profile edit the user just made.
+          // Uploads may be unconfigured or offline. Keep the existing photo
+          // rather than losing every other profile edit the user just made.
           avatarUploadFailed = true;
           nextPatch = { ...patch };
           delete nextPatch.avatar_url;
@@ -530,6 +542,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { avatarUploadFailed };
     },
     [user],
+  );
+
+  const canUploadPhotos = isCloudinaryConfigured();
+
+  const uploadListingImages = useCallback(
+    async (uris: string[]): Promise<string[]> => {
+      const cleaned = uris.map((uri) => uri.trim()).filter((uri) => uri.length > 0);
+      const local = cleaned.filter((uri) => !/^https?:\/\//i.test(uri));
+      if (local.length === 0) return cleaned;
+      if (!canUploadPhotos) throw new Error(cloudinaryConfigHint());
+
+      const uploaded = await uploadImagesToCloudinary(local, {
+        folder: process.env.EXPO_PUBLIC_CLOUDINARY_FOLDER || 'puran-haat',
+      });
+
+      // Rebuild the array in order, swapping each local URI for its public URL.
+      let cursor = 0;
+      return cleaned.map((uri) =>
+        /^https?:\/\//i.test(uri) ? uri : uploaded[cursor++],
+      );
+    },
+    [canUploadPhotos],
   );
 
   const toggleFavorite = useCallback(
@@ -1115,6 +1149,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ecoPoints,
     tradeCount,
     updateProfile,
+    canUploadPhotos,
+    uploadListingImages,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

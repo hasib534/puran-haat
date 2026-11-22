@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Colors } from '../../constants/colors';
-import { Typography, BorderRadius, Spacing } from '../../constants/theme';
+import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 
 interface SearchBarProps {
   value: string;
@@ -14,21 +14,22 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
-  placeholder = 'Search items, books, antiques in Haat...',
+  placeholder = 'Search items nearby...',
   onPressFilter,
 }) => {
   return (
     <View style={styles.container}>
       <View style={styles.inputWrapper}>
-        <MaterialIcons name="search" size={22} color={Colors.onSurfaceVariant} style={styles.searchIcon} />
+        <MaterialIcons name="search" size={21} color={Colors.outline} style={styles.searchIcon} />
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="rgba(66, 73, 62, 0.6)"
+          placeholderTextColor="rgba(66, 73, 62, 0.55)"
           style={styles.input}
           returnKeyType="search"
           clearButtonMode="while-editing"
+          accessibilityLabel="Search listings"
         />
         {value.length > 0 && (
           <TouchableOpacity onPress={() => onChangeText('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -39,7 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {onPressFilter && (
         <TouchableOpacity style={styles.filterButton} onPress={onPressFilter} activeOpacity={0.7}>
-          <MaterialIcons name="tune" size={20} color={Colors.onPrimaryContainer} />
+          <MaterialIcons name="tune" size={20} color={Colors.onPrimary} />
         </TouchableOpacity>
       )}
     </View>
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 9,
     paddingHorizontal: Spacing.margin,
     marginVertical: Spacing.xs,
   },
@@ -58,10 +59,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(85, 97, 88, 0.1)',
+    backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: BorderRadius.full,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(21, 66, 18, 0.08)',
+    ...Shadows.card,
   },
   searchIcon: {
     marginRight: 8,
@@ -73,10 +77,10 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   filterButton: {
-    width: 42,
-    height: 42,
+    width: 43,
+    height: 43,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

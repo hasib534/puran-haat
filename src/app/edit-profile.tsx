@@ -135,7 +135,7 @@ function EditProfileForm() {
       if (avatarUploadFailed) {
         showAlert(
           'Profile saved',
-          'Your details were saved, but the photo could not be uploaded. Photo uploads require Firebase Storage to be enabled for this project.',
+          'Your details were saved, but the photo could not be uploaded. Photo uploads need Cloudinary — add EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME and EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET to .env.local and restart Expo.',
           [{ text: 'OK', onPress: () => router.back() }],
         );
         return;
@@ -156,26 +156,15 @@ function EditProfileForm() {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.8}>
-            <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+            <MaterialIcons name="close" size={23} color={Colors.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
-          <TouchableOpacity
-            style={[styles.saveChip, !canSave && styles.saveChipDisabled]}
-            onPress={handleSave}
-            disabled={!canSave}
-            activeOpacity={0.8}
-          >
-            {saving ? (
-              <ActivityIndicator size="small" color={Colors.onPrimary} />
-            ) : (
-              <Text style={styles.saveChipText}>Save</Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -318,6 +307,21 @@ function EditProfileForm() {
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        <View style={styles.bottomBar}>
+          <TouchableOpacity
+            style={[styles.saveButton, !canSave && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={!canSave}
+            activeOpacity={0.88}
+          >
+            {saving ? (
+              <ActivityIndicator size="small" color={Colors.onPrimary} />
+            ) : (
+              <Text style={styles.saveButtonText}>Save Changes</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -328,28 +332,26 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.margin, paddingVertical: Spacing.sm, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: 'rgba(21,66,18,0.05)' },
   backButton: { width: 38, height: 38, borderRadius: BorderRadius.full, backgroundColor: 'rgba(21,66,18,0.08)', alignItems: 'center', justifyContent: 'center' },
   headerTitle: { ...Typography.headlineSm, color: Colors.primary, fontWeight: '700' },
-  saveChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: BorderRadius.full, backgroundColor: Colors.primary, minWidth: 64, alignItems: 'center' },
-  saveChipDisabled: { backgroundColor: Colors.secondary, opacity: 0.5 },
-  saveChipText: { ...Typography.labelMd, color: Colors.onPrimary, fontWeight: '700' },
-  scrollContent: { paddingHorizontal: Spacing.margin, paddingBottom: 30 },
-  avatarSection: { alignItems: 'center', marginTop: Spacing.lg, marginBottom: Spacing.lg },
+  headerSpacer: { width: 38 },
+  scrollContent: { paddingHorizontal: Spacing.margin, paddingBottom: Spacing.lg },
+  avatarSection: { alignItems: 'center', marginTop: Spacing.md, marginBottom: Spacing.lg },
   avatarWrap: { position: 'relative' },
-  avatar: { width: 104, height: 104, borderRadius: BorderRadius.full, borderWidth: 4, borderColor: Colors.surfaceContainerHighest },
+  avatar: { width: 112, height: 112, borderRadius: BorderRadius.full, borderWidth: 4, borderColor: Colors.surfaceContainerHighest },
   avatarPlaceholder: { backgroundColor: Colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
-  cameraBadge: { position: 'absolute', bottom: 2, right: 2, width: 34, height: 34, borderRadius: BorderRadius.full, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: Colors.background },
-  changePhotoText: { ...Typography.labelMd, color: Colors.tertiary, marginTop: Spacing.sm, fontWeight: '600' },
+  cameraBadge: { position: 'absolute', bottom: 4, right: 4, width: 36, height: 36, borderRadius: BorderRadius.full, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: Colors.background },
+  changePhotoText: { ...Typography.labelMd, color: Colors.tertiary, marginTop: Spacing.sm, fontWeight: '700' },
   field: { marginBottom: Spacing.md },
   label: { ...Typography.labelMd, color: Colors.onSurface, marginBottom: 6 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   counter: { ...Typography.labelSm, color: Colors.outline },
-  input: { backgroundColor: Colors.secondaryContainer, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface, borderWidth: 2, borderColor: 'transparent' },
+  input: { backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface, borderWidth: 1.5, borderColor: 'rgba(21,66,18,0.1)' },
   inputFocused: { borderColor: Colors.primary, backgroundColor: Colors.surface },
-  textArea: { minHeight: 90, textAlignVertical: 'top' },
+  textArea: { minHeight: 96, textAlignVertical: 'top' },
   errorText: { ...Typography.bodySm, color: Colors.error, marginTop: 4, fontSize: 11 },
-  usernameRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.secondaryContainer, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 2, borderColor: 'transparent' },
+  usernameRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 1.5, borderColor: 'rgba(21,66,18,0.1)' },
   at: { ...Typography.bodyMd, color: Colors.outline, marginRight: 4 },
   usernameInput: { flex: 1, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
-  locationRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.secondaryContainer, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 2, borderColor: 'transparent', gap: 8 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 1.5, borderColor: 'rgba(21,66,18,0.1)', gap: 8 },
   locationInput: { flex: 1, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
   section: { marginTop: Spacing.lg },
   sectionTitle: { ...Typography.labelLg, color: Colors.primary, marginBottom: 4 },
@@ -364,4 +366,21 @@ const styles = StyleSheet.create({
   connectText: { ...Typography.labelSm, color: Colors.primary },
   dangerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
   dangerText: { ...Typography.bodyMd, color: Colors.error, fontWeight: '600' },
+  bottomBar: {
+    paddingHorizontal: Spacing.margin,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
+    backgroundColor: Colors.background,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(21, 66, 18, 0.07)',
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveButtonDisabled: { opacity: 0.45 },
+  saveButtonText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },
 });

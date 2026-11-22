@@ -18,6 +18,8 @@ import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/them
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../lib/alert';
+import { TopHeader } from '../../components/layout/TopHeader';
 import { ItemCard } from '../../components/ui/ItemCard';
 import {
   loadRecentSearches,
@@ -39,6 +41,8 @@ export default function SearchTab() {
   const [selectedRadius, setSelectedRadius] = useState<Radius>('5km');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showAllTrending, setShowAllTrending] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +102,12 @@ export default function SearchTab() {
     [items],
   );
 
+  const allTrendingItems = useMemo(
+    () =>
+      [...items].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '')),
+    [items],
+  );
+
   const clearFilters = () => {
     setSearchText('');
     setSelectedCategory('all');
@@ -108,14 +118,24 @@ export default function SearchTab() {
     router.push({ pathname: '/item/[id]', params: { id: itemId } } as never);
   };
 
+  const handleMicPress = () => {
+    showAlert('Voice search', 'Voice search is not available yet. Type a keyword to search.');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Discover Haat</Text>
-        <Text style={styles.headerSubtitle}>খুঁজুন ও অদলবদল করুন</Text>
-      </View>
+      <TopHeader
+        districtName="Dhanmondi, Dhaka"
+        showNotifications
+        onPressNotifications={() => router.push('/notifications' as never)}
+        onPressLocation={() => {
+          showAlert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
+        }}
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Text style={styles.headerTitle}>Discover</Text>
+
         <View style={styles.searchBarWrapper}>
           <MaterialIcons name="search" size={22} color={Colors.outline} style={styles.searchIcon} />
           <TextInput
@@ -137,27 +157,49 @@ export default function SearchTab() {
               <MaterialIcons name="cancel" size={18} color={Colors.outline} />
             </TouchableOpacity>
           )}
+          <TouchableOpacity
+            style={styles.searchAction}
+            onPress={handleMicPress}
+            accessibilityLabel="Search by voice"
+          >
+            <MaterialIcons name="mic-none" size={21} color={Colors.primary} />
+          </TouchableOpacity>
+          <View style={styles.searchDivider} />
+          <TouchableOpacity
+            style={styles.searchAction}
+            onPress={() => setShowFilters((value) => !value)}
+            accessibilityLabel="Toggle distance filters"
+            accessibilityState={{ expanded: showFilters }}
+          >
+            <MaterialIcons
+              name="tune"
+              size={20}
+              color={showFilters ? Colors.tertiary : Colors.primary}
+            />
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.radiusRow}>
-          <Text style={styles.radiusLabel}>Distance:</Text>
-          {RADIUS_OPTIONS.map((radius) => {
-            const active = selectedRadius === radius;
-            return (
-              <TouchableOpacity
-                key={radius}
-                style={[styles.radiusPill, active && styles.radiusPillActive]}
-                onPress={() => setSelectedRadius(radius)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-              >
-                <Text style={[styles.radiusText, active && styles.radiusTextActive]}>
-                  {radius === 'all' ? 'All Dhaka' : `< ${radius}`}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        {showFilters ? (
+          <View style={styles.radiusRow}>
+            <Text style={styles.radiusLabel}>Within</Text>
+            {RADIUS_OPTIONS.map((radius) => {
+              const active = selectedRadius === radius;
+              return (
+                <TouchableOpacity
+                  key={radius}
+                  style={[styles.radiusPill, active && styles.radiusPillActive]}
+                  onPress={() => setSelectedRadius(radius)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text style={[styles.radiusText, active && styles.radiusTextActive]}>
+                    {radius === 'all' ? 'All Dhaka' : `< ${radius}`}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : null}
 
         {isFiltering && (
           <View style={styles.section}>
@@ -198,9 +240,15 @@ export default function SearchTab() {
                   onPress={() => openItem(item.id)}
                   accessibilityLabel={`Open ${item.title}`}
                 >
-                  <Image source={{ uri: item.images[0] }} style={styles.resultThumb} contentFit="cover" />
+                  <Image
+                    source={{ uri: item.images[0] }}
+                    style={styles.resultThumb}
+                    contentFit="cover"
+                  />
                   <View style={styles.resultBody}>
-                    <Text style={styles.resultTitle} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.resultTitle} numberOfLines={1}>
+                      {item.title}
+                    </Text>
                     <Text style={styles.resultMeta}>
                       {item.location_name}
                       {item.distance_km != null ? ` • ${item.distance_km} km` : ''}
@@ -262,10 +310,8 @@ export default function SearchTab() {
               return (
                 <TouchableOpacity
                   key={category.id}
-                  style={[styles.catCard, Shadows.card, active && styles.catCardActive]}
-                  onPress={() =>
-                    setSelectedCategory(active ? 'all' : category.id)
-                  }
+                  style={styles.catCard}
+                  onPress={() => setSelectedCategory(active ? 'all' : category.id)}
                   activeOpacity={0.8}
                   accessibilityRole="button"
                   accessibilityState={{ selected: active }}
@@ -273,11 +319,13 @@ export default function SearchTab() {
                   <View style={[styles.catIconCircle, active && styles.catIconCircleActive]}>
                     <MaterialIcons
                       name={category.icon as never}
-                      size={24}
+                      size={26}
                       color={active ? Colors.onPrimary : Colors.primary}
                     />
                   </View>
-                  <Text style={styles.catName} numberOfLines={1}>{category.name}</Text>
+                  <Text style={styles.catName} numberOfLines={1}>
+                    {category.name}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
@@ -286,21 +334,40 @@ export default function SearchTab() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Fresh Listings (নতুন জিনিস)</Text>
+            <Text style={styles.sectionTitle}>Trending Near You</Text>
+            <TouchableOpacity
+              onPress={() => setShowAllTrending((value) => !value)}
+              accessibilityRole="button"
+            >
+              <Text style={styles.clearAllText}>
+                {showAllTrending ? 'SHOW LESS' : 'SEE ALL'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          <FlatList
-            horizontal
-            nestedScrollEnabled
-            showsHorizontalScrollIndicator={false}
-            data={trendingItems}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.trendingList}
-            renderItem={({ item }) => (
-              <View style={styles.trendingCardWrap}>
-                <ItemCard item={item} onPress={() => openItem(item.id)} />
-              </View>
-            )}
-          />
+
+          {showAllTrending ? (
+            <View style={styles.trendingGrid}>
+              {allTrendingItems.map((item) => (
+                <View key={item.id} style={styles.trendingGridCard}>
+                  <ItemCard item={item} onPress={() => openItem(item.id)} />
+                </View>
+              ))}
+            </View>
+          ) : (
+            <FlatList
+              horizontal
+              nestedScrollEnabled
+              showsHorizontalScrollIndicator={false}
+              data={trendingItems}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.trendingList}
+              renderItem={({ item }) => (
+                <View style={styles.trendingCardWrap}>
+                  <ItemCard item={item} onPress={() => openItem(item.id)} />
+                </View>
+              )}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -312,34 +379,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    paddingHorizontal: Spacing.margin,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.xs,
-  },
   headerTitle: {
-    ...Typography.headlineMd,
+    ...Typography.displayLg,
     color: Colors.primary,
-  },
-  headerSubtitle: {
-    ...Typography.bodySm,
-    color: Colors.primaryContainer,
-    fontWeight: '600',
+    paddingHorizontal: Spacing.margin,
+    marginTop: Spacing.xs,
   },
   scrollContent: {
-    paddingHorizontal: Spacing.margin,
-    paddingBottom: 90,
+    paddingBottom: 100,
   },
   searchBarWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surfaceContainerLowest,
     borderRadius: BorderRadius.full,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
+    paddingLeft: Spacing.md,
+    paddingRight: 6,
+    paddingVertical: 6,
+    marginHorizontal: Spacing.margin,
     marginTop: Spacing.sm,
     borderWidth: 1,
     borderColor: 'rgba(21, 66, 18, 0.08)',
+    ...Shadows.card,
   },
   searchIcon: {
     marginRight: 8,
@@ -348,21 +409,36 @@ const styles = StyleSheet.create({
     flex: 1,
     ...Typography.bodyMd,
     color: Colors.onSurface,
+    paddingVertical: 6,
     padding: 0,
+  },
+  searchAction: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: 'rgba(21, 66, 18, 0.12)',
+    marginHorizontal: 2,
   },
   radiusRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
+    marginHorizontal: Spacing.margin,
     marginTop: Spacing.sm,
-    marginBottom: Spacing.md,
   },
   radiusLabel: {
     ...Typography.labelSm,
     color: Colors.onSurfaceVariant,
   },
   radiusPill: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 11,
     paddingVertical: 5,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.secondaryContainer,
@@ -378,7 +454,8 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
   },
   section: {
-    marginBottom: Spacing.lg,
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.margin,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -387,12 +464,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   sectionTitle: {
-    ...Typography.labelLg,
+    ...Typography.headlineSm,
     color: Colors.onSurface,
+    fontWeight: '700',
+    marginBottom: Spacing.sm,
   },
   clearAllText: {
     ...Typography.labelSm,
     color: Colors.primary,
+    fontWeight: '700',
   },
   activeFilterRow: {
     flexDirection: 'row',
@@ -422,7 +502,7 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: Colors.surfaceContainer,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: BorderRadius.full,
   },
   recentTagMain: {
@@ -437,44 +517,45 @@ const styles = StyleSheet.create({
   catGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 6,
+    marginHorizontal: -6,
   },
   catCard: {
-    width: '30%',
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: BorderRadius.lg,
-    paddingVertical: 14,
+    width: '33.333%',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(21, 66, 18, 0.05)',
-  },
-  catCardActive: {
-    borderColor: Colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
   },
   catIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: BorderRadius.full,
-    backgroundColor: Colors.secondaryContainer,
+    width: 58,
+    height: 58,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: 'rgba(45, 90, 39, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   catIconCircleActive: {
     backgroundColor: Colors.primary,
   },
   catName: {
-    ...Typography.labelSm,
+    ...Typography.labelMd,
     color: Colors.onSurface,
+    textAlign: 'center',
   },
   trendingList: {
     gap: 12,
     paddingVertical: 4,
   },
   trendingCardWrap: {
-    width: 200,
+    width: 202,
+  },
+  trendingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.gutter,
+  },
+  trendingGridCard: {
+    width: '47.7%',
   },
   emptyText: {
     ...Typography.bodyMd,
@@ -489,8 +570,6 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
     borderRadius: BorderRadius.lg,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(21,66,18,0.05)',
   },
   resultThumb: {
     width: 52,

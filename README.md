@@ -1,6 +1,6 @@
 # Puran Haat — Barter Marketplace App
 
-A **React Native / Expo** barter marketplace where users trade items locally — no cash required. Built with Firebase for authentication, real-time Firestore sync, and optional Cloud Storage for profile photos.
+A **React Native / Expo** barter marketplace where users trade items locally — no cash required. Built with Firebase for authentication, real-time Firestore sync, and Cloudinary for listing and profile photos.
 
 ---
 
@@ -17,9 +17,9 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 | **Proposal Inbox** | Chats tab splits into conversations and real proposals, highlighting offers that need your response |
 | **Listing Management** | My Listings screen to edit or delete your own items; owner actions also appear on item detail |
 | **Search Filters** | Discover filters by text, category, and distance; recent searches persist per user |
-| **Profile & Edit Profile** | Avatar upload via Firebase Storage (optional — needs Blaze plan), bio, district, username |
+| **Profile & Edit Profile** | Avatar upload via Cloudinary, bio, district, username |
 | **Eco Impact Tracking** | Per-user eco points, trade count, CO₂ savings |
-| **Security Rules** | Hardened Firestore + Storage rules with ownership, verified-email writes, immutable fields, and status guards |
+| **Security Rules** | Hardened Firestore rules with ownership, verified-email writes, immutable fields, and status guards |
 | **Tabs** | Home, Discover, Post, Chats, Profile |
 
 ---
@@ -31,7 +31,7 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 - **Backend**: Firebase
   - **Auth**: Email/Password + Google (web + native)
   - **Firestore**: Real-time subscriptions, compound indexes
-  - **Storage**: Avatars (requires the Blaze plan; profile edits still save without it)
+- **Images**: Cloudinary unsigned uploads (listing photos + avatars)
 - **State**: React Context + hooks (no Redux)
 - **UI**: `@expo/ui` native components (BottomSheet, Picker, Switch, etc.)
 - **Styling**: Custom theme tokens + StyleSheet
@@ -73,16 +73,27 @@ Open in:
 >
 > If native Google sign-in reports `DEVELOPER_ERROR` / `10`, the build's SHA-1 is not registered. Run `npx @react-native-google-signin/config-doctor`, add the fingerprint to the Firebase Android app, and rebuild.
 
+> ⚠️ **Android builds need JDK 21.** Gradle fails at `configureCMakeDebug` (restricted `java.lang.System` method / Prefab error) when a newer JDK such as 24 is on `PATH`. Point `JAVA_HOME` at a JDK 21 before building:
+>
+> ```powershell
+> $env:JAVA_HOME='C:\Users\<you>\.jdks\temurin-21'
+> $env:Path="$env:JAVA_HOME\bin;$env:Path"
+> npx expo run:android
+> ```
+>
+> Linux/macOS: `export JAVA_HOME=/path/to/jdk-21` (or use SDKMAN/ASDF to pin it).
+
 ---
 
 ## 🔐 Firebase Setup
 
 1. **Create a Firebase project** (or use `puran-haat-app`):
    - Enable **Firestore** (region `asia-south1` recommended for South Asia)
-   - Enable **Storage** *(optional — Firebase now requires the Blaze plan. Skip it to run the app without avatar uploads; all other profile fields still save)*
    - Enable **Authentication** → Sign-in methods:
      - Email/Password
      - Google (add authorized domains: `localhost`, your production domain)
+
+   > Firebase Storage is **not** required — photos upload to Cloudinary instead (see **Cloudinary Setup** below).
 
 2. **Register apps** in Firebase Console → Project Settings → General:
    - **Web** → copy `apiKey`, `authDomain`, `projectId`, `storageBucket`
@@ -103,6 +114,10 @@ Open in:
    EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 
    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=...
+
+   EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=...
+   EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET=...
+   EXPO_PUBLIC_CLOUDINARY_FOLDER=puran-haat
    ```
 
    Native Google client IDs come from the committed `google-services.json` / `GoogleService-Info.plist`, not from environment variables.
@@ -114,10 +129,26 @@ Open in:
    npx firebase-tools deploy --only firestore:rules,firestore:indexes --project puran-haat-app
    ```
 
-   Deploy `storage.rules` separately only after Storage is provisioned on the Blaze plan:
-   ```bash
-   npx firebase-tools deploy --only storage
+---
+
+## 🖼 Cloudinary Setup
+
+Listing photos and avatars upload straight from the client with a **Cloudinary unsigned upload preset** — no server or API secret needed.
+
+1. Create a free account at [cloudinary.com](https://cloudinary.com).
+2. Open **Settings → Upload → Upload presets → Add upload preset**.
+3. Set **Signing Mode** to **Unsigned**, optionally restrict formats/size, then save.
+4. Copy the **Cloud name** (Dashboard) and the **preset name** into `.env.local`:
+
+   ```env
+   EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+   EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-unsigned-preset
+   EXPO_PUBLIC_CLOUDINARY_FOLDER=puran-haat
    ```
+
+5. Restart Expo (`npx expo start -c`) so the new variables are bundled.
+
+> Never put a Cloudinary **API secret** in an `EXPO_PUBLIC_*` variable — those values ship inside the app bundle. Unsigned presets are safe to use client-side.
 
 ---
 
@@ -149,7 +180,8 @@ src/
 │   ├── useAuthGuard.ts     # Gate features behind auth+verification
 │   └── useConversationMessages.ts
 ├── lib/
-│   ├── firebase.ts         # Firebase SDK init, helpers, uploadProfileAvatar
+│   ├── firebase.ts         # Firebase SDK init + Firestore/auth helpers
+│   ├── cloudinary.ts       # Unsigned photo uploads
 │   ├── google-signin.ts    # Native Google Sign-In → Firebase ID token
 │   ├── notifications.ts    # Derives the activity feed from proposals + chats
 │   └── recent-searches.ts  # AsyncStorage-backed recent searches per user

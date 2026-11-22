@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Colors } from '../../constants/colors';
@@ -15,67 +15,67 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.secondary,
+        tabBarInactiveTintColor: Colors.onSecondaryContainer,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarHideOnKeyboard: true,
       }}
     >
-      {/* Tab 1: Home Feed */}
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="storefront" size={size || 24} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="home" size={24} color={color} />
           ),
         }}
       />
 
-      {/* Tab 2: Discover / Search */}
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Discover',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="search" size={size || 24} color={color} />
+          title: 'Search',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="search" size={26} color={color} />
           ),
         }}
       />
 
-      {/* Tab 3: Post an Item (Elevated Center Action) */}
       <Tabs.Screen
         name="post"
         options={{
-          title: 'Post',
+          title: 'Trade',
+          tabBarStyle: { display: 'none' },
           tabBarIcon: () => (
-            <View style={[styles.centerPostButton, Shadows.elevated]}>
-              <MaterialIcons name="add" size={28} color={Colors.onPrimary} />
+            <View style={styles.tradeTab}>
+              <View style={[styles.centerPostButton, Shadows.elevated]}>
+                <MaterialIcons name="add" size={24} color={Colors.onTertiary} />
+              </View>
+              <Text style={styles.tradeLabel}>Trade</Text>
             </View>
           ),
-          tabBarLabel: () => null, // Hide text for elevated center button
+          tabBarLabel: () => null,
         }}
       />
 
-      {/* Tab 4: Messages / Inbox */}
       <Tabs.Screen
         name="messages"
         options={{
-          title: 'Chats',
+          title: 'Chat',
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarBadgeStyle: styles.badge,
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="chat-bubble-outline" size={size || 22} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="forum" size={23} color={color} />
           ),
         }}
       />
 
-      {/* Tab 5: Profile */}
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="eco" size={size || 24} color={color} />
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="person" size={24} color={color} />
           ),
         }}
       />
@@ -88,8 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainer,
     borderTopLeftRadius: BorderRadius.xl,
     borderTopRightRadius: BorderRadius.xl,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(21, 66, 18, 0.08)',
+    borderTopWidth: 0,
     height: Platform.OS === 'ios' ? 88 : 68,
     paddingTop: 8,
     paddingBottom: Platform.OS === 'ios' ? 24 : 8,
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    elevation: 8,
+    ...Shadows.tabBar,
   },
   tabBarLabel: {
     fontSize: 10,
@@ -105,13 +104,23 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   centerPostButton: {
-    width: 48,
-    height: 48,
+    width: 38,
+    height: 38,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.tertiary,
     alignItems: 'center',
     justifyContent: 'center',
-    top: -14,
+  },
+  tradeTab: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    marginTop: -10,
+  },
+  tradeLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.primary,
   },
   badge: {
     backgroundColor: Colors.tertiary,

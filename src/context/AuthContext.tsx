@@ -19,6 +19,7 @@ import {
   signInWithGooglePopup as fbSignInWithGooglePopup,
   signOut as fbSignOut,
   signUp as fbSignUp,
+  saveUserProfile,
   subscribeToAuth,
   type FirebaseUser,
 } from '../lib/firebase';
@@ -28,7 +29,7 @@ interface AuthContextValue {
   loading: boolean;
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string, username?: string) => Promise<void>;
   signInWithGoogle: (idToken: string) => Promise<void>;
   signInWithGooglePopup: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -96,14 +97,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const handleSignUp = useCallback(async (email: string, password: string) => {
-    try {
-      const next = await fbSignUp(email, password);
-      setUser(next);
-    } catch (error) {
-      throw new Error(authErrorMessage(error));
-    }
-  }, []);
+  const handleSignUp = useCallback(
+    async (email: string, password: string, fullName?: string, username?: string) => {
+      try {
+        const next = await fbSignUp(email, password, fullName);
+        if (fullName?.trim() || username?.trim()) {
+          await saveUserProfile(next.uid, {
+            full_name: fullName?.trim() || next.displayName || email.split('@')[0],
+            ...(username?.trim() ? { username: username.trim() } : {}),
+          }).catch((error) => {
+            // Auth still succeeded; the profile form can fill these in later.
+            console.warn('Could not save signup profile:', error);
+          });
+        }
+        setUser(next);
+      } catch (error) {
+        throw new Error(authErrorMessage(error));
+      }
+    },
+    [],
+  );
 
   const handleSignInWithGoogle = useCallback(async (idToken: string) => {
     try {

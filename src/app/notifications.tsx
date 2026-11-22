@@ -12,8 +12,18 @@ import { AuthGate } from '../components/auth/AuthGate';
 import {
   buildNotifications,
   relativeTime,
+  unreadNotificationCount,
   type AppNotification,
 } from '../lib/notifications';
+
+const ICON_TINT: Record<
+  AppNotification['kind'],
+  { background: string; color: string }
+> = {
+  proposal: { background: 'rgba(217, 230, 218, 0.9)', color: Colors.primary },
+  trade: { background: 'rgba(217, 230, 218, 0.9)', color: Colors.primary },
+  message: { background: 'rgba(106, 33, 13, 0.1)', color: Colors.tertiary },
+};
 
 export default function NotificationsScreen() {
   return (
@@ -34,6 +44,7 @@ function NotificationsView() {
     () => buildNotifications({ uid: user?.uid, proposals, conversations }),
     [conversations, proposals, user?.uid],
   );
+  const unreadCount = useMemo(() => unreadNotificationCount(notifications), [notifications]);
 
   const openNotification = (notification: AppNotification) => {
     if (!notification.conversationId) return;
@@ -47,14 +58,27 @@ function NotificationsView() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={styles.iconButton}
           onPress={() => router.back()}
           accessibilityLabel="Go back"
         >
-          <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
+          <MaterialIcons name="arrow-back" size={23} color={Colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={styles.headerSpacer} />
+        <View style={styles.headerText}>
+          <Text style={styles.headerTitle}>Activity</Text>
+          <Text style={styles.headerSubtitle}>
+            {unreadCount > 0
+              ? `${unreadCount} ${unreadCount === 1 ? 'update needs' : 'updates need'} your attention`
+              : 'Proposals, trades, and messages'}
+          </Text>
+        </View>
+        {unreadCount > 0 ? (
+          <View style={styles.unreadPill}>
+            <Text style={styles.unreadPillText}>{unreadCount} new</Text>
+          </View>
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
       </View>
 
       <FlatList
@@ -62,43 +86,67 @@ function NotificationsView() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          notifications.length > 0 ? (
+            <Text style={styles.sectionLabel}>Recent activity</Text>
+          ) : null
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <MaterialIcons name="notifications-none" size={48} color={Colors.outline} />
-            <Text style={styles.emptyTitle}>No notifications yet</Text>
+            <View style={styles.emptyIconWrap}>
+              <MaterialIcons name="notifications-none" size={40} color={Colors.primary} />
+            </View>
+            <Text style={styles.emptyTitle}>You&apos;re all caught up</Text>
             <Text style={styles.emptyText}>
               When someone sends a proposal, replies to a trade, or accepts an offer, it will
               show up here.
             </Text>
           </View>
         }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            activeOpacity={item.conversationId ? 0.8 : 1}
-            onPress={() => openNotification(item)}
-            style={[styles.row, Shadows.card, item.unread && styles.rowUnread]}
-          >
-            <View style={styles.iconCircle}>
-              <MaterialIcons
-                name={item.icon}
-                size={20}
-                color={item.icon === 'cancel' ? Colors.error : Colors.primary}
-              />
-            </View>
-            <View style={styles.rowBody}>
-              <View style={styles.rowTop}>
-                <Text style={styles.title} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                <Text style={styles.time}>{relativeTime(item.createdAt)}</Text>
+        renderItem={({ item }) => {
+          const tint = ICON_TINT[item.kind];
+          const tappable = Boolean(item.conversationId);
+          return (
+            <TouchableOpacity
+              activeOpacity={tappable ? 0.8 : 1}
+              onPress={() => openNotification(item)}
+              disabled={!tappable}
+              style={[styles.row, Shadows.card, item.unread && styles.rowUnread]}
+              accessibilityRole={tappable ? 'button' : undefined}
+              accessibilityLabel={item.title}
+            >
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: item.icon === 'cancel' ? Colors.errorContainer : tint.background },
+                ]}
+              >
+                <MaterialIcons
+                  name={item.icon}
+                  size={20}
+                  color={item.icon === 'cancel' ? Colors.error : tint.color}
+                />
               </View>
-              <Text style={styles.body} numberOfLines={2}>
-                {item.body}
-              </Text>
-            </View>
-            {item.unread && <View style={styles.dot} />}
-          </TouchableOpacity>
-        )}
+
+              <View style={styles.rowBody}>
+                <View style={styles.rowTop}>
+                  <Text style={[styles.title, item.unread && styles.titleUnread]} numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.time}>{relativeTime(item.createdAt)}</Text>
+                </View>
+                <Text style={styles.body} numberOfLines={2}>
+                  {item.body}
+                </Text>
+              </View>
+
+              {tappable && (
+                <MaterialIcons name="chevron-right" size={18} color={Colors.outline} />
+              )}
+              {item.unread && !tappable && <View style={styles.dot} />}
+            </TouchableOpacity>
+          );
+        }}
       />
     </SafeAreaView>
   );
@@ -109,12 +157,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 10,
     paddingHorizontal: Spacing.margin,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(21,66,18,0.05)',
   },
-  backButton: {
+  iconButton: {
     width: 38,
     height: 38,
     borderRadius: BorderRadius.full,
@@ -122,17 +172,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerText: { flex: 1 },
   headerTitle: { ...Typography.headlineSm, color: Colors.primary, fontWeight: '700' },
+  headerSubtitle: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
   headerSpacer: { width: 38 },
+  unreadPill: {
+    backgroundColor: Colors.tertiary,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  unreadPillText: { ...Typography.labelSm, color: Colors.onTertiary, fontWeight: '700', fontSize: 10 },
   scrollContent: {
     paddingHorizontal: Spacing.margin,
-    paddingBottom: 20,
+    paddingBottom: 24,
     gap: 10,
     paddingTop: Spacing.sm,
     flexGrow: 1,
   },
+  sectionLabel: {
+    ...Typography.labelSm,
+    color: Colors.onSurfaceVariant,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 2,
+  },
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
     backgroundColor: Colors.surfaceContainerLowest,
     padding: Spacing.sm,
@@ -140,18 +207,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(21,66,18,0.05)',
   },
-  rowUnread: { borderColor: Colors.primaryFixed },
+  rowUnread: { borderColor: 'rgba(21, 66, 18, 0.22)', backgroundColor: Colors.surface },
   iconCircle: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
     borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(45,90,39,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   rowBody: { flex: 1 },
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   title: { ...Typography.labelLg, color: Colors.onSurface, flex: 1 },
+  titleUnread: { fontWeight: '700', color: Colors.primary },
   time: { ...Typography.bodySm, color: Colors.outline, fontSize: 10 },
   body: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginTop: 2, lineHeight: 18 },
   dot: {
@@ -161,8 +228,24 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.tertiary,
     alignSelf: 'center',
   },
-  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80, gap: 8 },
-  emptyTitle: { ...Typography.headlineSm, color: Colors.onSurface },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+    gap: 8,
+    paddingHorizontal: Spacing.md,
+  },
+  emptyIconWrap: {
+    width: 84,
+    height: 84,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.secondaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  emptyTitle: { ...Typography.headlineSm, color: Colors.onSurface, fontWeight: '700' },
   emptyText: {
     ...Typography.bodySm,
     color: Colors.onSurfaceVariant,

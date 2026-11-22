@@ -27,8 +27,8 @@ export const CategoryChip: React.FC<CategoryChipProps> = ({
     >
       <MaterialIcons
         name={category.icon as any}
-        size={16}
-        color={isSelected ? Colors.onPrimaryContainer : Colors.onSecondaryContainer}
+        size={15}
+        color={isSelected ? Colors.onPrimary : Colors.primary}
       />
       <Text
         style={[
@@ -47,24 +47,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: BorderRadius.full,
     marginRight: 8,
+    borderWidth: 1,
   },
   chipDefault: {
-    backgroundColor: Colors.secondaryContainer,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderColor: 'rgba(21, 66, 18, 0.1)',
   },
   chipSelected: {
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   text: {
     ...Typography.labelMd,
   },
   textDefault: {
-    color: Colors.onSecondaryContainer,
+    color: Colors.onSurfaceVariant,
   },
   textSelected: {
-    color: Colors.onPrimaryContainer,
+    color: Colors.onPrimary,
+    fontWeight: '700',
   },
 });

@@ -41,6 +41,13 @@
         }
       ],
       "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Puran Haat uses your photos to add pictures to your listings.",
+          "cameraPermission": "Puran Haat uses your camera to photograph items you want to trade."
+        }
+      ],
       "@react-native-google-signin/google-signin"
     ],
     "experiments": {

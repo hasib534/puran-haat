@@ -4,6 +4,9 @@
 //   EXPO_PUBLIC_FIREBASE_PROJECT_ID
 //   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET (optional)
 //
+// Image uploads (listing photos and avatars) go through Cloudinary — see
+// src/lib/cloudinary.ts — because Firebase Storage needs a paid plan.
+//
 // The SDK gives us real-time Firestore listeners plus proper token handling
 // that the previous REST-only client could not provide.
 
@@ -28,14 +31,6 @@ import {
   type Firestore,
   type Unsubscribe,
 } from 'firebase/firestore';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytes,
-  type FirebaseStorage,
-} from 'firebase/storage';
-
 import type { Item, Profile } from '../types';
 
 const API_KEY = process.env.EXPO_PUBLIC_FIREBASE_API_KEY || '';
@@ -97,7 +92,6 @@ function createAuth(app: FirebaseApp): Auth {
 
 export const auth: Auth | null = firebaseApp ? createAuth(firebaseApp) : null;
 export const db: Firestore | null = firebaseApp ? getFirestore(firebaseApp) : null;
-export const storage: FirebaseStorage | null = firebaseApp ? getStorage(firebaseApp) : null;
 
 export interface FirebaseUser {
   uid: string;
@@ -123,28 +117,6 @@ function requireAuth(): Auth {
   return auth;
 }
 
-function requireStorage(): FirebaseStorage {
-  if (!storage) throw new Error('Firebase Storage is not configured. Add your credentials to .env.local.');
-  return storage;
-}
-
-/**
- * Uploads a picked profile image and returns its public download URL.
- * Remote URLs are returned unchanged so existing Google avatars are preserved.
- */
-export async function uploadProfileAvatar(uid: string, uri: string): Promise<string> {
-  if (/^https?:\/\//i.test(uri)) return uri;
-
-  const response = await fetch(uri);
-  const blob = await response.blob();
-  const contentType = blob.type || 'image/jpeg';
-  const extension = contentType.split('/')[1]?.split('+')[0] || 'jpg';
-  const objectRef = ref(requireStorage(), `avatars/${uid}/profile-${Date.now()}.${extension}`);
-
-  await uploadBytes(objectRef, blob, { contentType });
-  return getDownloadURL(objectRef);
-}
-
 export function authErrorMessage(error: unknown): string {
   const err = error as { code?: string; message?: string } | null;
   const code = err?.code || '';
@@ -166,8 +138,17 @@ export function authErrorMessage(error: unknown): string {
   return messages[code] || err?.message || 'Something went wrong. Please try again.';
 }
 
-export async function signUp(email: string, password: string): Promise<FirebaseUser> {
+export async function signUp(
+  email: string,
+  password: string,
+  displayName?: string,
+): Promise<FirebaseUser> {
   const credential = await FirebaseAuth.createUserWithEmailAndPassword(requireAuth(), email, password);
+  if (displayName?.trim()) {
+    await FirebaseAuth.updateProfile(credential.user, {
+      displayName: displayName.trim(),
+    });
+  }
   try {
     await FirebaseAuth.sendEmailVerification(credential.user);
   } catch {
