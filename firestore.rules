@@ -45,6 +45,27 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------------
+    // Admin roster
+    //
+    // Admins are NOT a custom claim, because claims need the Admin SDK to
+    // mint. Instead membership is one document per admin UID under
+    // `admins/{uid}`. Only the Firebase console (which bypasses rules) or an
+    // existing super admin using the Admin SDK can add a row, so a client can
+    // never promote itself. See admin-web/README.md for the bootstrap step.
+    // ---------------------------------------------------------------------
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{adminId} {
+      // Signed-in clients may read their own row so the app can show the
+      // admin entry point; nobody writes from the client.
+      allow read: if isSelf(adminId);
+      allow write: if false;
+    }
+
+    // ---------------------------------------------------------------------
     // items — public marketplace listings
     // ---------------------------------------------------------------------
     match /items/{itemId} {
@@ -117,6 +138,13 @@ service cloud.firestore {
         && request.resource.data.get('trade_count', 0) == 0
         && request.resource.data.get('rating', 0) == 0;
 
+      // Demo profiles only: the portal's "Load demo data" button needs somewhere
+      // to hang the sample traders, and `demo-` ids can never collide with a
+      // real auth UID. Admins still cannot create arbitrary profiles.
+      allow create: if isAdmin()
+        && userId.matches('demo-.*')
+        && isNonEmptyString(request.resource.data.full_name, 80);
+
       allow update: if isSelf(userId)
         && isNonEmptyString(request.resource.data.full_name, 80)
         && isOptionalString(request.resource.data.get('username', null), 30)
@@ -133,6 +161,21 @@ service cloud.firestore {
             || request.resource.data.eco_points == resource.data.eco_points);
 
       allow delete: if isSelf(userId);
+
+      // Admins may only touch the moderation-owned fields, never identity,
+      // stats or the email-verification mirror.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['moderation_status', 'suspended_until', 'admin_notes', 'trust_score', 'is_verified'])
+        && isOneOf(
+             request.resource.data.get('moderation_status', 'clear'),
+             ['clear', 'flagged', 'suspended', 'banned']
+           )
+        && isOptionalNumber(request.resource.data.get('suspended_until', null))
+        && isOptionalString(request.resource.data.get('admin_notes', null), 2000)
+        && request.resource.data.get('trust_score', 0) is number
+        && request.resource.data.get('trust_score', 0) >= 0
+        && request.resource.data.get('trust_score', 0) <= 100;
     }
 
     // ---------------------------------------------------------------------
@@ -293,6 +336,84 @@ service cloud.firestore {
       allow delete: if isVerified()
         && resource.data.proposer_id == request.auth.uid
         && resource.data.status == 'pending';
+    }
+
+    // ---------------------------------------------------------------------
+    // Admin portal collections
+    //
+    // Traders can file their own verification request and a report; only an
+    // admin can read the queues or make decisions.
+    // ---------------------------------------------------------------------
+    match /verifications/{verificationId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.user_id == request.auth.uid);
+
+      allow create: if isAdmin()
+        || (isSignedIn()
+            && request.resource.data.user_id == request.auth.uid
+            && request.resource.data.status == 'pending'
+            && isNonEmptyString(request.resource.data.full_name, 80)
+            && isNonEmptyString(request.resource.data.document_type, 80)
+            && request.resource.data.file_count is int
+            && request.resource.data.risk_score is number
+            && request.resource.data.submitted_at is number);
+
+      allow update, delete: if isAdmin();
+    }
+
+    match /moderationReports/{reportId} {
+      allow read: if isAdmin();
+
+      allow create: if isAdmin()
+        || (isVerified()
+            && request.resource.data.reporter_id == request.auth.uid
+            && isNonEmptyString(request.resource.data.user_id, 128)
+            && isOneOf(request.resource.data.type, ['listing', 'message', 'account'])
+            && isNonEmptyString(request.resource.data.title, 120)
+            && isNonEmptyString(request.resource.data.detail, 2000)
+            && isOneOf(request.resource.data.status, ['open', 'resolved'])
+            && request.resource.data.created_at is number);
+
+      allow update, delete: if isAdmin();
+    }
+
+    // Auctions are public so the community can browse them before signing in.
+    match /auctions/{auctionId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin()
+        && isNonEmptyString(request.resource.data.title, 120)
+        && request.resource.data.starting_bid is number
+        && request.resource.data.starting_bid >= 0
+        && isOneOf(request.resource.data.status, ['scheduled', 'active', 'ended'])
+        && request.resource.data.starts_at is number
+        && request.resource.data.duration_hours is int;
+    }
+
+    match /rewardRules/{ruleId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin()
+        && isNonEmptyString(request.resource.data.name, 80)
+        && request.resource.data.multiplier is number
+        && request.resource.data.multiplier >= 0;
+    }
+
+    match /badges/{badgeId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin()
+        && isNonEmptyString(request.resource.data.name, 80)
+        && isNonEmptyString(request.resource.data.description, 240);
+    }
+
+    match /rewardGrants/{grantId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.recipient_id == request.auth.uid);
+      allow create: if isAdmin()
+        && isNonEmptyString(request.resource.data.recipient_id, 128)
+        && isNonEmptyString(request.resource.data.recipient_name, 80)
+        && isNonEmptyString(request.resource.data.reward_type, 80)
+        && isNonEmptyString(request.resource.data.reason, 240)
+        && request.resource.data.created_at is number;
+      allow update, delete: if isAdmin();
     }
 
     // Everything not matched above is denied.
