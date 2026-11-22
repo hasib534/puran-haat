@@ -25,7 +25,7 @@ import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
 
 export default function HomeFeedTab() {
-  const { items, toggleFavorite, proposals, conversations } = useApp();
+  const { items, toggleFavorite, proposals, conversations, isOffline } = useApp();
   const { user } = useAuth();
   const { guard } = useAuthGuard();
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,6 +44,10 @@ export default function HomeFeedTab() {
     () => items.reduce((total, item) => total + (Number(item.co2_saved_kg) || 0), 0),
     [items],
   );
+
+  // Only blame the connection when an empty feed really is caused by it; an
+  // empty result after filtering should still read as a filter problem.
+  const offlineAndEmpty = isOffline && items.length === 0;
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
@@ -183,10 +187,18 @@ export default function HomeFeedTab() {
         ListFooterComponent={filteredItems.length > 0 ? renderFooter : null}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <MaterialIcons name="inventory-2" size={48} color={Colors.outline} />
-            <Text style={styles.emptyTitle}>No items found</Text>
+            <MaterialIcons
+              name={offlineAndEmpty ? 'cloud-off' : 'inventory-2'}
+              size={48}
+              color={Colors.outline}
+            />
+            <Text style={styles.emptyTitle}>
+              {offlineAndEmpty ? 'You’re offline' : 'No items found'}
+            </Text>
             <Text style={styles.emptyDesc}>
-              Try searching for different keywords or clear filters
+              {offlineAndEmpty
+                ? 'Connect to the internet to load the latest listings.'
+                : 'Try searching for different keywords or clear filters'}
             </Text>
           </View>
         }

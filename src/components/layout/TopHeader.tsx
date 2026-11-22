@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../../constants/theme';
+import { useApp } from '../../context/AppContext';
 
 interface TopHeaderProps {
   districtName?: string;
@@ -31,54 +32,74 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onPressNotifications,
   onPressProfile,
 }) => {
+  const { isOffline } = useApp();
+
   return (
-    <View style={styles.header}>
-      <TouchableOpacity
-        style={styles.iconButton}
-        onPress={onPressLocation}
-        activeOpacity={0.7}
-        accessibilityLabel={`Change location, currently ${districtName}`}
-      >
-        <MaterialIcons name="location-on" size={23} color={Colors.primary} />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={onPressLocation}
+          activeOpacity={0.7}
+          accessibilityLabel={`Change location, currently ${districtName}`}
+        >
+          <MaterialIcons name="location-on" size={23} color={Colors.primary} />
+        </TouchableOpacity>
 
-      <Text style={styles.brandTitle} numberOfLines={1}>
-        Puran Haat
-      </Text>
+        <Text style={styles.brandTitle} numberOfLines={1}>
+          Puran Haat
+        </Text>
 
-      <View style={styles.rightSlot}>
-        {showNotifications ? (
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onPressNotifications}
-            activeOpacity={0.7}
-            accessibilityLabel="Open notifications"
-          >
-            <MaterialIcons name="notifications-none" size={23} color={Colors.primary} />
-            {unreadNotifications > 0 && <View style={styles.notificationDot} />}
-          </TouchableOpacity>
-        ) : onPressProfile ? (
-          <TouchableOpacity
-            style={styles.avatarButton}
-            onPress={onPressProfile}
-            activeOpacity={0.7}
-            accessibilityLabel="Open profile"
-          >
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
-            ) : (
-              <View style={styles.avatarFallback}>
-                <MaterialIcons name="person" size={21} color={Colors.primary} />
-              </View>
-            )}
-          </TouchableOpacity>
-        ) : null}
+        <View style={styles.rightSlot}>
+          {showNotifications ? (
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={onPressNotifications}
+              activeOpacity={0.7}
+              accessibilityLabel="Open notifications"
+            >
+              <MaterialIcons name="notifications-none" size={23} color={Colors.primary} />
+              {unreadNotifications > 0 && <View style={styles.notificationDot} />}
+            </TouchableOpacity>
+          ) : onPressProfile ? (
+            <TouchableOpacity
+              style={styles.avatarButton}
+              onPress={onPressProfile}
+              activeOpacity={0.7}
+              accessibilityLabel="Open profile"
+            >
+              {avatarUrl ? (
+                <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+              ) : (
+                <View style={styles.avatarFallback}>
+                  <MaterialIcons name="person" size={21} color={Colors.primary} />
+                </View>
+              )}
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
+
+      {isOffline && (
+        <View
+          style={styles.offlineBar}
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
+          <MaterialIcons name="cloud-off" size={15} color={Colors.onSecondaryContainer} />
+          <Text style={styles.offlineText}>
+            You&apos;re offline — showing saved listings
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.surface,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -135,5 +156,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.secondaryContainer,
+  },
+  offlineBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.margin,
+    paddingVertical: 6,
+    backgroundColor: Colors.secondaryContainer,
+  },
+  offlineText: {
+    ...Typography.labelMd,
+    color: Colors.onSecondaryContainer,
   },
 });

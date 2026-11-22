@@ -292,11 +292,24 @@ function toRecord(snapshot: { id: string; data: () => Record<string, unknown> | 
 export function subscribeToItems(
   callback: (items: FirestoreRecord[]) => void,
   onError?: (error: Error) => void,
+  /**
+   * Reports whether the latest snapshot came from the local cache, which is how
+   * the SDK exposes "the backend is unreachable right now". It is also `true`
+   * briefly during the initial sync, so callers should debounce before treating
+   * it as offline.
+   */
+  onCacheStateChange?: (fromCache: boolean) => void,
 ): Unsubscribe {
   if (!db) return () => {};
   return onSnapshot(
     collection(db, 'items'),
-    (snapshot) => callback(snapshot.docs.map(toRecord)),
+    // Metadata-only events are what tell us when the listener flips between
+    // cache and server, including reconnecting after a drop.
+    { includeMetadataChanges: true },
+    (snapshot) => {
+      onCacheStateChange?.(snapshot.metadata.fromCache);
+      callback(snapshot.docs.map(toRecord));
+    },
     onError,
   );
 }

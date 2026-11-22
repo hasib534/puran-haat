@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -93,6 +94,12 @@ export type EditableItemPatch = Partial<
 interface AppContextValue {
   items: Item[];
   itemsLoading: boolean;
+  /**
+   * True when the item feed has been serving from the Firestore cache long
+   * enough that the backend is probably unreachable, so screens can say so
+   * instead of pretending the haat is empty.
+   */
+  isOffline: boolean;
   favorites: string[];
   toggleFavorite: (id: string) => Promise<void>;
   addItem: (item: Item) => Promise<void>;
@@ -328,6 +335,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [rawItems, setRawItems] = useState<Item[]>(isFirebaseConfigured ? [] : MOCK_ITEMS);
   const [itemsLoading, setItemsLoading] = useState(isFirebaseConfigured);
+  const [isOffline, setIsOffline] = useState(false);
+  const offlineTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [favoriteState, setFavoriteState] = useState<{ uid: string; ids: Set<string> }>({
     uid: '',
@@ -350,7 +359,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Live item feed.
   useEffect(() => {
     if (!isFirebaseConfigured) return;
-    return subscribeToItems(
+
+    /**
+     * Firestore reports `fromCache` on every snapshot. It is briefly true during
+     * the first sync, so flipping the banner on immediately would flash it on a
+     * healthy launch. We only call it offline if the cache is still the source
+     * after this grace period.
+     */
+    const OFFLINE_GRACE_MS = 6000;
+    // Safety net for the rare cold start where the listener never emits a
+    // cache snapshot either, so the grace timer above has nothing to start.
+    const OFFLINE_FALLBACK_MS = 10000;
+    let sawServerSnapshot = false;
+    const fallbackTimer = setTimeout(() => {
+      if (!sawServerSnapshot) setIsOffline(true);
+    }, OFFLINE_FALLBACK_MS);
+
+    const handleCacheState = (fromCache: boolean) => {
+      if (offlineTimer.current) {
+        clearTimeout(offlineTimer.current);
+        offlineTimer.current = null;
+      }
+      if (!fromCache) {
+        sawServerSnapshot = true;
+        clearTimeout(fallbackTimer);
+        setIsOffline(false);
+        return;
+      }
+      offlineTimer.current = setTimeout(() => {
+        offlineTimer.current = null;
+        setIsOffline(true);
+      }, OFFLINE_GRACE_MS);
+    };
+
+    const unsubscribe = subscribeToItems(
       (rows) => {
         const mapped = rows
           .map(mapItem)
@@ -362,7 +404,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.warn('Items listener failed:', error.message);
         setItemsLoading(false);
       },
+      handleCacheState,
     );
+
+    return () => {
+      clearTimeout(fallbackTimer);
+      if (offlineTimer.current) {
+        clearTimeout(offlineTimer.current);
+        offlineTimer.current = null;
+      }
+      unsubscribe();
+    };
   }, []);
 
   // Live favorites for the signed-in user.
@@ -1130,6 +1182,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const value: AppContextValue = {
     items,
     itemsLoading,
+    isOffline,
     favorites: Array.from(favoriteIds),
     toggleFavorite,
     addItem,
