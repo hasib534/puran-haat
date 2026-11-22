@@ -5,14 +5,19 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": ["puranhaat", "com.puranhaat.app"],
+    "scheme": [
+      "puranhaat",
+      "com.puranhaat.app"
+    ],
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.puranhaat.app",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "icon": "./assets/expo.icon"
     },
     "android": {
       "package": "com.puranhaat.app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#FDFAE7",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -35,7 +40,8 @@
           "imageWidth": 76
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

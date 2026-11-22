@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "676232289406",
+    "project_id": "puran-haat-app",
+    "storage_bucket": "puran-haat-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676232289406:android:62b74631607c5f300fcc2f",
+        "android_client_info": {
+          "package_name": "com.puranhaat.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "676232289406-j2kj0mf1lf88r5dtur4mee1bakgor4em.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.puranhaat.app",
+            "certificate_hash": "53e643cfe1f07ba050cd6d38a1a1d026b2956a17"
+          }
+        },
+        {
+          "client_id": "676232289406-sot7jbiukih2ki70qbq8mluttvnenjtc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJLvm9KEXFn6LdDjVrAg1Tdo5ktOuEO0Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "676232289406-sot7jbiukih2ki70qbq8mluttvnenjtc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "676232289406-7rcglk691itr2un7cj4v4s8sio8u2cvr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.puranhaat.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

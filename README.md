@@ -8,7 +8,7 @@ A **React Native / Expo** barter marketplace where users trade items locally —
 
 | Feature | Description |
 |---------|-------------|
-| **Email/Password + Google Sign-In** | Web uses Firebase `signInWithPopup`; native uses `expo-auth-session` with PKCE |
+| **Email/Password + Google Sign-In** | Web uses Firebase `signInWithPopup`; iOS/Android use Google's native Sign-In SDK |
 | **Email Verification Required** | Only verified users can post items, chat, or send proposals |
 | **Real-time Home Feed** | `onSnapshot` listeners for items, favorites, conversations, proposals |
 | **Post Items** | Category, condition, trade mode (barter / free gift), eco impact rating, CO₂ saved |
@@ -56,17 +56,22 @@ npm install
 # Copy environment template and fill in your Firebase credentials
 cp .env.example .env.local
 
-# Start dev server
-npx expo start
+# Web dev server
+npx expo start --web
+
+# Native development build (required for Google Sign-In)
+npm run android   # or: npm run ios (macOS only)
 ```
 
 Open in:
-- **Web**: press `w` in terminal or visit `http://localhost:8081`
-- **iOS Simulator**: press `i` (macOS only)
-- **Android Emulator**: press `a`
-- **Expo Go**: scan QR (limited — no custom native modules)
+- **Web**: `npx expo start --web` or visit `http://localhost:8081`
+- **iOS Simulator**: `npm run ios` (macOS only — builds and installs the dev client)
+- **Android Emulator**: `npm run android` (builds and installs the dev client)
+- **Expo Go**: `npx expo start` then scan the QR (limited — no Google Sign-In or other custom native modules)
 
-> ⚠️ Google Sign-In on native requires a **development build** (`npx expo run:ios` / `npx expo run:android`) — it will **not** work in Expo Go.
+> ⚠️ Google Sign-In on iOS/Android requires a **development build** (`npx expo run:ios` / `npx expo run:android`, or an EAS development build). It uses the native Google Sign-In SDK and **will not work in Expo Go**.
+>
+> If native Google sign-in reports `DEVELOPER_ERROR` / `10`, the build's SHA-1 is not registered. Run `npx @react-native-google-signin/config-doctor`, add the fingerprint to the Firebase Android app, and rebuild.
 
 ---
 
@@ -84,6 +89,13 @@ Open in:
    - **iOS** → bundle ID: `com.puranhaat.app` → download `GoogleService-Info.plist`
    - **Android** → package: `com.puranhaat.app` → add **debug SHA-1** (and release SHA-1 later) → download `google-services.json`
 
+   Both native config files are committed at the repo root and are read by the Google Sign-In config plugin. Regenerate them after changing Firebase apps or signing certificates:
+   ```bash
+   npx firebase-tools apps:list --project puran-haat-app
+   npx firebase-tools apps:sdkconfig ANDROID <androidAppId> --project puran-haat-app --out google-services.json
+   npx firebase-tools apps:sdkconfig IOS <iosAppId> --project puran-haat-app --out GoogleService-Info.plist
+   ```
+
 3. **Add credentials to `.env.local`**:
    ```env
    EXPO_PUBLIC_FIREBASE_API_KEY=...
@@ -91,9 +103,11 @@ Open in:
    EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 
    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=...
-   EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=...
-   EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=...
    ```
+
+   Native Google client IDs come from the committed `google-services.json` / `GoogleService-Info.plist`, not from environment variables.
+
+   For EAS cloud builds, add the same `EXPO_PUBLIC_*` variables to the EAS environment (`eas env:create`) — `.env.local` is intentionally gitignored and is not uploaded.
 
 4. **Deploy security rules** (from repo root):
    ```bash
@@ -136,6 +150,7 @@ src/
 │   └── useConversationMessages.ts
 ├── lib/
 │   ├── firebase.ts         # Firebase SDK init, helpers, uploadProfileAvatar
+│   ├── google-signin.ts    # Native Google Sign-In → Firebase ID token
 │   ├── notifications.ts    # Derives the activity feed from proposals + chats
 │   └── recent-searches.ts  # AsyncStorage-backed recent searches per user
 ├── constants/

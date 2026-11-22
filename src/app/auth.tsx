@@ -10,8 +10,6 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
@@ -19,8 +17,7 @@ import { showAlert } from '../lib/alert';
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
-
-WebBrowser.maybeCompleteAuthSession();
+import { GoogleSignInUnavailableError, signInWithGoogleNative } from '../lib/google-signin';
 
 export default function AuthScreen() {
   const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, resetPassword, configured } = useAuth();
@@ -30,15 +27,6 @@ export default function AuthScreen() {
   const [submitting, setSubmitting] = useState(false);
 
   const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-
-  const [request, , promptAsync] = Google.useIdTokenAuthRequest({
-    // The web client ID is the fallback. For the best native experience add
-    // dedicated iOS/Android OAuth clients to .env.local as well.
-    clientId: webClientId,
-    webClientId,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  });
 
   const handleGooglePress = async () => {
     // On web, use Firebase's popup flow. It goes through the Firebase auth
@@ -58,31 +46,20 @@ export default function AuthScreen() {
       return;
     }
 
+    setSubmitting(true);
     try {
-      const result = await promptAsync();
-      if (result.type === 'success') {
-        const idToken = result.authentication?.idToken || result.params?.id_token;
-        if (!idToken) {
-          showAlert(
-            'Google sign-in incomplete',
-            'Google did not return an ID token. Check that the OAuth redirect URI for this app is authorized in Google Cloud Console.',
-          );
-          return;
-        }
-        setSubmitting(true);
-        try {
-          await signInWithGoogle(idToken);
-          router.back();
-        } catch (e) {
-          showAlert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
-        } finally {
-          setSubmitting(false);
-        }
-      } else if (result.type === 'error') {
-        showAlert('Google sign-in error', result.error?.message || 'Unknown error');
-      }
+      const idToken = await signInWithGoogleNative(webClientId);
+      if (!idToken) return; // User closed the account picker.
+      await signInWithGoogle(idToken);
+      router.back();
     } catch (e) {
-      showAlert('Google sign-in error', (e as Error)?.message || 'Unknown error');
+      const message =
+        e instanceof GoogleSignInUnavailableError
+          ? (e as Error).message
+          : (e as Error)?.message || 'Unknown error';
+      showAlert('Google sign-in failed', message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -127,6 +104,9 @@ export default function AuthScreen() {
       showAlert('Could not send reset email', (e as Error)?.message || 'Try again.');
     }
   };
+
+  const googleUnavailable =
+    !configured || (Platform.OS !== 'web' && !webClientId) || submitting;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -199,9 +179,9 @@ export default function AuthScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.googleButton, (!request || !configured) && { opacity: 0.5 }]}
+            style={[styles.googleButton, googleUnavailable && { opacity: 0.5 }]}
             onPress={handleGooglePress}
-            disabled={!request || !configured || submitting}
+            disabled={googleUnavailable}
             activeOpacity={0.88}
           >
             <MaterialIcons name="g-translate" size={20} color={Colors.onSurface} />

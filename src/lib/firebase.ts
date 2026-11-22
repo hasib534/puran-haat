@@ -197,8 +197,8 @@ export async function signInWithGoogleIdToken(googleIdToken: string): Promise<Fi
  *
  * The handler redirect URI is pre-authorized on the Firebase OAuth client, so
  * this avoids having to register every localhost/production origin as a
- * separate Google OAuth redirect URI. Native builds use expo-auth-session and
- * the ID-token exchange above instead.
+ * separate Google OAuth redirect URI. Native builds use the official Google
+ * Sign-In library and the ID-token exchange above instead.
  */
 export async function signInWithGooglePopup(): Promise<FirebaseUser> {
   if (Platform.OS !== 'web') {
