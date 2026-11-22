@@ -10,6 +10,7 @@ import {
   Switch,
   KeyboardAvoidingView,
   Platform,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -54,6 +55,8 @@ function PostItemForm() {
   const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  /** Set after a successful publish so the success screen can show its actions. */
+  const [published, setPublished] = useState<Item | null>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -222,16 +225,7 @@ function PostItemForm() {
       };
 
       await addItem(newItem);
-      showAlert(
-        'Item Published!',
-        `"${title}" is now live on Puran Haat! Nearby traders in ${locationName} will be able to see your listing.`,
-        [
-          {
-            text: 'View in Haat Feed',
-            onPress: () => router.push('/(tabs)' as never),
-          },
-        ],
-      );
+      setPublished(newItem);
       setPhotos([]);
       setTitle('');
       setDescription('');
@@ -245,6 +239,70 @@ function PostItemForm() {
       setSubmitting(false);
     }
   };
+
+  const goHome = () => {
+    setPublished(null);
+    router.push('/(tabs)' as never);
+  };
+
+  const sharePublished = () => {
+    if (!published) return;
+    Share.share({
+      message: `"${published.title}" is now on Puran Haat — trade, don't toss.`,
+    }).catch(() => {
+      // Dismissing the share sheet is not an error worth interrupting the user.
+    });
+  };
+
+  if (published) {
+    return (
+      <SafeAreaView style={styles.successSafeArea} edges={['top', 'bottom']}>
+        <View style={styles.successBody}>
+          <View style={styles.successIconWrap}>
+            <MaterialIcons name="eco" size={56} color={Colors.primary} />
+          </View>
+
+          <Text style={styles.successTitle}>Item Published!</Text>
+          <Text style={styles.successSubtitle}>
+            Your listing is now live in the Puran Haat community. Thank you for contributing to a
+            sustainable neighborhood.
+          </Text>
+
+          <Text style={styles.successItemTitle} numberOfLines={2}>
+            {published.title}
+          </Text>
+
+          <View style={styles.successActions}>
+            <TouchableOpacity
+              style={styles.successPrimary}
+              activeOpacity={0.88}
+              onPress={() => {
+                const id = published.id;
+                setPublished(null);
+                router.push({ pathname: '/item/[id]', params: { id } } as never);
+              }}
+            >
+              <MaterialIcons name="visibility" size={19} color={Colors.onPrimary} />
+              <Text style={styles.successPrimaryText}>View Listing</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.successSecondary}
+              activeOpacity={0.88}
+              onPress={sharePublished}
+            >
+              <MaterialIcons name="share" size={19} color={Colors.primary} />
+              <Text style={styles.successSecondaryText}>Share</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={goHome} activeOpacity={0.7}>
+              <Text style={styles.successLink}>Go to Home</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -1106,5 +1164,84 @@ const styles = StyleSheet.create({
     ...Typography.labelLg,
     color: Colors.onPrimary,
     fontWeight: '700',
+  },
+  successSafeArea: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  successBody: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xl,
+  },
+  successIconWrap: {
+    width: 128,
+    height: 128,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primaryFixed,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.lg,
+    ...Shadows.card,
+  },
+  successTitle: {
+    ...Typography.displayLg,
+    color: Colors.onSurface,
+    textAlign: 'center',
+  },
+  successSubtitle: {
+    ...Typography.bodyMd,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    marginTop: Spacing.xs,
+    maxWidth: 320,
+  },
+  successItemTitle: {
+    ...Typography.labelLg,
+    color: Colors.primary,
+    textAlign: 'center',
+    marginTop: Spacing.md,
+  },
+  successActions: {
+    alignSelf: 'stretch',
+    marginTop: Spacing.xl,
+    gap: Spacing.sm,
+  },
+  successPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.full,
+    paddingVertical: 16,
+  },
+  successPrimaryText: {
+    ...Typography.labelLg,
+    color: Colors.onPrimary,
+    fontWeight: '700',
+  },
+  successSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    paddingVertical: 15,
+  },
+  successSecondaryText: {
+    ...Typography.labelLg,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  successLink: {
+    ...Typography.labelLg,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
+    paddingVertical: Spacing.sm,
   },
 });

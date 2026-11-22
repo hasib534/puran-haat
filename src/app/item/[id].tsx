@@ -165,14 +165,7 @@ export default function ItemDetailScreen() {
   const handleViewProfile = () => {
     const seller = item.user;
     if (!seller) return;
-    showAlert(
-      seller.full_name,
-      [
-        seller.district ? `Based in ${seller.district}` : 'Puran Haat community member',
-        seller.is_verified ? 'Verified trader' : 'Member',
-        seller.rating ? `Rating ${seller.rating.toFixed(1)} from ${seller.trade_count} trades` : 'No ratings yet',
-      ].join('\n'),
-    );
+    router.push({ pathname: '/user/[id]', params: { id: seller.id } } as never);
   };
 
   return (

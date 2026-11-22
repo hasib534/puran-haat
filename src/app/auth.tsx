@@ -24,8 +24,7 @@ import { GoogleSignInUnavailableError, signInWithGoogleNative } from '../lib/goo
 type AuthMode = 'signin' | 'signup';
 
 export default function AuthScreen() {
-  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, resetPassword, configured } =
-    useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, configured } = useAuth();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
@@ -118,17 +117,11 @@ export default function AuthScreen() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email.trim()) {
-      showAlert('Enter your email', 'Type your account email above, then tap Forgot password.');
-      return;
-    }
-    try {
-      await resetPassword(email.trim());
-      showAlert('Reset link sent', `Check ${email.trim()} for a password reset link.`);
-    } catch (e) {
-      showAlert('Could not send reset email', (e as Error)?.message || 'Try again.');
-    }
+  const handleForgotPassword = () => {
+    router.push({
+      pathname: '/forgot-password',
+      params: email.trim() ? { email: email.trim() } : {},
+    } as never);
   };
 
   const googleUnavailable =
