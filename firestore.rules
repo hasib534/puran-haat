@@ -20,8 +20,24 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // `Map.get` with a default keeps this safe for tokens that carry no
+    // email_verified claim at all (anonymous guests, some providers).
     function isVerified() {
-      return isSignedIn() && request.auth.token.email_verified == true;
+      return isSignedIn() && request.auth.token.get('email_verified', false) == true;
+    }
+
+    // Guest sessions use Firebase Anonymous Auth, so a visitor can browse and
+    // chat before creating an account. Detected from the token's provider.
+    function isAnonymous() {
+      return isSignedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    // Chat is open to guests as well as verified traders. Creating listings,
+    // sending proposals and admin actions still require a verified email.
+    // Guests are checked first so an anonymous token never touches the
+    // email-verification claim.
+    function canChat() {
+      return isAnonymous() || isVerified();
     }
 
     function isSelf(uid) {
@@ -80,6 +96,37 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------------
+    // presence — live online / last-seen flag, one row per trader
+    //
+    // Presence is semi-public on purpose: any signed-in trader may read it so
+    // a chat can show "Online" / "Last seen 5m ago". Only the owner may write
+    // their own row, so nobody can spoof someone else being online.
+    // ---------------------------------------------------------------------
+    match /presence/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSelf(userId)
+        && request.resource.data.online is bool
+        && request.resource.data.last_seen is number;
+      allow delete: if isSelf(userId);
+    }
+
+    // ---------------------------------------------------------------------
+    // pushTokens — private device registrations, one doc per trader
+    //
+    // Kept out of the profile so another signed-in trader can never read
+    // someone else's device tokens. Only the owner reads or writes their row;
+    // the push Worker uses the Admin SDK, which bypasses these rules.
+    // ---------------------------------------------------------------------
+    match /pushTokens/{userId} {
+      allow read: if isSelf(userId);
+      allow create, update: if isSelf(userId)
+        && request.resource.data.tokens is list
+        && request.resource.data.tokens.size() <= 10
+        && request.resource.data.updated_at is number;
+      allow delete: if isSelf(userId);
+    }
+
+    // ---------------------------------------------------------------------
     // items — public marketplace listings
     // ---------------------------------------------------------------------
     match /items/{itemId} {
@@ -91,7 +138,7 @@ service cloud.firestore {
         && request.resource.data.user is map
         && request.resource.data.user.id == request.auth.uid
         // The seller badge is derived from the auth claim, not the client.
-        && request.resource.data.user.get('is_verified', false) == request.auth.token.email_verified
+        && request.resource.data.user.get('is_verified', false) == request.auth.token.get('email_verified', false)
         && isNonEmptyString(request.resource.data.user.full_name, 80)
         && request.resource.data.user.get('rating', 0) is number
         && request.resource.data.user.get('trade_count', 0) is int
@@ -149,7 +196,7 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
         && hasValidCoordinates()
         // The badge must mirror the real email-verification claim.
-        && request.resource.data.get('is_verified', false) == request.auth.token.email_verified
+        && request.resource.data.get('is_verified', false) == request.auth.token.get('email_verified', false)
         // New accounts start with a clean scoreboard.
         && request.resource.data.get('eco_points', 0) == 0
         && request.resource.data.get('trade_count', 0) == 0
@@ -169,7 +216,7 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
         && hasValidCoordinates()
-        && request.resource.data.get('is_verified', false) == request.auth.token.email_verified
+        && request.resource.data.get('is_verified', false) == request.auth.token.get('email_verified', false)
         // Ratings and counters are server-owned. Clients cannot inflate them.
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['rating'])
             || request.resource.data.rating == resource.data.rating)
@@ -220,7 +267,7 @@ service cloud.firestore {
       allow read: if isSignedIn()
         && request.auth.uid in resource.data.participants;
 
-      allow create: if isVerified()
+      allow create: if canChat()
         && request.resource.data.participants is list
         && request.resource.data.participants.size() == 2
         && request.auth.uid in request.resource.data.participants
@@ -244,7 +291,7 @@ service cloud.firestore {
                 && request.resource.data.get('receiver_id', '') != request.auth.uid))
         && request.resource.data.created_at is number;
 
-      allow update: if isVerified()
+      allow update: if canChat()
         && request.auth.uid in resource.data.participants
         // The participant pair, profile snapshots, item and creation time
         // can never change.
@@ -271,6 +318,20 @@ service cloud.firestore {
         && request.resource.data.lastMessage.size() <= 1000
         && request.resource.data.lastMessageAt is number
         && request.resource.data.unread is map
+        // Ephemeral live-chat signals.
+        //  * typing — a heartbeat timestamp, written while a participant types.
+        //  * reads  — the timestamp a participant has read the thread up to, so
+        //             the other side can show a per-message "Seen" receipt.
+        // Each participant may only write their OWN key: the counterpart's entry
+        // must stay untouched, so neither side can forge presence or a receipt.
+        && request.resource.data.get('typing', {}) is map
+        && request.resource.data.get('reads', {}) is map
+        && resource.data.get('typing', {})
+             .diff(request.resource.data.get('typing', {})).affectedKeys()
+             .hasOnly([request.auth.uid])
+        && resource.data.get('reads', {})
+             .diff(request.resource.data.get('reads', {})).affectedKeys()
+             .hasOnly([request.auth.uid])
         // Only the receiver can accept or decline. A declined thread can be
         // re-opened with a new proposal.
         && (request.resource.data.status == resource.data.status
@@ -296,7 +357,7 @@ service cloud.firestore {
         && conversation().participants is list
         && request.auth.uid in conversation().participants;
 
-      allow create: if isVerified()
+      allow create: if canChat()
         && conversation().participants is list
         && request.auth.uid in conversation().participants
         && request.resource.data.sender_id == request.auth.uid

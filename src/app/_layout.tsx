@@ -11,6 +11,7 @@ import {
   loadOnboardingSeen,
   subscribeOnboarding,
 } from "../lib/onboarding";
+import { configurePushNotifications, observeNotificationTaps } from "../lib/push";
 
 // Dev-only: the Firestore SDK emits a benign "WebChannelConnection ... transport
 // errored" warning whenever its long-poll listener reconnects. This is routine on
@@ -32,6 +33,24 @@ export default function RootLayout() {
 
   useEffect(() => {
     loadOnboardingSeen();
+  }, []);
+
+  // Show notifications while the app is open, and open the right chat when a
+  // trader taps one. Both are no-ops on web or when no push sender is set up.
+  useEffect(() => {
+    void configurePushNotifications();
+    let cancelled = false;
+    let dispose: (() => void) | undefined;
+    observeNotificationTaps((url) => {
+      router.push(url as never);
+    }).then((cleanup) => {
+      if (cancelled) cleanup();
+      else dispose = cleanup;
+    });
+    return () => {
+      cancelled = true;
+      dispose?.();
+    };
   }, []);
 
   const onOnboardingRoute = segments[0] === "onboarding";

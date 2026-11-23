@@ -24,8 +24,9 @@ import { GoogleSignInUnavailableError, signInWithGoogleNative } from '../lib/goo
 type AuthMode = 'signin' | 'signup';
 
 export default function AuthScreen() {
-  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, configured } = useAuth();
-  const [mode, setMode] = useState<AuthMode>('signin');
+  const { signIn, signUp, signInWithGoogle, signInWithGooglePopup, configured, isGuest } = useAuth();
+  // Guests arrive here from a "Create account" prompt, so lead with sign up.
+  const [mode, setMode] = useState<AuthMode>('signup');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -188,6 +189,16 @@ export default function AuthScreen() {
                 );
               })}
             </View>
+
+            {isGuest && configured && (
+              <View style={styles.guestNote}>
+                <MaterialIcons name="info-outline" size={18} color={Colors.primary} />
+                <Text style={styles.guestNoteText}>
+                  You&apos;re browsing as a guest. Create an account to keep your chats and start
+                  posting items.
+                </Text>
+              </View>
+            )}
 
             {!configured && (
               <View style={styles.warning}>
@@ -460,6 +471,16 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   warningText: { ...Typography.bodySm, color: Colors.tertiary, flex: 1 },
+  guestNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(45, 90, 39, 0.08)',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+  },
+  guestNoteText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, flex: 1 },
   label: {
     ...Typography.labelMd,
     color: Colors.onSurface,

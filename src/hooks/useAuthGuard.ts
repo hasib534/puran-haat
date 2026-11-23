@@ -24,6 +24,15 @@ export function useAuthGuard() {
       }
 
       if (options.requireVerified && !user.emailVerified) {
+        // Guests use Anonymous Auth and have no inbox to verify, so invite them
+        // to create a real account instead.
+        if (user.isAnonymous) {
+          showAlert('Create an account', `Guests can browse and chat. Create a free account to ${action}.`, [
+            { text: 'Not now', style: 'cancel' },
+            { text: 'Create account', onPress: () => router.push('/auth' as never) },
+          ]);
+          return false;
+        }
         showAlert(
           'Verify your email',
           `Please verify ${user.email} before you ${action}.`,
@@ -51,5 +60,7 @@ export function useAuthGuard() {
     guard,
     canAct: !configured || Boolean(user),
     isVerified: !configured || Boolean(user?.emailVerified),
+    /** True while browsing as a guest (or when Firebase is unset). */
+    isGuest: !configured || !user || user.isAnonymous,
   };
 }

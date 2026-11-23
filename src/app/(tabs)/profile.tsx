@@ -27,7 +27,7 @@ const CATEGORY_BY_ID = new Map(MOCK_CATEGORIES.map((category) => [category.id, c
 
 export default function ProfileTab() {
   const { profile, ecoPoints, tradeCount, items, seedItems, proposals, conversations } = useApp();
-  const { user, signOut, resetPassword } = useAuth();
+  const { user, signOut, resetPassword, isGuest } = useAuth();
   const [showEcoImpact, setShowEcoImpact] = useState(true);
 
   const favCount = items.filter((i) => i.is_favorite).length;
@@ -97,6 +97,31 @@ export default function ProfileTab() {
 
         <VerificationBanner />
 
+        {isGuest ? (
+          <View style={[styles.card, styles.guestCard, Shadows.card]}>
+            <View style={styles.guestRow}>
+              <View style={styles.guestIcon}>
+                <MaterialIcons name="person-add" size={22} color={Colors.primary} />
+              </View>
+              <View style={styles.guestBody}>
+                <Text style={styles.guestTitle}>You&apos;re browsing as a guest</Text>
+                <Text style={styles.guestText}>
+                  Create a free account to post items, send trade proposals, and keep your chats for
+                  good.
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.guestButton}
+              onPress={() => router.push('/auth' as never)}
+              activeOpacity={0.88}
+            >
+              <MaterialIcons name="person-add" size={18} color={Colors.onPrimary} />
+              <Text style={styles.guestButtonText}>Create account</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
         {/* Account information */}
         <View style={[styles.card, Shadows.card]}>
           <View style={styles.cardHeader}>
@@ -126,6 +151,11 @@ export default function ProfileTab() {
                 {profile.is_verified && (
                   <MaterialIcons name="verified" size={16} color={Colors.primary} />
                 )}
+                {isGuest ? (
+                  <View style={styles.guestChip}>
+                    <Text style={styles.guestChipText}>Guest</Text>
+                  </View>
+                ) : null}
               </View>
               <Text style={styles.identityMeta}>
                 {profile.username ? `@${profile.username}` : 'Community trader'}
@@ -160,7 +190,7 @@ export default function ProfileTab() {
           <Text style={styles.fieldLabel}>Email Address</Text>
           <View style={styles.fieldValue}>
             <Text style={styles.fieldText} numberOfLines={1}>
-              {user?.email || 'Sign in to add an email'}
+              {user?.email || (isGuest ? 'Guest account — no email yet' : 'Sign in to add an email')}
             </Text>
           </View>
 
@@ -364,18 +394,18 @@ export default function ProfileTab() {
 
         <TouchableOpacity
           style={styles.logoutButton}
-          onPress={user ? handleSignOut : () => router.push('/auth' as never)}
+          onPress={isGuest ? () => router.push('/auth' as never) : handleSignOut}
           activeOpacity={0.85}
         >
           <MaterialIcons
-            name={user ? 'logout' : 'login'}
+            name={isGuest ? 'person-add' : 'logout'}
             size={20}
             color={Colors.tertiary}
           />
-          <Text style={styles.logoutText}>{user ? 'Logout' : 'Sign In'}</Text>
+          <Text style={styles.logoutText}>{isGuest ? 'Create an account' : 'Logout'}</Text>
         </TouchableOpacity>
 
-        {__DEV__ && isFirebaseConfigured && user && (
+        {__DEV__ && isFirebaseConfigured && user && !isGuest && (
           <TouchableOpacity
             style={styles.seedButton}
             onPress={async () => {
@@ -566,4 +596,41 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   seedText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },
+  guestCard: {
+    borderWidth: 1,
+    borderColor: 'rgba(45, 90, 39, 0.16)',
+    // Opaque on purpose: a translucent fill lets Android's elevation shadow
+    // bleed through the card and paint a muddy second layer inside it.
+    backgroundColor: Colors.secondaryContainer,
+  },
+  guestRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  guestIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: BorderRadius.full,
+    backgroundColor: 'rgba(45, 90, 39, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestBody: { flex: 1 },
+  guestTitle: { ...Typography.bodyMd, color: Colors.onSurface, fontWeight: '700' },
+  guestText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginTop: 2, lineHeight: 18 },
+  guestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.full,
+    marginTop: Spacing.md,
+  },
+  guestButtonText: { ...Typography.labelLg, color: Colors.onPrimary, fontWeight: '700' },
+  guestChip: {
+    backgroundColor: Colors.secondaryContainer,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+  },
+  guestChipText: { ...Typography.labelSm, color: Colors.onSecondaryContainer, fontWeight: '700' },
 });

@@ -23,6 +23,9 @@ import { useLocation } from '../../context/LocationContext';
 import { mapsUrl, type Coords } from '../../lib/geo';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { useConversationMessages } from '../../hooks/useConversationMessages';
+import { useNow } from '../../hooks/useNow';
+import { useTypingSignal } from '../../hooks/useTypingSignal';
+import { isSeenByPeer, isTypingFresh, presenceLabel } from '../../lib/presence';
 import { AuthGate } from '../../components/auth/AuthGate';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
 
@@ -39,8 +42,16 @@ export default function ChatScreen() {
 
 function ChatView() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { items, conversations, sendMessage, markConversationRead, acceptTrade, declineTrade } =
-    useApp();
+  const {
+    items,
+    conversations,
+    sendMessage,
+    markConversationRead,
+    setTyping,
+    presence,
+    acceptTrade,
+    declineTrade,
+  } = useApp();
   const { user } = useAuth();
   const { guard } = useAuthGuard();
   const { location, coordsOf } = useLocation();
@@ -54,17 +65,39 @@ function ChatView() {
   const other = conv?.other || item?.user;
 
   const [inputText, setInputText] = useState('');
+  // A coarse clock so "typing…" expires on its own and "last seen" stays fresh.
+  const now = useNow(4000);
 
   useEffect(() => {
     if (!conv?.id) return;
     markConversationRead(conv.id).catch(() => {});
   }, [conv?.id, markConversationRead]);
 
+  // --- Live typing heartbeat -----------------------------------------------
+  // Publishes the caller's "typing" signal; clears itself on send or leave.
+  const typingSignal = useTypingSignal(conv?.id, setTyping);
+
+  const handleInputChange = (text: string) => {
+    setInputText(text);
+    typingSignal.onChange(text);
+  };
+
+  // The newest message we sent is the one that carries the read receipt.
+  let lastOwnMessageId: string | null = null;
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    if (messages[i].sender === 'me') {
+      lastOwnMessageId = messages[i].id;
+      break;
+    }
+  }
+
+
   const handleSend = async () => {
     if (!inputText.trim() || !conv) return;
-    if (!guard('send messages', { requireVerified: true })) return;
+    if (!guard('send messages')) return;
     const text = inputText;
     setInputText('');
+    typingSignal.stop();
     try {
       await sendMessage(conv.id, text);
     } catch (error) {
@@ -86,7 +119,7 @@ function ChatView() {
 
   const handleShareLocation = () => {
     if (!conv) return;
-    if (!guard('share a location', { requireVerified: true })) return;
+    if (!guard('share a location')) return;
 
     const itemCoords = coordsOf(item);
     const myCoords = location
@@ -178,6 +211,11 @@ function ChatView() {
       ? `${other.rating.toFixed(1)} (${other.trade_count} ${other.trade_count === 1 ? 'trade' : 'trades'})`
       : 'New trader';
 
+  const peerPresence = presence[other.id];
+  const peerTyping = isTypingFresh(conv.typingAt, now);
+  // Typing wins over presence, which wins over the star rating fallback.
+  const presenceSubtitle = presenceLabel(peerPresence, conv.typingAt, now);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Header */}
@@ -204,13 +242,23 @@ function ChatView() {
                 <MaterialIcons name="verified" size={10} color={Colors.onPrimary} />
               </View>
             )}
+            {peerPresence?.online && <View style={styles.onlineDot} />}
           </View>
           <View style={styles.headerText}>
             <Text style={styles.traderName} numberOfLines={1}>{other.full_name}</Text>
-            <View style={styles.ratingRow}>
-              <MaterialIcons name="star" size={12} color={Colors.star} />
-              <Text style={styles.ratingText}>{ratingLabel}</Text>
-            </View>
+            {presenceSubtitle ? (
+              <Text
+                style={[styles.presenceText, peerTyping && styles.presenceTyping]}
+                numberOfLines={1}
+              >
+                {presenceSubtitle}
+              </Text>
+            ) : (
+              <View style={styles.ratingRow}>
+                <MaterialIcons name="star" size={12} color={Colors.star} />
+                <Text style={styles.ratingText}>{ratingLabel}</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -336,6 +384,8 @@ function ChatView() {
           }
           renderItem={({ item: msg }) => {
             const isMe = msg.sender === 'me';
+            const seen = isMe && isSeenByPeer(conv.readWatermark, msg.createdAt);
+            const isLastOwn = isMe && msg.id === lastOwnMessageId;
             return (
               <View style={[styles.msgRow, isMe ? styles.msgRowMe : styles.msgRowOther]}>
                 {!isMe && (
@@ -360,11 +410,16 @@ function ChatView() {
                     <Text style={styles.msgTime}>{msg.time}</Text>
                     {isMe && (
                       <MaterialIcons
-                        name="done-all"
+                        name={seen ? 'done-all' : 'done'}
                         size={13}
-                        color={Colors.primary}
+                        color={seen ? Colors.primary : Colors.outline}
                         style={styles.readIcon}
                       />
+                    )}
+                    {isLastOwn && (
+                      <Text style={[styles.receiptText, seen && styles.receiptTextSeen]}>
+                        {seen ? 'Seen' : 'Sent'}
+                      </Text>
                     )}
                   </View>
                 </View>
@@ -398,7 +453,7 @@ function ChatView() {
           <TextInput
             style={styles.inputField}
             value={inputText}
-            onChangeText={setInputText}
+            onChangeText={handleInputChange}
             placeholder="Type a message..."
             placeholderTextColor="rgba(66, 73, 62, 0.55)"
             returnKeyType="send"
@@ -474,10 +529,23 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.surface,
   },
+  onlineDot: {
+    position: 'absolute',
+    top: -1,
+    left: -1,
+    width: 12,
+    height: 12,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primaryContainer,
+    borderWidth: 2,
+    borderColor: Colors.surface,
+  },
   headerText: { flex: 1 },
   traderName: { ...Typography.labelLg, color: Colors.onSurface, fontWeight: '700' },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 1 },
   ratingText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
+  presenceText: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11, marginTop: 1 },
+  presenceTyping: { color: Colors.primary, fontStyle: 'italic', fontWeight: '600' },
   tradeCard: {
     backgroundColor: Colors.surfaceContainerLowest,
     marginHorizontal: Spacing.margin,
@@ -606,6 +674,8 @@ const styles = StyleSheet.create({
   metaRowOther: { justifyContent: 'flex-start' },
   msgTime: { fontSize: 9, color: Colors.outline },
   readIcon: { marginLeft: 1 },
+  receiptText: { fontSize: 9, color: Colors.outline, marginLeft: 3 },
+  receiptTextSeen: { color: Colors.primary, fontWeight: '600' },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,0 +1,11 @@
+name = "puran-haat-push"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# The service account JSON is a secret, never a committed variable:
+#   npx wrangler secret put FIREBASE_SERVICE_ACCOUNT
+#
+# The Worker is called from the mobile app, so a permissive origin is fine.
+# If you later call it from a browser, restrict this to your web origin.
+[vars]
+ALLOWED_ORIGIN = "*"

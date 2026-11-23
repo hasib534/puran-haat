@@ -99,7 +99,7 @@ export default function ItemDetailScreen() {
       showAlert('Your listing', 'This is your own item. You can manage it from your profile.');
       return;
     }
-    if (!guard('message this trader', { requireVerified: true })) return;
+    if (!guard('message this trader')) return;
     if (!item.user) {
       showAlert('Unavailable', 'This trader has no profile yet.');
       return;

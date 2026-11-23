@@ -15,6 +15,7 @@ import {
   resendVerificationEmail,
   sendPasswordReset,
   signIn as fbSignIn,
+  signInAnonymously,
   signInWithGoogleIdToken,
   signInWithGooglePopup as fbSignInWithGooglePopup,
   signOut as fbSignOut,
@@ -28,6 +29,8 @@ interface AuthContextValue {
   user: FirebaseUser | null;
   loading: boolean;
   configured: boolean;
+  /** True when the visitor is browsing as a guest (anonymous session). */
+  isGuest: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName?: string, username?: string) => Promise<void>;
   signInWithGoogle: (idToken: string) => Promise<void>;
@@ -44,6 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(isFirebaseConfigured);
   const userRef = useRef<FirebaseUser | null>(null);
+  // Guards against starting more than one anonymous session at a time.
+  const anonInFlightRef = useRef(false);
 
   useEffect(() => {
     userRef.current = user;
@@ -54,20 +59,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     return subscribeToAuth((next) => {
-      setUser(next);
-      setLoading(false);
       if (next) {
-        // Pull a fresh ID token on launch/sign-in. This makes an email that was
-        // verified outside the app (or a new custom claim) effective for
-        // Firestore rules immediately.
-        refreshCurrentUser()
-          .then((refreshed) => {
-            if (refreshed) setUser(refreshed);
-          })
-          .catch(() => {
-            // Offline launches keep the cached session; the next focus retries.
-          });
+        setUser(next);
+        setLoading(false);
+        // Guests have no email or custom claims to refresh yet.
+        if (!next.isAnonymous) {
+          // Pull a fresh ID token on launch/sign-in. This makes an email that
+          // was verified outside the app (or a new custom claim) effective for
+          // Firestore rules immediately.
+          refreshCurrentUser()
+            .then((refreshed) => {
+              if (refreshed) setUser(refreshed);
+            })
+            .catch(() => {
+              // Offline launches keep the cached session; the next focus retries.
+            });
+        }
+        return;
       }
+
+      // No session: start a guest session so a visitor can browse and chat
+      // before creating an account. Signing out of a real account lands here
+      // too, so it becomes a fresh guest instead of a dead-end.
+      if (anonInFlightRef.current) return;
+      anonInFlightRef.current = true;
+      signInAnonymously()
+        .then((guest) => setUser(guest))
+        .catch((error) => {
+          console.warn('Could not start guest session:', (error as Error).message);
+          setUser(null);
+        })
+        .finally(() => {
+          anonInFlightRef.current = false;
+          setLoading(false);
+        });
     });
   }, []);
 
@@ -76,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state !== 'active' || !userRef.current) return;
+      if (state !== 'active' || !userRef.current || userRef.current.isAnonymous) return;
       refreshCurrentUser()
         .then((next) => {
           if (next) setUser(next);
@@ -168,6 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         loading,
         configured: isFirebaseConfigured,
+        isGuest: !user || user.isAnonymous,
         signIn: handleSignIn,
         signUp: handleSignUp,
         signInWithGoogle: handleSignInWithGoogle,

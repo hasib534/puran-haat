@@ -18,6 +18,8 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthGate } from '../../components/auth/AuthGate';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
+import { useNow } from '../../hooks/useNow';
+import { isTypingFresh } from '../../lib/presence';
 import type { TradeProposal } from '../../types';
 
 type InboxTab = 'chats' | 'proposals';
@@ -53,10 +55,12 @@ export default function MessagesTab() {
 }
 
 function InboxView() {
-  const { conversations, proposals, profile } = useApp();
+  const { conversations, proposals, profile, presence } = useApp();
   const { user } = useAuth();
   const [tab, setTab] = useState<InboxTab>('chats');
   const [searchText, setSearchText] = useState('');
+  // Ticks so a stale "typing…" preview clears itself.
+  const now = useNow(6000);
 
   const query = searchText.trim().toLowerCase();
 
@@ -210,6 +214,7 @@ function InboxView() {
                     <MaterialIcons name="verified" size={11} color={Colors.onPrimary} />
                   </View>
                 )}
+                {presence[c.other.id]?.online && <View style={styles.onlineDot} />}
               </View>
 
               <View style={styles.rowBody}>
@@ -217,8 +222,13 @@ function InboxView() {
                   <Text style={styles.name} numberOfLines={1}>{c.other.full_name}</Text>
                   <Text style={styles.time}>{formatInboxTime(c.lastMessageAt)}</Text>
                 </View>
-                <Text style={styles.preview} numberOfLines={1}>
-                  {c.lastMessage || 'Start the conversation'}
+                <Text
+                  style={[styles.preview, isTypingFresh(c.typingAt, now) && styles.previewTyping]}
+                  numberOfLines={1}
+                >
+                  {isTypingFresh(c.typingAt, now)
+                    ? 'typing…'
+                    : c.lastMessage || 'Start the conversation'}
                 </Text>
                 <View style={styles.itemRow}>
                   <MaterialIcons name="swap-horiz" size={12} color={Colors.primary} />
@@ -417,12 +427,24 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.surfaceContainerLowest,
   },
+  onlineDot: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 14,
+    height: 14,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primaryContainer,
+    borderWidth: 2,
+    borderColor: Colors.surfaceContainerLowest,
+  },
   imageFallback: { alignItems: 'center', justifyContent: 'center' },
   rowBody: { flex: 1, minWidth: 0 },
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   name: { ...Typography.labelLg, color: Colors.onSurface, fontWeight: '700', flex: 1 },
   time: { ...Typography.bodySm, color: Colors.outline, fontSize: 10 },
   preview: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginTop: 1 },
+  previewTyping: { color: Colors.primary, fontStyle: 'italic', fontWeight: '600' },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 3 },
   itemTitle: { ...Typography.labelSm, color: Colors.primary, flex: 1, fontSize: 10 },
   itemTitleStrong: { ...Typography.labelSm, color: Colors.primary, marginTop: 2 },

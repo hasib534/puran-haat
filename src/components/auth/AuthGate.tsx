@@ -66,6 +66,33 @@ export function AuthGate({
   }
 
   if (requireVerified && !user.emailVerified) {
+    // A guest session (Anonymous Auth) has no email to verify, so point them at
+    // account creation instead of a verification flow that cannot apply.
+    if (user.isAnonymous) {
+      return (
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+          <View style={styles.card}>
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="person-add" size={30} color={Colors.primary} />
+            </View>
+            <Text style={styles.title}>Create an account to continue</Text>
+            <Text style={styles.description}>
+              You&apos;re browsing as a guest. Create a free account to post items, send trade
+              proposals, and keep your chats for good.
+            </Text>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={() => router.push('/auth' as never)}
+              activeOpacity={0.88}
+            >
+              <MaterialIcons name="person-add" size={20} color={Colors.onPrimary} />
+              <Text style={styles.primaryButtonText}>Create account</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      );
+    }
+
     const handleResend = async () => {
       setBusy(true);
       try {

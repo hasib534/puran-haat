@@ -25,15 +25,21 @@ import {
   saveUserProfile,
   seedItemsToFirestore,
   sendMessage as sendMessageDoc,
+  setTyping as setTypingDoc,
   subscribeToConversations,
   subscribeToFavorites,
   subscribeToItems,
+  subscribeToPresence,
   subscribeToProposals,
   subscribeToUserProfile,
   type ConversationDoc,
   type FirestoreRecord,
   type ProposalDoc,
 } from '../lib/firebase';
+import { usePresenceHeartbeat } from '../hooks/usePresence';
+import { usePushRegistration } from '../hooks/usePushRegistration';
+import { notifyConversationMessage } from '../lib/push';
+import type { PresenceEntry } from '../lib/presence';
 import {
   cloudinaryConfigHint,
   isCloudinaryConfigured,
@@ -65,6 +71,10 @@ export interface Conversation {
   proposerId?: string;
   /** Who must accept/decline the current proposal. */
   receiverId?: string;
+  /** The other participant's live typing heartbeat, if any. */
+  typingAt?: number;
+  /** The timestamp the other participant has read the thread up to. */
+  readWatermark?: number;
   /** True while an optimistic conversation is still being written to Firestore. */
   pending?: boolean;
 }
@@ -114,6 +124,10 @@ interface AppContextValue {
   ensureConversation: (itemId: string, other: Profile, firstMessage?: string) => string;
   sendMessage: (convId: string, text: string) => Promise<void>;
   markConversationRead: (convId: string) => Promise<void>;
+  /** Publishes/clears the caller's live "typing" heartbeat for a thread. */
+  setTyping: (convId: string, isTyping: boolean) => Promise<void>;
+  /** Live online/last-seen map keyed by trader UID. */
+  presence: Record<string, PresenceEntry>;
   acceptTrade: (convId: string) => Promise<void>;
   declineTrade: (convId: string) => Promise<void>;
   proposals: TradeProposal[];
@@ -221,6 +235,13 @@ const guestProfile: Profile = {
 
 const EMPTY_FAVORITES = new Set<string>();
 
+/**
+ * A client that dies without marking itself offline simply stops refreshing
+ * its heartbeat, so an "online" row older than this is treated as offline.
+ * Comfortably above the 25s heartbeat interval in usePresenceHeartbeat.
+ */
+const PRESENCE_STALE_MS = 70_000;
+
 /** Only finite numbers are trusted; `null`/strings/NaN become undefined. */
 function readNumber(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
@@ -270,6 +291,8 @@ function mapConversation(record: FirestoreRecord, uid: string): Conversation {
   const profiles = (record.profiles as Record<string, Profile>) || {};
   const otherId = participants.find((participant) => participant !== uid) || '';
   const unreadMap = (record.unread as Record<string, number>) || {};
+  const typingMap = (record.typing as Record<string, number>) || {};
+  const readsMap = (record.reads as Record<string, number>) || {};
 
   return {
     id: record.id,
@@ -294,6 +317,8 @@ function mapConversation(record: FirestoreRecord, uid: string): Conversation {
     proposalId: record.proposalId ? String(record.proposalId) : undefined,
     proposerId: record.proposer_id ? String(record.proposer_id) : undefined,
     receiverId: record.receiver_id ? String(record.receiver_id) : undefined,
+    typingAt: Number(typingMap[otherId] || 0) || undefined,
+    readWatermark: Number(readsMap[otherId] || 0) || undefined,
     pending: false,
   };
 }
@@ -347,6 +372,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Items carry a live, real distance wherever the user's location is known.
   const { annotate } = useLocation();
 
+  // Keeps this device's presence row current (online / last-seen).
+  usePresenceHeartbeat(user?.uid);
+  // Stores this device's push token so the Worker can reach the trader.
+  usePushRegistration(user?.uid);
+
   const [rawItems, setRawItems] = useState<Item[]>(isFirebaseConfigured ? [] : MOCK_ITEMS);
   const [itemsLoading, setItemsLoading] = useState(isFirebaseConfigured);
   const [isOffline, setIsOffline] = useState(false);
@@ -366,6 +396,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     uid: '',
     rows: [],
   });
+
+  const [presence, setPresence] = useState<Record<string, PresenceEntry>>({});
 
   const [profileState, setProfileState] = useState<Profile>(currentUser);
   const [profileOwner, setProfileOwner] = useState('');
@@ -478,6 +510,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
       },
       (error) => console.warn('Proposals listener failed:', error.message),
+    );
+  }, [user]);
+
+  // Live presence for every trader, so a chat can show an online dot without
+  // opening one listener per conversation. Rows that stopped heartbeating are
+  // aged out here rather than trusted at face value.
+  useEffect(() => {
+    if (!isFirebaseConfigured || !user) return;
+    return subscribeToPresence(
+      (rows) => {
+        const next: Record<string, PresenceEntry> = {};
+        const now = Date.now();
+        for (const row of rows) {
+          const lastSeen = Number(row.last_seen || 0);
+          const online = Boolean(row.online) && now - lastSeen < PRESENCE_STALE_MS;
+          next[row.id] = { online, lastSeen };
+        }
+        setPresence(next);
+      },
+      (error) => console.warn('Presence listener failed:', error.message),
     );
   }, [user]);
 
@@ -854,6 +906,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             }));
             return sendMessageDoc(id, user.uid, [user.uid, other.id], message);
           })
+          .then(() => {
+            void notifyConversationMessage(id);
+          })
           .catch((error) => {
             // Drop the optimistic thread so the chat screen shows its
             // "conversation not found" state instead of a fake history.
@@ -914,6 +969,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (!user) throw new Error('Sign in to send messages.');
       const participants = [user.uid, conversation.other.id];
       await sendMessageDoc(conversation.id, user.uid, participants, trimmed);
+      // Sending ends the typing state immediately for the other side.
+      await setTypingDoc(conversation.id, user.uid, false).catch(() => {});
+      // Fire-and-forget: wake the recipient's device (no-op without a Worker).
+      void notifyConversationMessage(conversation.id);
     },
     [conversations, user],
   );
@@ -931,9 +990,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }));
 
       if (!isFirebaseConfigured || !user) return;
-      // Conversation updates are verified-write only; skip the request for
-      // unverified accounts instead of producing a silent permission error.
-      if (!user.emailVerified) return;
+      // Guests (anonymous) may chat, but an unverified *email* account cannot
+      // write to conversations yet — skip instead of a silent permission error.
+      if (!user.isAnonymous && !user.emailVerified) return;
       try {
         await clearConversationUnread(convId, user.uid);
       } catch (error) {
@@ -941,6 +1000,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     },
     [conversations, user],
+  );
+
+  const setTyping = useCallback(
+    async (convId: string, isTyping: boolean) => {
+      if (!isFirebaseConfigured || !user) return;
+      // Chat-capable only: guests qualify, unverified email accounts do not.
+      if (!user.isAnonymous && !user.emailVerified) return;
+      try {
+        await setTypingDoc(convId, user.uid, isTyping);
+      } catch (error) {
+        console.warn('Could not update typing state:', (error as Error).message);
+      }
+    },
+    [user],
   );
 
   const acceptTrade = useCallback(
@@ -1163,6 +1236,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           isNewConversation: !existing,
         });
         await sendMessageDoc(conversationId, user.uid, [user.uid, receiverId], message);
+        void notifyConversationMessage(conversationId);
       } catch (error) {
         // Roll back the optimistic proposal/thread so a rejected write does not
         // leave a ghost trade in the UI.
@@ -1211,6 +1285,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ensureConversation,
     sendMessage,
     markConversationRead,
+    setTyping,
+    presence,
     acceptTrade,
     declineTrade,
     proposals,

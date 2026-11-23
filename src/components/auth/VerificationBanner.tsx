@@ -11,7 +11,8 @@ export function VerificationBanner() {
   const { user, resendVerification, refreshUser } = useAuth();
   const [busy, setBusy] = useState(false);
 
-  if (!user || user.emailVerified) return null;
+  // Guests have no inbox to verify; the profile screen offers account creation.
+  if (!user || user.isAnonymous || user.emailVerified) return null;
 
   const handleResend = async () => {
     setBusy(true);

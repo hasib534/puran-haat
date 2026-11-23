@@ -17,8 +17,11 @@ import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import * as FirebaseAuth from 'firebase/auth';
 import type { Auth, Persistence, User } from 'firebase/auth';
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getFirestore,
   increment,
@@ -99,6 +102,8 @@ export interface FirebaseUser {
   displayName: string | null;
   photoURL: string | null;
   emailVerified: boolean;
+  /** True for a guest session created with Firebase Anonymous Auth. */
+  isAnonymous: boolean;
 }
 
 export function mapUser(user: User | null): FirebaseUser | null {
@@ -109,6 +114,7 @@ export function mapUser(user: User | null): FirebaseUser | null {
     displayName: user.displayName,
     photoURL: user.photoURL,
     emailVerified: user.emailVerified,
+    isAnonymous: user.isAnonymous,
   };
 }
 
@@ -131,7 +137,10 @@ export function authErrorMessage(error: unknown): string {
     'auth/invalid-credential': 'Incorrect email or password.',
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
     'auth/network-request-failed': 'Network error. Check your internet connection.',
-    'auth/operation-not-allowed': 'Email sign-in is disabled. Enable it in Firebase Console → Authentication.',
+    'auth/operation-not-allowed': 'This sign-in method is disabled. Enable it in Firebase Console → Authentication.',
+    'auth/admin-restricted-operation': 'This sign-in method is disabled. Enable it in Firebase Console → Authentication.',
+    'auth/credential-already-in-use': 'These credentials are already used by another account. Sign in instead.',
+    'auth/provider-already-linked': 'This account is already linked to that provider.',
     'auth/user-disabled': 'This account has been disabled.',
     'auth/requires-recent-login': 'Please sign in again to continue.',
   };
@@ -143,7 +152,18 @@ export async function signUp(
   password: string,
   displayName?: string,
 ): Promise<FirebaseUser> {
-  const credential = await FirebaseAuth.createUserWithEmailAndPassword(requireAuth(), email, password);
+  const instance = requireAuth();
+  const current = instance.currentUser;
+  // A guest upgrading their account keeps the same uid — and therefore their
+  // chat history — by linking the new email/password onto the anonymous user
+  // instead of creating a fresh account.
+  const credential =
+    current && current.isAnonymous
+      ? await FirebaseAuth.linkWithCredential(
+          current,
+          FirebaseAuth.EmailAuthProvider.credential(email, password),
+        )
+      : await FirebaseAuth.createUserWithEmailAndPassword(instance, email, password);
   if (displayName?.trim()) {
     await FirebaseAuth.updateProfile(credential.user, {
       displayName: displayName.trim(),
@@ -162,13 +182,40 @@ export async function signIn(email: string, password: string): Promise<FirebaseU
   return mapUser(credential.user)!;
 }
 
+/**
+ * Starts a guest session. Anonymous accounts get a real uid so a visitor can
+ * browse, chat and favorite before signing up; their activity carries over when
+ * they link a real credential (see `signUp` / Google sign-in).
+ */
+export async function signInAnonymously(): Promise<FirebaseUser> {
+  const credential = await FirebaseAuth.signInAnonymously(requireAuth());
+  return mapUser(credential.user)!;
+}
+
 export async function signOut(): Promise<void> {
   if (!auth) return;
   await FirebaseAuth.signOut(auth);
 }
 
+/** True when the credential belongs to an existing account, so linking failed. */
+function isCredentialInUse(error: unknown): boolean {
+  const code = (error as { code?: string } | null)?.code || '';
+  return code === 'auth/credential-already-in-use' || code === 'auth/email-already-in-use';
+}
+
 export async function signInWithGoogleIdToken(googleIdToken: string): Promise<FirebaseUser> {
   const credential = FirebaseAuth.GoogleAuthProvider.credential(googleIdToken);
+  const current = auth?.currentUser;
+  // Keep the guest's uid (and chats) when the Google account is new to us.
+  if (current && current.isAnonymous) {
+    try {
+      const linked = await FirebaseAuth.linkWithCredential(current, credential);
+      return mapUser(linked.user)!;
+    } catch (error) {
+      if (!isCredentialInUse(error)) throw error;
+      // The Google account already exists — fall through and sign into it.
+    }
+  }
   const result = await FirebaseAuth.signInWithCredential(requireAuth(), credential);
   return mapUser(result.user)!;
 }
@@ -186,6 +233,15 @@ export async function signInWithGooglePopup(): Promise<FirebaseUser> {
     throw new Error('Google popup sign-in is only available on web.');
   }
   const provider = new FirebaseAuth.GoogleAuthProvider();
+  const current = auth?.currentUser;
+  if (current && current.isAnonymous) {
+    try {
+      const linked = await FirebaseAuth.linkWithPopup(current, provider);
+      return mapUser(linked.user)!;
+    } catch (error) {
+      if (!isCredentialInUse(error)) throw error;
+    }
+  }
   const result = await FirebaseAuth.signInWithPopup(requireAuth(), provider);
   return mapUser(result.user)!;
 }
@@ -233,6 +289,17 @@ export interface ConversationDoc {
   proposalId?: string;
   proposer_id?: string;
   receiver_id?: string;
+  /**
+   * Live typing heartbeat, keyed by participant UID. A timestamp is written
+   * while that participant types and cleared when they stop, so the other side
+   * can show "typing…" only while it is fresh.
+   */
+  typing?: Record<string, number>;
+  /**
+   * Read watermark, keyed by participant UID: the timestamp each participant
+   * has read their thread up to. The other side uses it for "Seen" receipts.
+   */
+  reads?: Record<string, number>;
   created_at: number;
 }
 
@@ -240,6 +307,22 @@ export interface MessageDoc {
   sender_id: string;
   text: string;
   created_at: number;
+}
+
+export interface PresenceDoc {
+  online: boolean;
+  last_seen: number;
+}
+
+/**
+ * Private per-trader push registration. Kept in its own collection (not on the
+ * profile) so other signed-in users can never read someone else's device
+ * tokens. `tokens` holds Expo or native FCM/APNs tokens; the push worker
+ * prunes entries the provider reports as dead.
+ */
+export interface PushTokensDoc {
+  tokens: string[];
+  updated_at: number;
 }
 
 export interface ProposalDoc {
@@ -379,6 +462,24 @@ export function subscribeToProposals(
   );
 }
 
+/**
+ * Streams the entire `presence` collection so a chat screen can show an
+ * online/last-seen dot without opening one listener per conversation. Presence
+ * is deliberately semi-public: any signed-in trader may read it, but only the
+ * owner may write their own row (enforced in firestore.rules).
+ */
+export function subscribeToPresence(
+  callback: (rows: FirestoreRecord[]) => void,
+  onError?: (error: Error) => void,
+): Unsubscribe {
+  if (!db) return () => {};
+  return onSnapshot(
+    collection(db, 'presence'),
+    (snapshot) => callback(snapshot.docs.map(toRecord)),
+    onError,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Writes
 // ---------------------------------------------------------------------------
@@ -471,9 +572,71 @@ export async function setConversationStatus(
   await updateConversation(id, { status });
 }
 
+/**
+ * Clears the caller's unread badge and stamps their read watermark so the
+ * other participant can show a "Seen" receipt on their last message. Both
+ * fields live on the conversation document and are written atomically.
+ */
 export async function clearConversationUnread(id: string, uid: string): Promise<void> {
   if (!db) return;
-  await updateDoc(doc(db, 'conversations', id), { [`unread.${uid}`]: 0 });
+  await updateDoc(doc(db, 'conversations', id), {
+    [`unread.${uid}`]: 0,
+    [`reads.${uid}`]: Date.now(),
+  });
+}
+
+/**
+ * Publishes or clears the caller's typing heartbeat on a conversation. Only the
+ * caller's own key is touched, so neither side can fake the other's typing.
+ */
+export async function setTyping(
+  conversationId: string,
+  uid: string,
+  isTyping: boolean,
+): Promise<void> {
+  if (!db) return;
+  await updateDoc(doc(db, 'conversations', conversationId), {
+    [`typing.${uid}`]: isTyping ? Date.now() : deleteField(),
+  });
+}
+
+/**
+ * Writes the caller's presence row. `last_seen` is always stamped so a stale
+ * "online" flag can be aged out by readers if a client dies without marking
+ * itself offline.
+ */
+export async function setPresence(uid: string, online: boolean): Promise<void> {
+  if (!db) return;
+  await setDoc(
+    doc(db, 'presence', uid),
+    clean({ online, last_seen: Date.now() } satisfies PresenceDoc),
+    { merge: true },
+  );
+}
+
+/**
+ * Adds this device's push token to the caller's private registration doc.
+ * `arrayUnion` keeps re-registering idempotent across app launches.
+ */
+export async function registerPushToken(uid: string, token: string): Promise<void> {
+  if (!db || !token) return;
+  // Do not run this through `clean`: it would rebuild the FieldValue sentinel
+  // into a plain object and Firestore would reject the write.
+  await setDoc(
+    doc(db, 'pushTokens', uid),
+    { tokens: arrayUnion(token), updated_at: Date.now() },
+    { merge: true },
+  );
+}
+
+/** Removes a device token, e.g. when notifications are disabled. */
+export async function unregisterPushToken(uid: string, token: string): Promise<void> {
+  if (!db || !token) return;
+  await setDoc(
+    doc(db, 'pushTokens', uid),
+    { tokens: arrayRemove(token), updated_at: Date.now() },
+    { merge: true },
+  );
 }
 
 export async function sendMessage(

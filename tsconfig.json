@@ -21,6 +21,7 @@
     "node_modules",
     "admin-web",
     "dist",
-    "stitch_puran_haat"
+    "stitch_puran_haat",
+    "push-worker"
   ]
 }

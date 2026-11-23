@@ -51,6 +51,14 @@
           "locationWhenInUsePermission": "Puran Haat uses your location to show items for trade near you and to save a pickup area on your listings."
         }
       ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#154212",
+          "defaultChannel": "messages"
+        }
+      ],
       "@react-native-google-signin/google-signin"
     ],
     "experiments": {
