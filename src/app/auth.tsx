@@ -43,7 +43,7 @@ export default function AuthScreen() {
       setSubmitting(true);
       try {
         await signInWithGooglePopup();
-        router.back();
+        leaveAuth();
       } catch (e) {
         showAlert('Google sign-in failed', (e as Error)?.message || 'Unknown error');
       } finally {
@@ -57,7 +57,7 @@ export default function AuthScreen() {
       const idToken = await signInWithGoogleNative(webClientId);
       if (!idToken) return;
       await signInWithGoogle(idToken);
-      router.back();
+      leaveAuth();
     } catch (e) {
       const message =
         e instanceof GoogleSignInUnavailableError
@@ -101,13 +101,13 @@ export default function AuthScreen() {
     try {
       if (mode === 'signin') {
         await signIn(email.trim(), password);
-        router.back();
+        leaveAuth();
       } else {
         await signUp(email.trim(), password, fullName.trim(), username.trim());
         showAlert(
           'Verify your email',
           `Your account is ready. We sent a verification link to ${email.trim()}. Verify it to start posting and trading.`,
-          [{ text: 'OK', onPress: () => router.back() }],
+          [{ text: 'OK', onPress: leaveAuth }],
         );
       }
     } catch (e) {
@@ -124,6 +124,20 @@ export default function AuthScreen() {
     } as never);
   };
 
+  /**
+   * Leaves the auth screen. When auth was opened from inside the app (Profile,
+   * a gated action, ...) we simply return to it. When it is the entry screen —
+   * e.g. right after onboarding, where there is nothing behind it — we send the
+   * user to the home feed instead of trapping them on a blank back stack.
+   */
+  const leaveAuth = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/' as never);
+    }
+  };
+
   const googleUnavailable =
     !configured || (Platform.OS !== 'web' && !webClientId) || submitting;
 
@@ -134,7 +148,7 @@ export default function AuthScreen() {
       <View style={styles.backdropTop} />
       <View style={styles.backdropBottom} />
 
-      <TouchableOpacity style={styles.closeButton} onPress={() => router.back()} accessibilityLabel="Close">
+      <TouchableOpacity style={styles.closeButton} onPress={leaveAuth} accessibilityLabel="Close">
         <MaterialIcons name="close" size={22} color={Colors.primary} />
       </TouchableOpacity>
 

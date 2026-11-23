@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../constants/theme';
+import { useAuth } from '../context/AuthContext';
 import { markOnboardingSeen } from '../lib/onboarding';
 
 interface OnboardingStep {
@@ -54,6 +55,7 @@ const STEPS: OnboardingStep[] = [
 
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
+  const { user } = useAuth();
   const listRef = useRef<FlatList<OnboardingStep>>(null);
   const [index, setIndex] = useState(0);
   const [finishing, setFinishing] = useState(false);
@@ -81,8 +83,10 @@ export default function OnboardingScreen() {
     if (finishing) return;
     setFinishing(true);
     await markOnboardingSeen();
-    router.replace('/' as never);
-  }, [finishing]);
+    // New visitors go straight to sign in / sign up; an already signed-in user
+    // (e.g. replaying the intro) just continues to the app.
+    router.replace((user ? '/' : '/auth') as never);
+  }, [finishing, user]);
 
   const primaryLabel = isLast ? 'Get Started' : 'Next';
 
