@@ -21,6 +21,8 @@ import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/them
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthGate } from '../../components/auth/AuthGate';
+import { LocationField, type LocationValue } from '../../components/location/LocationField';
+import { coordsForAreaLabel } from '../../lib/geo';
 import { showAlert } from '../../lib/alert';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import type { ConditionType, Item, TradeModeType } from '../../types';
@@ -110,7 +112,13 @@ function EditListingForm({ item }: { item: Item }) {
   const [categoryId, setCategoryId] = useState(item.category_id);
   const [condition, setCondition] = useState<ConditionType>(item.condition);
   const [tradeMode, setTradeMode] = useState<TradeModeType>(item.trade_mode);
-  const [locationName, setLocationName] = useState(item.location_name);
+  const [location, setLocation] = useState<LocationValue>(() => ({
+    label: item.location_name,
+    coords:
+      item.latitude != null && item.longitude != null
+        ? { latitude: item.latitude, longitude: item.longitude }
+        : coordsForAreaLabel(item.location_name) ?? null,
+  }));
   const [photos, setPhotos] = useState<string[]>(item.images || []);
   const [saving, setSaving] = useState(false);
 
@@ -196,7 +204,9 @@ function EditListingForm({ item }: { item: Item }) {
         category_id: categoryId,
         condition,
         trade_mode: tradeMode,
-        location_name: locationName.trim() || 'Dhaka',
+        location_name: location.label.trim() || 'Dhaka',
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
         images: uploadedPhotos,
       });
       showAlert('Listing updated', 'Your changes are live on the Haat.', [
@@ -387,15 +397,11 @@ function EditListingForm({ item }: { item: Item }) {
             })}
           </View>
 
-          <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            value={locationName}
-            onChangeText={setLocationName}
-            maxLength={120}
+          <LocationField
+            label="Location"
+            value={location}
+            onChange={setLocation}
             placeholder="Area, city"
-            placeholderTextColor="rgba(66, 73, 62, 0.6)"
-            accessibilityLabel="Listing location"
           />
 
           <TouchableOpacity

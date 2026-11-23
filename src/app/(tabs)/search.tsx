@@ -15,9 +15,11 @@ import { router } from 'expo-router';
 
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
+import { formatDistanceKm, RADIUS_OPTIONS } from '../../lib/geo';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
 import { showAlert } from '../../lib/alert';
 import { TopHeader } from '../../components/layout/TopHeader';
 import { ItemCard } from '../../components/ui/ItemCard';
@@ -27,9 +29,6 @@ import {
   saveRecentSearches,
 } from '../../lib/recent-searches';
 
-type Radius = '1km' | '5km' | '10km' | 'all';
-
-const RADIUS_OPTIONS: Radius[] = ['1km', '5km', '10km', 'all'];
 const CATEGORY_NAME_BY_ID = new Map(
   MOCK_CATEGORIES.map((category) => [category.id, category.name]),
 );
@@ -37,8 +36,8 @@ const CATEGORY_NAME_BY_ID = new Map(
 export default function SearchTab() {
   const { items } = useApp();
   const { user } = useAuth();
+  const { radiusKm, setRadiusKm, sortByDistance, location, distanceTo } = useLocation();
   const [searchText, setSearchText] = useState('');
-  const [selectedRadius, setSelectedRadius] = useState<Radius>('5km');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -73,17 +72,16 @@ export default function SearchTab() {
 
   const query = searchText.trim().toLowerCase();
   const isFiltering = query.length > 0 || selectedCategory !== 'all';
-  const maxDistance = selectedRadius === 'all' ? null : Number.parseInt(selectedRadius, 10);
 
   const filteredResults = useMemo(() => {
     if (!isFiltering) return [];
-    return items.filter((item) => {
+    const matched = items.filter((item) => {
       if (selectedCategory !== 'all' && item.category_id !== selectedCategory) return false;
-      if (
-        maxDistance != null &&
-        (item.distance_km == null || item.distance_km > maxDistance)
-      ) {
-        return false;
+      if (radiusKm != null && location) {
+        // Only a known area can honestly decide "within X km"; without one we
+        // show everything rather than silently hiding the whole catalogue.
+        const km = distanceTo(item);
+        if (km == null || km > radiusKm) return false;
       }
       if (!query) return true;
       return (
@@ -92,7 +90,8 @@ export default function SearchTab() {
         item.location_name.toLowerCase().includes(query)
       );
     });
-  }, [isFiltering, items, maxDistance, query, selectedCategory]);
+    return sortByDistance(matched);
+  }, [distanceTo, isFiltering, items, location, query, radiusKm, selectedCategory, sortByDistance]);
 
   const trendingItems = useMemo(
     () =>
@@ -125,12 +124,8 @@ export default function SearchTab() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <TopHeader
-        districtName="Dhanmondi, Dhaka"
         showNotifications
         onPressNotifications={() => router.push('/notifications' as never)}
-        onPressLocation={() => {
-          showAlert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
-        }}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -180,24 +175,43 @@ export default function SearchTab() {
         </View>
 
         {showFilters ? (
-          <View style={styles.radiusRow}>
-            <Text style={styles.radiusLabel}>Within</Text>
-            {RADIUS_OPTIONS.map((radius) => {
-              const active = selectedRadius === radius;
-              return (
-                <TouchableOpacity
-                  key={radius}
-                  style={[styles.radiusPill, active && styles.radiusPillActive]}
-                  onPress={() => setSelectedRadius(radius)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                >
-                  <Text style={[styles.radiusText, active && styles.radiusTextActive]}>
-                    {radius === 'all' ? 'All Dhaka' : `< ${radius}`}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          <View style={styles.radiusBlock}>
+            <View style={styles.radiusRow}>
+              <Text style={styles.radiusLabel}>Within</Text>
+              {RADIUS_OPTIONS.map((option) => {
+                const active = radiusKm === option.value;
+                return (
+                  <TouchableOpacity
+                    key={option.label}
+                    style={[styles.radiusPill, active && styles.radiusPillActive]}
+                    onPress={() => setRadiusKm(option.value)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={
+                      option.value == null
+                        ? 'Any distance'
+                        : `Within ${option.value} kilometres`
+                    }
+                  >
+                    <Text style={[styles.radiusText, active && styles.radiusTextActive]}>
+                      {option.value == null ? 'Any' : `< ${option.label}`}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <TouchableOpacity
+              style={styles.radiusAreaLink}
+              onPress={() => router.push('/location' as never)}
+              accessibilityRole="button"
+              accessibilityLabel="Change the area distances are measured from"
+            >
+              <MaterialIcons name="location-on" size={13} color={Colors.primary} />
+              <Text style={styles.radiusAreaText} numberOfLines={1}>
+                {location ? `Measuring from ${location.label}` : 'Set an area to filter by distance'}
+              </Text>
+              <MaterialIcons name="chevron-right" size={15} color={Colors.primary} />
+            </TouchableOpacity>
           </View>
         ) : null}
 
@@ -251,7 +265,9 @@ export default function SearchTab() {
                     </Text>
                     <Text style={styles.resultMeta}>
                       {item.location_name}
-                      {item.distance_km != null ? ` • ${item.distance_km} km` : ''}
+                      {formatDistanceKm(item.distance_km)
+                        ? ` • ${formatDistanceKm(item.distance_km)}`
+                        : ''}
                     </Text>
                   </View>
                   <MaterialIcons name="chevron-right" size={20} color={Colors.outline} />
@@ -425,13 +441,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(21, 66, 18, 0.12)',
     marginHorizontal: 2,
   },
+  radiusBlock: {
+    marginTop: Spacing.sm,
+  },
   radiusRow: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 8,
     marginHorizontal: Spacing.margin,
-    marginTop: Spacing.sm,
+  },
+  radiusAreaLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginHorizontal: Spacing.margin,
+    marginTop: 8,
+  },
+  radiusAreaText: {
+    ...Typography.bodySm,
+    color: Colors.primary,
+    flexShrink: 1,
   },
   radiusLabel: {
     ...Typography.labelSm,

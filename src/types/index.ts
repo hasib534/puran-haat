@@ -15,6 +15,9 @@ export interface Profile {
   username?: string;
   avatar_url?: string;
   district?: string;
+  /** Optional coordinates behind `district`, used for "near you" sorting. */
+  latitude?: number;
+  longitude?: number;
   bio?: string;
   rating: number;
   trade_count: number;
@@ -33,7 +36,15 @@ export interface Item {
   eco_impact_rating: EcoImpactType;
   co2_saved_kg: number;
   images: string[];
+  /** Human-readable area, e.g. "Dhanmondi, Dhaka". Always present. */
   location_name: string;
+  /** Coordinates of the pickup area when the poster shared them. */
+  latitude?: number;
+  longitude?: number;
+  /**
+   * Distance to the viewer in km. Computed live by the location layer — it is
+   * not stored on the document and is absent when the viewer has no location.
+   */
   distance_km?: number;
   is_favorite?: boolean;
   user?: Profile;

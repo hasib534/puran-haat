@@ -11,6 +11,7 @@ import React, {
 import { MOCK_ITEMS } from '../data/mock-items';
 import { Item, Profile, TradeProposal } from '../types';
 import { useAuth } from './AuthContext';
+import { useLocation } from './LocationContext';
 import {
   clearConversationUnread,
   deleteItemDoc,
@@ -85,6 +86,8 @@ export type EditableItemPatch = Partial<
     | 'condition'
     | 'trade_mode'
     | 'location_name'
+    | 'latitude'
+    | 'longitude'
     | 'images'
     | 'co2_saved_kg'
     | 'eco_impact_rating'
@@ -218,6 +221,11 @@ const guestProfile: Profile = {
 
 const EMPTY_FAVORITES = new Set<string>();
 
+/** Only finite numbers are trusted; `null`/strings/NaN become undefined. */
+function readNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
 function mapProfile(record: FirestoreRecord): Profile {
   return {
     id: record.id,
@@ -225,6 +233,8 @@ function mapProfile(record: FirestoreRecord): Profile {
     username: record.username ? String(record.username) : undefined,
     avatar_url: record.avatar_url ? String(record.avatar_url) : undefined,
     district: record.district ? String(record.district) : undefined,
+    latitude: readNumber(record.latitude),
+    longitude: readNumber(record.longitude),
     bio: record.bio ? String(record.bio) : undefined,
     rating: Number(record.rating || 0),
     trade_count: Number(record.trade_count || 0),
@@ -246,7 +256,9 @@ function mapItem(record: FirestoreRecord): Item {
     co2_saved_kg: Number(record.co2_saved_kg || 0),
     images: Array.isArray(record.images) ? (record.images as string[]) : [],
     location_name: String(record.location_name || 'Dhaka'),
-    distance_km: record.distance_km !== undefined ? Number(record.distance_km) : undefined,
+    latitude: readNumber(record.latitude),
+    longitude: readNumber(record.longitude),
+    distance_km: readNumber(record.distance_km),
     is_favorite: Boolean(record.is_favorite),
     user: record.user ? (record.user as Profile) : undefined,
     created_at: String(record.created_at || ''),
@@ -332,6 +344,8 @@ const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  // Items carry a live, real distance wherever the user's location is known.
+  const { annotate } = useLocation();
 
   const [rawItems, setRawItems] = useState<Item[]>(isFirebaseConfigured ? [] : MOCK_ITEMS);
   const [itemsLoading, setItemsLoading] = useState(isFirebaseConfigured);
@@ -515,8 +529,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [favoriteState, user]);
 
   const items = useMemo(
-    () => rawItems.map((item) => ({ ...item, is_favorite: favoriteIds.has(item.id) })),
-    [rawItems, favoriteIds],
+    () =>
+      annotate(
+        rawItems.map((item) => ({ ...item, is_favorite: favoriteIds.has(item.id) })),
+      ),
+    [annotate, rawItems, favoriteIds],
   );
 
   const fallbackProfile = useMemo<Profile>(() => {

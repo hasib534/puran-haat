@@ -25,11 +25,14 @@ import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthGate } from '../../components/auth/AuthGate';
+import { LocationField, type LocationValue } from '../../components/location/LocationField';
+import { coordsForAreaLabel } from '../../lib/geo';
 import type { ConditionType, Item, TradeModeType } from '../../types';
 
 const STEPS = ['Photos', 'Item Details', 'Exchange'] as const;
 const CATEGORY_OPTIONS = MOCK_CATEGORIES.filter((category) => category.id !== 'all');
 const MAX_PHOTOS = 5;
+const DEFAULT_LOCATION = 'Dhanmondi, Dhaka';
 
 const CONDITION_OPTIONS: { value: ConditionType; label: string }[] = [
   { value: 'brand_new', label: 'New' },
@@ -67,7 +70,10 @@ function PostItemForm() {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [interestCategories, setInterestCategories] = useState<string[]>([]);
   const [openToOffers, setOpenToOffers] = useState(true);
-  const [locationName, setLocationName] = useState('Dhanmondi, Dhaka');
+  const [location, setLocation] = useState<LocationValue>(() => ({
+    label: DEFAULT_LOCATION,
+    coords: coordsForAreaLabel(DEFAULT_LOCATION) ?? null,
+  }));
 
   const categoryName = useMemo(
     () => CATEGORY_OPTIONS.find((category) => category.id === selectedCategory)?.name || '',
@@ -213,8 +219,9 @@ function PostItemForm() {
         eco_impact_rating: 'Med',
         co2_saved_kg: 3.0,
         images: uploadedPhotos,
-        location_name: locationName.trim() || 'Dhaka',
-        distance_km: 0.5,
+        location_name: location.label.trim() || 'Dhaka',
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
         is_favorite: false,
         user: {
           ...profile,
@@ -556,18 +563,12 @@ function PostItemForm() {
                   accessibilityLabel="Item description"
                 />
 
-                <Text style={styles.label}>Pickup Location</Text>
-                <View style={styles.locationRow}>
-                  <MaterialIcons name="location-on" size={18} color={Colors.primary} />
-                  <TextInput
-                    style={styles.locationInput}
-                    placeholder="Dhanmondi, Mirpur, TSC..."
-                    placeholderTextColor="rgba(66, 73, 62, 0.55)"
-                    value={locationName}
-                    onChangeText={setLocationName}
-                    accessibilityLabel="Pickup location"
-                  />
-                </View>
+                <LocationField
+                  label="Pickup Location"
+                  value={location}
+                  onChange={setLocation}
+                  hint="Add an exact pin so traders can find you."
+                />
               </View>
             </>
           )}
@@ -733,7 +734,7 @@ function PostItemForm() {
                   </Text>
                   <Text style={styles.previewMeta}>
                     {categoryName} · {tradeMode === 'free' ? 'Free gift' : 'Barter'} ·{' '}
-                    {locationName.trim() || 'Dhaka'}
+                    {location.label.trim() || 'Dhaka'}
                   </Text>
                 </View>
               </View>
@@ -1033,17 +1034,6 @@ const styles = StyleSheet.create({
   },
   conditionText: { ...Typography.labelSm, color: Colors.onSurfaceVariant },
   conditionTextActive: { color: Colors.primary, fontWeight: '700' },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.surfaceContainerLow,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(21, 66, 18, 0.1)',
-  },
-  locationInput: { flex: 1, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
   cardHeading: { ...Typography.labelLg, color: Colors.primary, fontWeight: '700' },
   cardHint: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginTop: 2 },
   wishChipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: Spacing.sm },

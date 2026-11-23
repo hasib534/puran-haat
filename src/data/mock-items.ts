@@ -1,4 +1,5 @@
 import { Category, Item } from '../types';
+import { coordsForAreaLabel } from '../lib/geo';
 
 export const MOCK_CATEGORIES: Category[] = [
   { id: 'all', name: 'All Items', icon: 'storefront' },
@@ -11,7 +12,7 @@ export const MOCK_CATEGORIES: Category[] = [
   { id: 'electronics', name: 'Electronics', icon: 'devices' },
 ];
 
-export const MOCK_ITEMS: Item[] = [
+const BASE_ITEMS: Item[] = [
   {
     id: '1',
     user_id: 'u1',
@@ -27,7 +28,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1580481077195-c3f2d2b0cb3e?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'Dhanmondi, Dhaka',
-    distance_km: 0.8,
     is_favorite: false,
     user: {
       id: 'u1',
@@ -55,7 +55,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'Mirpur DOHS, Dhaka',
-    distance_km: 1.2,
     is_favorite: true,
     user: {
       id: 'u2',
@@ -83,7 +82,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'TSC, Dhaka University',
-    distance_km: 2.5,
     is_favorite: false,
     user: {
       id: 'u3',
@@ -111,7 +109,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'Banani, Dhaka',
-    distance_km: 3.1,
     is_favorite: false,
     user: {
       id: 'u4',
@@ -139,7 +136,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1584990347449-3a3399b53874?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'Uttara Sector 7',
-    distance_km: 4.5,
     is_favorite: false,
     user: {
       id: 'u5',
@@ -167,7 +163,6 @@ export const MOCK_ITEMS: Item[] = [
       'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=800&q=80',
     ],
     location_name: 'Bashundhara R/A, Dhaka',
-    distance_km: 5.2,
     is_favorite: true,
     user: {
       id: 'u6',
@@ -182,3 +177,14 @@ export const MOCK_ITEMS: Item[] = [
     created_at: '2026-10-06T18:00:00Z',
   },
 ];
+
+/**
+ * Sample listings, resolved against the area catalogue so the demo data carries
+ * real coordinates. Distance is viewer-relative, so nothing is stored here — the
+ * location layer computes it for whoever is looking.
+ */
+export const MOCK_ITEMS: Item[] = BASE_ITEMS.map((item) => ({
+  ...item,
+  ...coordsForAreaLabel(item.location_name),
+  distance_km: undefined,
+}));

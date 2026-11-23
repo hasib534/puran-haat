@@ -1,15 +1,24 @@
 import { Stack, router, useRootNavigationState, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useSyncExternalStore } from "react";
-import { StyleSheet, View } from "react-native";
+import { LogBox, StyleSheet, View } from "react-native";
 import { Colors } from "../constants/colors";
 import { AppProvider } from "../context/AppContext";
 import { AuthProvider } from "../context/AuthContext";
+import { LocationProvider } from "../context/LocationContext";
 import {
   getOnboardingSeen,
   loadOnboardingSeen,
   subscribeOnboarding,
 } from "../lib/onboarding";
+
+// Dev-only: the Firestore SDK emits a benign "WebChannelConnection ... transport
+// errored" warning whenever its long-poll listener reconnects. This is routine on
+// emulators and flaky networks and the SDK retries on its own, so keep it out of
+// the LogBox toast without hiding genuine Firestore errors.
+if (__DEV__) {
+  LogBox.ignoreLogs([/WebChannelConnection[\s\S]*transport errored/]);
+}
 
 export default function RootLayout() {
   // null = still reading storage, true/false = known.
@@ -40,19 +49,25 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <AppProvider>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: Colors.background },
-            animation: "slide_from_right",
-          }}
-        >
-          <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
-        </Stack>
-        {showBootCover && <View style={styles.bootCover} />}
-      </AppProvider>
+      <LocationProvider>
+        <AppProvider>
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: Colors.background },
+              animation: "slide_from_right",
+            }}
+          >
+            <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
+            <Stack.Screen
+              name="location"
+              options={{ presentation: "modal", animation: "slide_from_bottom" }}
+            />
+          </Stack>
+          {showBootCover && <View style={styles.bootCover} />}
+        </AppProvider>
+      </LocationProvider>
     </AuthProvider>
   );
 }

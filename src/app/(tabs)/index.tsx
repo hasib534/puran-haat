@@ -18,19 +18,23 @@ import { TopHeader } from '../../components/layout/TopHeader';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { CategoryChip } from '../../components/ui/CategoryChip';
 import { ItemCard } from '../../components/ui/ItemCard';
+import { LocationBar, type FeedSort } from '../../components/location/LocationBar';
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { VerificationBanner } from '../../components/auth/VerificationBanner';
 
 export default function HomeFeedTab() {
   const { items, toggleFavorite, proposals, conversations, isOffline } = useApp();
   const { user } = useAuth();
+  const { sortByDistance, location, radiusKm, distanceTo, setRadiusKm } = useLocation();
   const { guard } = useAuthGuard();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [modeFilter, setModeFilter] = useState<'all' | 'trade' | 'free'>('all');
+  const [sort, setSort] = useState<FeedSort>('newest');
 
   const unreadNotifications = useMemo(
     () =>
@@ -50,7 +54,7 @@ export default function HomeFeedTab() {
   const offlineAndEmpty = isOffline && items.length === 0;
 
   const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+    const matched = items.filter((item) => {
       if (selectedCategory === 'verified' && !item.user?.is_verified) return false;
       if (
         selectedCategory !== 'all' &&
@@ -69,7 +73,32 @@ export default function HomeFeedTab() {
       }
       return true;
     });
-  }, [items, selectedCategory, modeFilter, searchQuery]);
+    // The radius only applies once we actually know where the buyer is;
+    // otherwise there is nothing honest to measure from.
+    const inRange =
+      radiusKm != null && location
+        ? matched.filter((item) => {
+            const km = distanceTo(item);
+            return km != null && km <= radiusKm;
+          })
+        : matched;
+    // "Newest" is the default; "Nearest" is opt-in and needs a known location,
+    // so an empty area silently falls back to the arrival order.
+    return sort === 'nearest' ? sortByDistance(inRange) : inRange;
+  }, [
+    distanceTo,
+    items,
+    location,
+    modeFilter,
+    radiusKm,
+    searchQuery,
+    selectedCategory,
+    sort,
+    sortByDistance,
+  ]);
+
+  /** True when the only thing hiding listings is the distance setting. */
+  const hiddenByRadius = filteredItems.length === 0 && location != null && radiusKm != null;
 
   const handleToggleFavorite = (itemId: string) => {
     if (!guard('save favorites')) return;
@@ -81,6 +110,8 @@ export default function HomeFeedTab() {
   const renderHeader = () => (
     <View style={styles.listHeaderContainer}>
       <VerificationBanner />
+
+      <LocationBar sort={sort} onSortChange={setSort} />
 
       <SearchBar
         value={searchQuery}
@@ -163,12 +194,8 @@ export default function HomeFeedTab() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <TopHeader
-        districtName="Dhanmondi, Dhaka"
         unreadNotifications={unreadNotifications}
         avatarUrl={user?.photoURL || undefined}
-        onPressLocation={() => {
-          showAlert('Change Location', 'Current: Dhanmondi, Dhaka.\nProximity radius: 5.0 km');
-        }}
         onPressNotifications={() => {
           router.push('/notifications' as never);
         }}
@@ -188,18 +215,34 @@ export default function HomeFeedTab() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <MaterialIcons
-              name={offlineAndEmpty ? 'cloud-off' : 'inventory-2'}
+              name={offlineAndEmpty ? 'cloud-off' : hiddenByRadius ? 'near-me-disabled' : 'inventory-2'}
               size={48}
               color={Colors.outline}
             />
             <Text style={styles.emptyTitle}>
-              {offlineAndEmpty ? 'You’re offline' : 'No items found'}
+              {offlineAndEmpty
+                ? 'You’re offline'
+                : hiddenByRadius
+                  ? 'Nothing this close yet'
+                  : 'No items found'}
             </Text>
             <Text style={styles.emptyDesc}>
               {offlineAndEmpty
                 ? 'Connect to the internet to load the latest listings.'
-                : 'Try searching for different keywords or clear filters'}
+                : hiddenByRadius
+                  ? `No listings within ${radiusKm} km of ${location?.label ?? 'your area'}.`
+                  : 'Try searching for different keywords or clear filters'}
             </Text>
+            {hiddenByRadius && (
+              <TouchableOpacity
+                style={styles.emptyAction}
+                onPress={() => setRadiusKm(null)}
+                accessibilityRole="button"
+                accessibilityLabel="Show listings at any distance"
+              >
+                <Text style={styles.emptyActionText}>Show anywhere</Text>
+              </TouchableOpacity>
+            )}
           </View>
         }
         renderItem={({ item }) => (
@@ -359,4 +402,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
   },
+  emptyAction: {
+    marginTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
+  },
+  emptyActionText: { ...Typography.labelMd, color: Colors.onPrimary },
 });

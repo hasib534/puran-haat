@@ -6,6 +6,8 @@ type AlertButton = {
   style?: 'default' | 'cancel' | 'destructive';
 };
 
+export type { AlertButton };
+
 /**
  * Cross-platform replacement for `Alert.alert`.
  *

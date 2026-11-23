@@ -40,6 +40,20 @@ service cloud.firestore {
       return value == null || value is number;
     }
 
+    // Optional coordinate pair. Both keys must be absent, or both present as
+    // numbers inside the legal WGS-84 range.
+    function isOptionalCoordinate(value, lower, upper) {
+      return value == null || (value is number && value >= lower && value <= upper);
+    }
+
+    function hasValidCoordinates() {
+      return isOptionalCoordinate(request.resource.data.get('latitude', null), -90, 90)
+        && isOptionalCoordinate(request.resource.data.get('longitude', null), -180, 180)
+        // Never store half a pin: latitude and longitude travel together.
+        && (request.resource.data.get('latitude', null) == null)
+             == (request.resource.data.get('longitude', null) == null);
+    }
+
     function isOneOf(value, allowed) {
       return value in allowed;
     }
@@ -94,6 +108,7 @@ service cloud.firestore {
         && request.resource.data.images.size() <= 5
         && isNonEmptyString(request.resource.data.location_name, 120)
         && isOptionalNumber(request.resource.data.get('distance_km', null))
+        && hasValidCoordinates()
         && isNonEmptyString(request.resource.data.created_at, 40);
 
       allow update: if isVerified()
@@ -112,6 +127,7 @@ service cloud.firestore {
         && request.resource.data.co2_saved_kg >= 0
         && isNonEmptyString(request.resource.data.location_name, 120)
         && isOptionalNumber(request.resource.data.get('distance_km', null))
+        && hasValidCoordinates()
         && request.resource.data.images is list
         && request.resource.data.images.size() <= 5;
 
@@ -131,6 +147,7 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('bio', null), 160)
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
+        && hasValidCoordinates()
         // The badge must mirror the real email-verification claim.
         && request.resource.data.get('is_verified', false) == request.auth.token.email_verified
         // New accounts start with a clean scoreboard.
@@ -151,6 +168,7 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('bio', null), 160)
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
+        && hasValidCoordinates()
         && request.resource.data.get('is_verified', false) == request.auth.token.email_verified
         // Ratings and counters are server-owned. Clients cannot inflate them.
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['rating'])

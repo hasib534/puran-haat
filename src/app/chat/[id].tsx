@@ -14,11 +14,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { showAlert } from '../../lib/alert';
+import { showAlert, type AlertButton } from '../../lib/alert';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/theme';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
+import { mapsUrl, type Coords } from '../../lib/geo';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { useConversationMessages } from '../../hooks/useConversationMessages';
 import { AuthGate } from '../../components/auth/AuthGate';
@@ -41,6 +43,7 @@ function ChatView() {
     useApp();
   const { user } = useAuth();
   const { guard } = useAuthGuard();
+  const { location, coordsOf } = useLocation();
 
   const conv = conversations.find((entry) => entry.id === id || entry.itemId === id);
   const item = items.find((entry) => entry.id === conv?.itemId) || items.find((entry) => entry.id === id);
@@ -68,6 +71,56 @@ function ChatView() {
       setInputText(text);
       showAlert('Message not sent', (error as Error).message);
     }
+  };
+
+  /** Sends a tappable maps link so the other trader can meet at a real spot. */
+  const sendPlace = async (label: string, coords: Coords) => {
+    if (!conv) return;
+    const text = `📍 Meet here: ${label}\n${mapsUrl(coords)}`;
+    try {
+      await sendMessage(conv.id, text);
+    } catch (error) {
+      showAlert('Location not shared', (error as Error).message);
+    }
+  };
+
+  const handleShareLocation = () => {
+    if (!conv) return;
+    if (!guard('share a location', { requireVerified: true })) return;
+
+    const itemCoords = coordsOf(item);
+    const myCoords = location
+      ? { latitude: location.latitude, longitude: location.longitude }
+      : null;
+
+    if (!itemCoords && !myCoords) {
+      showAlert(
+        'No area yet',
+        'Set your area first, or open a listing that has a pickup pin, then share it here.',
+        [
+          { text: 'Not now', style: 'cancel' },
+          { text: 'Choose area', onPress: () => router.push('/location') },
+        ],
+      );
+      return;
+    }
+
+    const buttons: AlertButton[] = [{ text: 'Cancel', style: 'cancel' }];
+    // Prefer the listing's pin: it is where the item actually is.
+    if (itemCoords) {
+      buttons.push({
+        text: 'Listing pickup area',
+        onPress: () => void sendPlace(item?.location_name || 'Pickup area', itemCoords),
+      });
+    }
+    if (myCoords && location) {
+      buttons.push({
+        text: 'My area',
+        onPress: () => void sendPlace(location.label, myCoords),
+      });
+    }
+
+    showAlert('Share location', 'Send a maps pin for the meeting spot.', buttons);
   };
 
   const handleAcceptTrade = async () => {
@@ -336,12 +389,7 @@ function ChatView() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.attachButton}
-            onPress={() =>
-              showAlert(
-                'Share Location',
-                'Meet in a public place like a cafe or community center. Live location sharing is coming soon.',
-              )
-            }
+            onPress={handleShareLocation}
             accessibilityLabel="Share a meeting location"
           >
             <MaterialIcons name="location-on" size={20} color={Colors.primary} />

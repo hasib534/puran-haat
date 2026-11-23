@@ -21,6 +21,8 @@ import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { AuthGate } from '../components/auth/AuthGate';
+import { LocationField, type LocationValue } from '../components/location/LocationField';
+import { coordsForAreaLabel } from '../lib/geo';
 
 const BIO_LIMIT = 160;
 
@@ -41,7 +43,13 @@ function EditProfileForm() {
   const [fullName, setFullName] = useState(profile.full_name);
   const [username, setUsername] = useState(profile.username || '');
   const [bio, setBio] = useState(profile.bio || '');
-  const [district, setDistrict] = useState(profile.district || '');
+  const [location, setLocation] = useState<LocationValue>(() => ({
+    label: profile.district || '',
+    coords:
+      profile.latitude != null && profile.longitude != null
+        ? { latitude: profile.latitude, longitude: profile.longitude }
+        : coordsForAreaLabel(profile.district || '') ?? null,
+  }));
   const [avatarUri, setAvatarUri] = useState(profile.avatar_url || '');
   const [saving, setSaving] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
@@ -51,10 +59,12 @@ function EditProfileForm() {
       fullName.trim() !== profile.full_name ||
       username.trim() !== (profile.username || '') ||
       bio.trim() !== (profile.bio || '') ||
-      district.trim() !== (profile.district || '') ||
+      location.label.trim() !== (profile.district || '') ||
+      (location.coords?.latitude ?? null) !== (profile.latitude ?? null) ||
+      (location.coords?.longitude ?? null) !== (profile.longitude ?? null) ||
       avatarUri !== (profile.avatar_url || '')
     );
-  }, [fullName, username, bio, district, avatarUri, profile]);
+  }, [fullName, username, bio, location, avatarUri, profile]);
 
   const usernameValid = username.trim() === '' || /^[a-zA-Z0-9_]{3,20}$/.test(username.trim());
   const nameValid = fullName.trim().length >= 2;
@@ -129,7 +139,9 @@ function EditProfileForm() {
         full_name: fullName.trim(),
         username: username.trim(),
         bio: bio.trim(),
-        district: district.trim(),
+        district: location.label.trim(),
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
         avatar_url: avatarUri,
       });
       if (avatarUploadFailed) {
@@ -148,7 +160,7 @@ function EditProfileForm() {
     } finally {
       setSaving(false);
     }
-  }, [fullName, username, bio, district, avatarUri, nameValid, usernameValid, updateProfile]);
+  }, [fullName, username, bio, location, avatarUri, nameValid, usernameValid, updateProfile]);
 
   const inputStyle = (key: string) => [
     styles.input,
@@ -248,19 +260,13 @@ function EditProfileForm() {
 
           {/* Location */}
           <View style={styles.field}>
-            <Text style={styles.label}>Location</Text>
-            <View style={[styles.locationRow, focused === 'location' && styles.inputFocused]}>
-              <MaterialIcons name="location-on" size={20} color={Colors.primary} />
-              <TextInput
-                style={styles.locationInput}
-                value={district}
-                onChangeText={setDistrict}
-                onFocus={() => setFocused('location')}
-                onBlur={() => setFocused(null)}
-                placeholder="Dhanmondi, Dhaka"
-                placeholderTextColor={Colors.outline}
-              />
-            </View>
+            <LocationField
+              label="Location"
+              value={location}
+              onChange={setLocation}
+              placeholder="Dhanmondi, Dhaka"
+              hint="Helps traders see how far you are."
+            />
           </View>
 
           {/* Social connections */}
@@ -351,8 +357,6 @@ const styles = StyleSheet.create({
   usernameRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 1.5, borderColor: 'rgba(21,66,18,0.1)' },
   at: { ...Typography.bodyMd, color: Colors.outline, marginRight: 4 },
   usernameInput: { flex: 1, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
-  locationRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surfaceContainerLowest, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, borderWidth: 1.5, borderColor: 'rgba(21,66,18,0.1)', gap: 8 },
-  locationInput: { flex: 1, paddingVertical: 12, ...Typography.bodyMd, color: Colors.onSurface },
   section: { marginTop: Spacing.lg },
   sectionTitle: { ...Typography.labelLg, color: Colors.primary, marginBottom: 4 },
   sectionSub: { ...Typography.bodySm, color: Colors.onSurfaceVariant, marginBottom: Spacing.sm },

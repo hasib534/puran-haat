@@ -17,6 +17,7 @@ import { Typography, BorderRadius, Spacing, Shadows } from '../../constants/them
 import { MOCK_CATEGORIES } from '../../data/mock-items';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { showAlert } from '../../lib/alert';
 
@@ -43,10 +44,12 @@ export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { items, itemsLoading, toggleFavorite, ensureConversation, deleteItem } = useApp();
   const { user } = useAuth();
+  const { openLocationInMaps, distanceLabelTo, coordsOf } = useLocation();
   const { guard } = useAuthGuard();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const item = items.find((it) => it.id === id);
+  const hasMapPin = coordsOf(item) != null;
 
   if (itemsLoading && !item) {
     return (
@@ -252,7 +255,7 @@ export default function ItemDetailScreen() {
             <View style={styles.metaItem}>
               <MaterialIcons name="location-on" size={15} color={Colors.primary} />
               <Text style={styles.metaText}>
-                {item.distance_km != null ? `${item.distance_km} km away` : item.location_name}
+                {distanceLabelTo(item) ? `${distanceLabelTo(item)} away` : item.location_name}
               </Text>
             </View>
             <Text style={styles.metaDot}>•</Text>
@@ -261,6 +264,35 @@ export default function ItemDetailScreen() {
               <Text style={styles.metaText}>{postedLabel(item.created_at)}</Text>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={[styles.pickupCard, Shadows.card]}
+            onPress={hasMapPin ? () => void openLocationInMaps(item) : undefined}
+            disabled={!hasMapPin}
+            activeOpacity={hasMapPin ? 0.8 : 1}
+            accessibilityRole={hasMapPin ? 'button' : undefined}
+            accessibilityLabel={
+              hasMapPin
+                ? `Open pickup area ${item.location_name} in maps`
+                : `Pickup area ${item.location_name}`
+            }
+          >
+            <View style={styles.pickupIcon}>
+              <MaterialIcons name="place" size={20} color={Colors.primary} />
+            </View>
+            <View style={styles.pickupBody}>
+              <Text style={styles.pickupLabel}>Pickup area</Text>
+              <Text style={styles.pickupValue} numberOfLines={1}>
+                {item.location_name}
+              </Text>
+            </View>
+            {hasMapPin && (
+              <>
+                <Text style={styles.pickupAction}>Directions</Text>
+                <MaterialIcons name="chevron-right" size={18} color={Colors.primary} />
+              </>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.tagRow}>
             {category && (
@@ -569,6 +601,30 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   metaText: { ...Typography.bodySm, color: Colors.onSurfaceVariant },
   metaDot: { color: Colors.outline },
+  pickupCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: BorderRadius.lg,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginTop: Spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(21, 66, 18, 0.08)',
+  },
+  pickupIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 90, 39, 0.1)',
+  },
+  pickupBody: { flex: 1 },
+  pickupLabel: { ...Typography.labelSm, color: Colors.onSurfaceVariant },
+  pickupValue: { ...Typography.labelLg, color: Colors.onSurface },
+  pickupAction: { ...Typography.labelMd, color: Colors.primary },
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

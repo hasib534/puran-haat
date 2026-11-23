@@ -5,6 +5,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Shadows } from '../../constants/theme';
 import { Item } from '../../types';
+import { formatDistanceKm } from '../../lib/geo';
 
 interface ItemCardProps {
   item: Item;
@@ -17,6 +18,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onPress, onToggleFavor
   const isTrade = item.trade_mode === 'trade';
   const rating = Number(item.user?.rating) || 0;
   const hasTrustRow = Boolean(item.user?.is_verified) || rating > 0;
+  // Only shown when the viewer has a location; otherwise the area is the honest
+  // thing to display.
+  const distance = formatDistanceKm(item.distance_km);
 
   return (
     <TouchableOpacity
@@ -46,7 +50,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onPress, onToggleFavor
         <View style={styles.rowMeta}>
           <MaterialIcons name="location-on" size={13} color={Colors.onSurfaceVariant} />
           <Text style={styles.distanceText} numberOfLines={1}>
-            {item.distance_km != null ? `${item.distance_km} km away` : item.location_name}
+            {distance ? `${distance} away` : item.location_name}
           </Text>
         </View>
 

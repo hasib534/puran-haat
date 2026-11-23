@@ -81,7 +81,7 @@ export default function ProfileTab() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <TopHeader
-        districtName={profile.district || 'Dhanmondi, Dhaka'}
+        districtName={profile.district || undefined}
         avatarUrl={profile.avatar_url}
         onPressLocation={() => router.push('/edit-profile' as never)}
         onPressProfile={() => router.push('/edit-profile' as never)}

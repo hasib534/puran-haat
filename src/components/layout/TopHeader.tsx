@@ -2,11 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../../constants/theme';
 import { useApp } from '../../context/AppContext';
+import { useLocation } from '../../context/LocationContext';
 
 interface TopHeaderProps {
+  /** Overrides the area shown in the pill; defaults to the active location. */
   districtName?: string;
   avatarUrl?: string;
   unreadNotifications?: number;
@@ -22,9 +25,13 @@ interface TopHeaderProps {
  * The home mockup keeps the brand centred with the location picker on the
  * left and the signed-in trader's avatar on the right. Discover swaps the
  * avatar for the notification bell, so both arrangements are supported here.
+ *
+ * The left side is a pill rather than a bare pin: the area you are browsing is
+ * the single biggest filter in the app, so it should be readable, and tapping
+ * it opens the picker from wherever you are.
  */
 export const TopHeader: React.FC<TopHeaderProps> = ({
-  districtName = 'Dhanmondi, Dhaka',
+  districtName,
   avatarUrl,
   unreadNotifications = 0,
   showNotifications = false,
@@ -33,17 +40,43 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onPressProfile,
 }) => {
   const { isOffline } = useApp();
+  const { location, detecting, hydrated } = useLocation();
+
+  const label = districtName ?? location?.label ?? null;
+  // "Dhanmondi, Dhaka" is too long for the app bar; the locality is the useful half.
+  const shortLabel = label ? label.split(',')[0] : null;
+  const openPicker = onPressLocation ?? (() => router.push('/location' as never));
+  const pillLabel = detecting
+    ? 'Locating…'
+    : shortLabel ?? (hydrated ? 'Set area' : 'Loading…');
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.iconButton}
-          onPress={onPressLocation}
+          style={[styles.locationPill, !shortLabel && styles.locationPillEmpty]}
+          onPress={openPicker}
           activeOpacity={0.7}
-          accessibilityLabel={`Change location, currently ${districtName}`}
+          accessibilityRole="button"
+          accessibilityLabel={
+            shortLabel
+              ? `Change location, currently ${label}`
+              : 'Set your location area'
+          }
+          accessibilityState={{ busy: detecting }}
         >
-          <MaterialIcons name="location-on" size={23} color={Colors.primary} />
+          <MaterialIcons
+            name={location?.source === 'gps' ? 'my-location' : 'location-on'}
+            size={17}
+            color={shortLabel ? Colors.primary : Colors.onSurfaceVariant}
+          />
+          <Text
+            style={[styles.locationText, !shortLabel && styles.locationTextEmpty]}
+            numberOfLines={1}
+          >
+            {pillLabel}
+          </Text>
+          <MaterialIcons name="expand-more" size={15} color={Colors.onSurfaceVariant} />
         </TouchableOpacity>
 
         <Text style={styles.brandTitle} numberOfLines={1}>
@@ -106,6 +139,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.margin,
     paddingVertical: Spacing.xs,
     backgroundColor: Colors.surface,
+  },
+  locationPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    maxWidth: 132,
+    paddingLeft: 8,
+    paddingRight: 4,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.secondaryContainer,
+  },
+  locationPillEmpty: {
+    backgroundColor: Colors.surfaceContainer,
+  },
+  locationText: {
+    ...Typography.labelMd,
+    color: Colors.primary,
+    flexShrink: 1,
+  },
+  locationTextEmpty: {
+    color: Colors.onSurfaceVariant,
   },
   iconButton: {
     width: 40,

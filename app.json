@@ -45,6 +45,12 @@
           "cameraPermission": "Puran Haat uses your camera to photograph items you want to trade."
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Puran Haat uses your location to show items for trade near you and to save a pickup area on your listings."
+        }
+      ],
       "@react-native-google-signin/google-signin"
     ],
     "experiments": {
