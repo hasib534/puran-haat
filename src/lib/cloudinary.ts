@@ -95,30 +95,6 @@ function describeRequestError(error: unknown): string {
   return 'the request failed';
 }
 
-// Uploading several megabytes over mobile data fails intermittently ("Network
-// request failed", a dropped socket, a flaky handover between Wi-Fi and data),
-// so retry the transport itself before telling the user their connection is
-// bad. A failed *response* is never retried here — that is a configuration
-// problem and retrying would just burn the user's data again.
-const UPLOAD_ATTEMPTS = 3;
-
-async function postFormWithRetry(endpoint: string, form: FormData): Promise<Response> {
-  let lastError: unknown = null;
-
-  for (let attempt = 1; attempt <= UPLOAD_ATTEMPTS; attempt += 1) {
-    try {
-      return await fetch(endpoint, { method: 'POST', body: form });
-    } catch (error) {
-      lastError = error;
-      if (attempt < UPLOAD_ATTEMPTS) {
-        await new Promise((resolve) => setTimeout(resolve, 600 * attempt));
-      }
-    }
-  }
-
-  throw lastError;
-}
-
 function parseCloudinaryBody(text: string): CloudinaryResponse {
   if (!text || !text.trim()) return {};
   try {
@@ -131,34 +107,19 @@ function parseCloudinaryBody(text: string): CloudinaryResponse {
   }
 }
 
-/**
- * Strategy 1: React Native's own networking, posting a `{uri, name, type}`
- * part. This is the normal path and works on most devices.
- */
-async function uploadWithFetch(target: UploadTarget): Promise<UploadOutcome> {
-  const form = new FormData();
-  form.append('upload_preset', UPLOAD_PRESET);
-  form.append('folder', target.folder);
-  form.append('file', {
-    uri: target.uri,
-    name: fileNameFor(target.uri),
-    type: mimeFor(target.uri),
-  } as unknown as Blob);
-
-  const response = await postFormWithRetry(target.endpoint, form);
-  const text = await response.text().catch(() => '');
-  return { ok: response.ok, status: response.status, payload: parseCloudinaryBody(text) };
-}
+const XHR_TIMEOUT_MS = 120_000;
 
 /**
- * Strategy 2: Expo's native upload task, which streams the file from disk
- * itself instead of going through React Native's FormData encoder.
+ * Strategy 1: Expo's native upload task, which streams the file from disk.
  *
- * This exists because some devices fail strategy 1 for every photo with a bare
- * "Network request failed" while the network is demonstrably fine (the same
- * account uploads from a browser over the same connection). The two paths share
- * no JavaScript, so retrying through this one either works or proves the
- * failure is not in the encoder. Both modules already ship inside the app.
+ * This must be the primary path on native. React Native's `fetch` cannot upload
+ * a file part here: since SDK 54 Expo installs its own `fetch`, and its
+ * FormData encoder throws "Unsupported FormDataPart implementation" for the
+ * `{uri, name, type}` parts that React Native understands — before a single
+ * byte is sent. That is what made every photo and the profile avatar fail.
+ *
+ * The file is streamed by OkHttp with its own 60s timeouts, so large photos on
+ * a slow connection are not cut off by the JS side.
  */
 async function uploadWithFileSystem(target: UploadTarget): Promise<UploadOutcome> {
   const { File, UploadType } = await import('expo-file-system');
@@ -176,6 +137,42 @@ async function uploadWithFileSystem(target: UploadTarget): Promise<UploadOutcome
     status: result.status,
     payload: parseCloudinaryBody(result.body),
   };
+}
+
+/**
+ * Strategy 2: React Native's own XMLHttpRequest.
+ *
+ * Kept as a fallback because it goes through React Native's networking module
+ * rather than Expo's fetch, and it does understand `{uri}` file parts (verified
+ * returning HTTP 200 on a device). If the native upload task is ever
+ * unavailable, this still gets the photo up.
+ */
+function uploadWithXhr(target: UploadTarget): Promise<UploadOutcome> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append('upload_preset', UPLOAD_PRESET);
+    form.append('folder', target.folder);
+    form.append('file', {
+      uri: target.uri,
+      name: fileNameFor(target.uri),
+      type: mimeFor(target.uri),
+    } as unknown as Blob);
+
+    const request = new XMLHttpRequest();
+    request.open('POST', target.endpoint);
+    request.timeout = XHR_TIMEOUT_MS;
+    request.onload = () => {
+      const status = request.status;
+      resolve({
+        ok: status >= 200 && status < 300,
+        status,
+        payload: parseCloudinaryBody(String(request.responseText || '')),
+      });
+    };
+    request.onerror = () => reject(new Error('Network request failed'));
+    request.ontimeout = () => reject(new Error('The upload timed out'));
+    request.send(form);
+  });
 }
 
 /**
@@ -226,6 +223,7 @@ export async function uploadImageToCloudinary(
   const folder = (options.folder || DEFAULT_FOLDER).trim();
   const endpoint = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
+  // The web build uses the browser's real fetch, which handles Blob parts fine.
   if (Platform.OS === 'web') {
     const source = await fetch(uri);
     if (!source.ok) throw new Error('Could not read the selected photo.');
@@ -237,8 +235,7 @@ export async function uploadImageToCloudinary(
     form.append('file', blob, fileNameFor(uri));
 
     const response = await fetch(endpoint, { method: 'POST', body: form });
-    const text = await response.text().catch(() => '');
-    const payload = parseCloudinaryBody(text);
+    const payload = parseCloudinaryBody(await response.text().catch(() => ''));
     if (response.ok && !payload.error) {
       const publicUrl = payload.secure_url || payload.url;
       if (!publicUrl) throw new Error('Cloudinary did not return an image URL.');
@@ -251,7 +248,7 @@ export async function uploadImageToCloudinary(
   }
 
   const target: UploadTarget = { endpoint, uri, folder };
-  const strategies = [() => uploadWithFetch(target), () => uploadWithFileSystem(target)];
+  const strategies = [() => uploadWithFileSystem(target), () => uploadWithXhr(target)];
 
   // Prefer Cloudinary's own explanation (it means a request arrived) over a
   // transport error, but report the transport error when nothing got through.
