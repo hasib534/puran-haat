@@ -44,3 +44,8 @@ example
 # generated native folders
 /ios
 /android
+
+# local scratch files and build artifacts
+notes.txt
+metro.log
+*.apk
