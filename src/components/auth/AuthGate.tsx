@@ -31,6 +31,18 @@ export function AuthGate({
   const { user, loading, configured, resendVerification, refreshUser } = useAuth();
   const [busy, setBusy] = useState(false);
 
+  // Every blocked state gets a way out. Prefer returning to the previous screen,
+  // and fall back to the home feed when there is nothing behind us (for example
+  // when the Trade tab was opened directly). Without this a guest who taps the
+  // centre Trade button — which hides the tab bar — would be stuck here.
+  const dismiss = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/' as never);
+    }
+  };
+
   // Demo mode: the app still works with mock data when Firebase is unset.
   if (!configured) return <>{children}</>;
 
@@ -60,6 +72,9 @@ export function AuthGate({
             <MaterialIcons name="login" size={20} color={Colors.onPrimary} />
             <Text style={styles.primaryButtonText}>Sign In / Create Account</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.secondaryButton} onPress={dismiss} activeOpacity={0.7}>
+            <Text style={styles.secondaryButtonText}>Not now</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -77,8 +92,8 @@ export function AuthGate({
             </View>
             <Text style={styles.title}>Create an account to continue</Text>
             <Text style={styles.description}>
-              You&apos;re browsing as a guest. Create a free account to post items, send trade
-              proposals, and keep your chats for good.
+              You&apos;re browsing as a guest. Create a free account to post items and send trade
+              proposals — or keep browsing and chatting for now.
             </Text>
             <TouchableOpacity
               style={styles.primaryButton}
@@ -87,6 +102,9 @@ export function AuthGate({
             >
               <MaterialIcons name="person-add" size={20} color={Colors.onPrimary} />
               <Text style={styles.primaryButtonText}>Create account</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} onPress={dismiss} activeOpacity={0.7}>
+              <Text style={styles.secondaryButtonText}>Not now</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -143,6 +161,9 @@ export function AuthGate({
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryButton} onPress={handleRefresh} disabled={busy}>
             <Text style={styles.secondaryButtonText}>I&apos;ve verified — refresh</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.secondaryButton} onPress={dismiss} activeOpacity={0.7}>
+            <Text style={styles.secondaryButtonText}>Not now</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
