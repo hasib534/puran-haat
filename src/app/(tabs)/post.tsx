@@ -226,7 +226,7 @@ function PostItemForm() {
         user: {
           ...profile,
           id: user?.uid || 'me',
-          is_verified: user?.emailVerified ?? profile.is_verified,
+          is_verified: profile.is_verified,
         },
         created_at: new Date().toISOString(),
       };

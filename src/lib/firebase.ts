@@ -502,6 +502,24 @@ export function subscribeToPresence(
   );
 }
 
+/**
+ * Streams the signed-in trader's own identity-review requests. The rules let
+ * the owner read their rows and keep the admin queue private, so the query is
+ * constrained by `user_id` to stay provable for the rules engine.
+ */
+export function subscribeToMyVerifications(
+  uid: string,
+  callback: (requests: FirestoreRecord[]) => void,
+  onError?: (error: Error) => void,
+): Unsubscribe {
+  if (!db) return () => {};
+  return onSnapshot(
+    query(collection(db, 'verifications'), where('user_id', '==', uid)),
+    (snapshot) => callback(snapshot.docs.map(toRecord)),
+    onError,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Writes
 // ---------------------------------------------------------------------------
@@ -520,6 +538,42 @@ export async function deleteItemDoc(itemId: string): Promise<void> {
 export async function saveUserProfile(uid: string, patch: Partial<Profile>): Promise<void> {
   if (!db) return;
   await setDoc(doc(db, 'users', uid), clean(patch), { merge: true });
+}
+
+/**
+ * Files an identity-review request for the admin portal.
+ *
+ * `file_count` is derived from `documents` because the rules require the two to
+ * agree: the reviewer must never see a request claiming files it does not
+ * carry. The write is shape-checked server-side, so this function mirrors the
+ * same constraints (1-4 images, a document type, a numeric risk score).
+ */
+export async function submitVerificationRequest(params: {
+  uid: string;
+  full_name: string;
+  document_type: string;
+  documents: string[];
+  risk_score: number;
+}): Promise<string> {
+  if (!db) throw new Error('Firebase is not configured.');
+  const documents = params.documents.filter((uri) => uri.trim().length > 0);
+  if (documents.length === 0) throw new Error('Add at least one photo of your document.');
+
+  const id = newDocId('verifications');
+  await setDoc(
+    doc(db, 'verifications', id),
+    clean({
+      user_id: params.uid,
+      full_name: params.full_name.trim().slice(0, 80),
+      document_type: params.document_type.trim().slice(0, 80),
+      documents,
+      file_count: documents.length,
+      risk_score: params.risk_score,
+      status: 'pending',
+      submitted_at: Date.now(),
+    }),
+  );
+  return id;
 }
 
 /**

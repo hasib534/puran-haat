@@ -215,6 +215,34 @@ export default function ProfileTab() {
           </View>
         </View>
 
+        {/* Verification */}
+        <View style={[styles.card, Shadows.card]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <MaterialIcons name="verified-user" size={20} color={Colors.primary} />
+              <Text style={styles.cardTitle}>Verification</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => router.push('/verification' as never)}
+            accessibilityRole="button"
+          >
+            <View style={styles.settingBody}>
+              <Text style={styles.settingTitle}>
+                {profile.is_verified ? 'Verified trader' : 'Get verified'}
+              </Text>
+              <Text style={styles.settingSubtitle}>
+                {profile.is_verified
+                  ? 'Your identity review was approved'
+                  : 'Send an identity document for review'}
+              </Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={20} color={Colors.outline} />
+          </TouchableOpacity>
+        </View>
+
         {/* Sustainability */}
         <View style={[styles.card, Shadows.card]}>
           <View style={styles.cardHeader}>

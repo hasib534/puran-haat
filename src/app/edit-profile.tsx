@@ -281,9 +281,30 @@ function EditProfileForm() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Trust &amp; Verification</Text>
             <Text style={styles.sectionSub}>
-              A verified email and a real photo are what build trust today. Social
-              account linking is coming soon.
+              Identity is reviewed by our team before a verified badge is granted. A
+              verified email is still required to post and trade.
             </Text>
+
+            <TouchableOpacity
+              style={styles.socialRow}
+              onPress={() => router.push('/verification' as never)}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+            >
+              <View style={styles.socialIcon}>
+                <MaterialIcons name="verified-user" size={20} color={Colors.primary} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.socialLabel}>Identity verification</Text>
+                <Text style={styles.connectedName}>
+                  {profile.is_verified
+                    ? 'Verified trader — badge active'
+                    : 'Not verified yet — request a review'}
+                </Text>
+              </View>
+              <Text style={styles.connectText}>{profile.is_verified ? 'View' : 'Start'}</Text>
+            </TouchableOpacity>
+
             {[
               { name: 'Instagram', icon: 'photo-camera' },
               { name: 'Facebook', icon: 'group' },

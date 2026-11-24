@@ -1,0 +1,23 @@
+{
+  "name": "puran-haat-functions",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Admin-only Cloud Functions for Puran Haat: disable or delete Firebase Auth accounts.",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "npm run build && firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

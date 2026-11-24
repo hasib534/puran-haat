@@ -32,16 +32,61 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous';
     }
 
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ---------------------------------------------------------------------
+    // Moderation state
+    //
+    // Admins write `moderation_status` / `suspended_until` on `users/{uid}`.
+    // Every path that creates community content reads it back, so a suspended
+    // or banned account is stopped by the database even though the mobile app
+    // never inspects those fields itself. A trader without a profile document
+    // yet counts as clear, so first-run writes are never blocked. Repeated
+    // get() calls are cached by the rules engine, so this costs one read.
+    // ---------------------------------------------------------------------
+    function hasProfile() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function profileField(name, fallback) {
+      return hasProfile()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(name, fallback)
+        : fallback;
+    }
+
+    function isBanned() {
+      return profileField('moderation_status', 'clear') == 'banned';
+    }
+
+    function isSuspended() {
+      return profileField('moderation_status', 'clear') == 'suspended'
+        && profileField('suspended_until', 0) > request.time.toMillis();
+    }
+
+    function isBlocked() {
+      return isBanned() || isSuspended();
+    }
+
+    // The verified badge is granted by an admin (see the `users` rules below),
+    // so a listing's author snapshot must mirror the profile, not the client.
+    function hasVerifiedBadge() {
+      return profileField('is_verified', false) == true;
+    }
+
+    // Verified email (allowed to trade) and not currently suspended or banned.
+    function canPublish() {
+      return isVerified() && !isBlocked();
+    }
+
     // Chat is open to guests as well as verified traders. Creating listings,
     // sending proposals and admin actions still require a verified email.
     // Guests are checked first so an anonymous token never touches the
-    // email-verification claim.
+    // email-verification claim. A suspended or banned account loses chat too.
     function canChat() {
-      return isAnonymous() || isVerified();
-    }
-
-    function isSelf(uid) {
-      return isSignedIn() && request.auth.uid == uid;
+      return (isAnonymous() || isVerified()) && !isBlocked();
     }
 
     function isNonEmptyString(value, maxLength) {
@@ -133,12 +178,12 @@ service cloud.firestore {
       // The feed is public so signed-out visitors can browse.
       allow read: if true;
 
-      allow create: if isVerified()
+      allow create: if canPublish()
         && request.resource.data.user_id == request.auth.uid
         && request.resource.data.user is map
         && request.resource.data.user.id == request.auth.uid
-        // The seller badge is derived from the auth claim, not the client.
-        && request.resource.data.user.get('is_verified', false) == request.auth.token.get('email_verified', false)
+        // The seller badge mirrors the admin-granted profile badge.
+        && request.resource.data.user.get('is_verified', false) == hasVerifiedBadge()
         && isNonEmptyString(request.resource.data.user.full_name, 80)
         && request.resource.data.user.get('rating', 0) is number
         && request.resource.data.user.get('trade_count', 0) is int
@@ -158,7 +203,7 @@ service cloud.firestore {
         && hasValidCoordinates()
         && isNonEmptyString(request.resource.data.created_at, 40);
 
-      allow update: if isVerified()
+      allow update: if canPublish()
         && resource.data.user_id == request.auth.uid
         // Ownership and creation time are immutable, even for the owner.
         && request.resource.data.user_id == resource.data.user_id
@@ -178,8 +223,13 @@ service cloud.firestore {
         && request.resource.data.images is list
         && request.resource.data.images.size() <= 5;
 
-      allow delete: if isVerified()
+      allow delete: if canPublish()
         && resource.data.user_id == request.auth.uid;
+
+      // Moderation take-down. The owner paths above stay authoritative for
+      // normal edits; an admin can remove a listing, or re-stamp the author's
+      // verified badge after a verification decision, regardless of ownership.
+      allow update, delete: if isAdmin();
     }
 
     // ---------------------------------------------------------------------
@@ -195,8 +245,9 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
         && hasValidCoordinates()
-        // The badge must mirror the real email-verification claim.
-        && request.resource.data.get('is_verified', false) == request.auth.token.get('email_verified', false)
+        // The verified badge is admin-granted, never self-assigned. New
+        // accounts start unverified until an identity review approves them.
+        && request.resource.data.get('is_verified', false) == false
         // New accounts start with a clean scoreboard.
         && request.resource.data.get('eco_points', 0) == 0
         && request.resource.data.get('trade_count', 0) == 0
@@ -216,7 +267,9 @@ service cloud.firestore {
         && isOptionalString(request.resource.data.get('district', null), 80)
         && isOptionalString(request.resource.data.get('avatar_url', null), 2048)
         && hasValidCoordinates()
-        && request.resource.data.get('is_verified', false) == request.auth.token.get('email_verified', false)
+        // `is_verified` is admin-owned: a trader may never grant or revoke
+        // their own badge, and may not accidentally clear an admin grant.
+        && request.resource.data.get('is_verified', false) == resource.data.get('is_verified', false)
         // Ratings and counters are server-owned. Clients cannot inflate them.
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['rating'])
             || request.resource.data.rating == resource.data.rating)
@@ -232,6 +285,7 @@ service cloud.firestore {
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['moderation_status', 'suspended_until', 'admin_notes', 'trust_score', 'is_verified'])
+        && request.resource.data.get('is_verified', false) is bool
         && isOneOf(
              request.resource.data.get('moderation_status', 'clear'),
              ['clear', 'flagged', 'suspended', 'banned']
@@ -375,7 +429,7 @@ service cloud.firestore {
       allow read: if isSignedIn()
         && request.auth.uid in resource.data.participants;
 
-      allow create: if isVerified()
+      allow create: if canPublish()
         && request.resource.data.proposer_id == request.auth.uid
         && request.resource.data.participants is list
         && request.resource.data.participants.size() == 2
@@ -391,7 +445,7 @@ service cloud.firestore {
         && isNonEmptyString(request.resource.data.conversation_id, 128)
         && request.resource.data.created_at is number;
 
-      allow update: if isVerified()
+      allow update: if canPublish()
         && request.auth.uid in resource.data.participants
         // Trade participants, items and creation time are immutable.
         && request.resource.data.participants == resource.data.participants
@@ -412,7 +466,7 @@ service cloud.firestore {
             || (resource.data.status == 'accepted'
                 && request.resource.data.status == 'completed'));
 
-      allow delete: if isVerified()
+      allow delete: if canPublish()
         && resource.data.proposer_id == request.auth.uid
         && resource.data.status == 'pending';
     }
@@ -429,11 +483,18 @@ service cloud.firestore {
 
       allow create: if isAdmin()
         || (isSignedIn()
+            && !isBlocked()
             && request.resource.data.user_id == request.auth.uid
             && request.resource.data.status == 'pending'
             && isNonEmptyString(request.resource.data.full_name, 80)
             && isNonEmptyString(request.resource.data.document_type, 80)
             && request.resource.data.file_count is int
+            // A request carries the images the reviewer will check, and the
+            // count must match them, so the queue never claims files it lacks.
+            && request.resource.data.documents is list
+            && request.resource.data.documents.size() >= 1
+            && request.resource.data.documents.size() <= 4
+            && request.resource.data.file_count == request.resource.data.documents.size()
             && request.resource.data.risk_score is number
             && request.resource.data.submitted_at is number);
 
@@ -444,7 +505,7 @@ service cloud.firestore {
       allow read: if isAdmin();
 
       allow create: if isAdmin()
-        || (isVerified()
+        || (canPublish()
             && request.resource.data.reporter_id == request.auth.uid
             && isNonEmptyString(request.resource.data.user_id, 128)
             && isOneOf(request.resource.data.type, ['listing', 'message', 'account'])

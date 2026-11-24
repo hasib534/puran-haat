@@ -385,7 +385,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // (which hands back a fresh object on each app foreground and used to tear
   // down and rebuild all five listeners).
   const userUid = user?.uid;
-  const userEmailVerified = user?.emailVerified;
   const userDisplayName = user?.displayName;
   const userEmail = user?.email;
   const userPhotoURL = user?.photoURL;
@@ -561,12 +560,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       (record) => {
         if (record) {
           const mapped = mapProfile(record);
-          if (userEmailVerified && !mapped.is_verified) {
-            mapped.is_verified = true;
-            saveUserProfile(uid, { is_verified: true }).catch((error) =>
-              console.warn('Could not sync verification badge:', error.message),
-            );
-          }
+          // `is_verified` is admin-owned. The app only reads it: an admin
+          // approves an identity review, and the badge follows. Verified email
+          // is a separate gate (it is what allows posting and trading).
           setProfileOwner(uid);
           setProfileState((prev) => ({ ...prev, ...mapped, id: uid }));
           return;
@@ -581,7 +577,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           rating: 0,
           trade_count: 0,
           eco_points: 0,
-          is_verified: Boolean(userEmailVerified),
+          is_verified: false,
         };
         setProfileOwner(uid);
         setProfileState(initial);
@@ -591,7 +587,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Profile listener failed:', error.message),
     );
-  }, [userUid, userEmailVerified, userDisplayName, userEmail, userPhotoURL]);
+  }, [userUid, userDisplayName, userEmail, userPhotoURL]);
 
   const favoriteIds = useMemo(() => {
     if (!isFirebaseConfigured) return favoriteState.ids;
@@ -614,7 +610,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: user.uid,
       full_name: user.displayName || user.email?.split('@')[0] || 'Trader',
       avatar_url: user.photoURL || undefined,
-      is_verified: user.emailVerified,
+      // The verified badge comes from the admin-reviewed profile document, so
+      // the optimistic fallback never assumes it.
+      is_verified: false,
     };
   }, [user]);
 
@@ -791,7 +789,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         user: {
           ...profile,
           id: user.uid,
-          is_verified: user.emailVerified,
+          is_verified: profile.is_verified,
         },
         created_at: new Date().toISOString(),
       };

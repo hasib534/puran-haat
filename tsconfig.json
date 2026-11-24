@@ -22,6 +22,7 @@
     "admin-web",
     "dist",
     "stitch_puran_haat",
-    "push-worker"
+    "push-worker",
+    "functions"
   ]
 }

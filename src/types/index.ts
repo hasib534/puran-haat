@@ -2,6 +2,27 @@ export type ConditionType = 'brand_new' | 'like_new' | 'gently_used' | 'fair';
 export type TradeModeType = 'trade' | 'free' | 'auction';
 export type EcoImpactType = 'High' | 'Med' | 'Low';
 export type ProposalStatusType = 'pending' | 'accepted' | 'declined' | 'countered' | 'completed';
+export type VerificationStatusType = 'pending' | 'approved' | 'rejected';
+
+/**
+ * An identity-review request filed from the app and decided in the admin
+ * portal. `documents` holds the uploaded identity photo URLs; `risk_score` is
+ * the client's own heuristic (the reviewer is never expected to trust it).
+ */
+export interface VerificationRequest {
+  id: string;
+  user_id: string;
+  full_name: string;
+  document_type: string;
+  file_count: number;
+  risk_score: number;
+  status: VerificationStatusType;
+  submitted_at: number;
+  documents: string[];
+  reviewed_at?: number;
+  reviewed_by?: string;
+  notes?: string;
+}
 
 export interface Category {
   id: string;
