@@ -22,8 +22,10 @@ import {
   signUp as fbSignUp,
   saveUserProfile,
   subscribeToAuth,
+  unregisterPushToken,
   type FirebaseUser,
 } from '../lib/firebase';
+import { peekPushToken } from '../lib/push';
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -162,6 +164,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const handleSignOut = useCallback(async () => {
+    // Detach this device's push token from the account being left behind first;
+    // otherwise the token stays under the old uid and keeps delivering its
+    // notifications to a session that is no longer signed in.
+    const uid = userRef.current?.uid;
+    const token = peekPushToken();
+    if (uid && token) {
+      await unregisterPushToken(uid, token).catch((error) =>
+        console.warn('Could not remove push token on sign-out:', (error as Error).message),
+      );
+    }
     await fbSignOut();
     setUser(null);
   }, []);

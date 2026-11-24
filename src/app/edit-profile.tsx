@@ -17,6 +17,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 
 import { showAlert } from '../lib/alert';
+import { cloudinaryConfigHint, isCloudinaryConfigured } from '../lib/cloudinary';
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing } from '../constants/theme';
 import { useApp } from '../context/AppContext';
@@ -135,7 +136,7 @@ function EditProfileForm() {
     }
     setSaving(true);
     try {
-      const { avatarUploadFailed } = await updateProfile({
+      const { avatarUploadFailed, avatarError } = await updateProfile({
         full_name: fullName.trim(),
         username: username.trim(),
         bio: bio.trim(),
@@ -145,9 +146,16 @@ function EditProfileForm() {
         avatar_url: avatarUri,
       });
       if (avatarUploadFailed) {
+        // Show the real reason. Only point at the env config when Cloudinary is
+        // genuinely unconfigured, so a network or format error is not
+        // misreported as a missing setup step.
         showAlert(
-          'Profile saved',
-          'Your details were saved, but the photo could not be uploaded. Photo uploads need Cloudinary — add EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME and EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET to .env.local and restart Expo.',
+          'Profile saved without the photo',
+          isCloudinaryConfigured()
+            ? `Your details were saved, but the photo could not be uploaded.\n\n${
+                avatarError || 'Please try again.'
+              }`
+            : `Your details were saved, but photo uploads are not configured.\n\n${cloudinaryConfigHint()}`,
           [{ text: 'OK', onPress: () => router.back() }],
         );
         return;
@@ -271,11 +279,14 @@ function EditProfileForm() {
 
           {/* Social connections */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Trust & Verification</Text>
-            <Text style={styles.sectionSub}>Connect accounts to help neighbors know you&apos;re real.</Text>
+            <Text style={styles.sectionTitle}>Trust &amp; Verification</Text>
+            <Text style={styles.sectionSub}>
+              A verified email and a real photo are what build trust today. Social
+              account linking is coming soon.
+            </Text>
             {[
-              { name: 'Instagram', icon: 'photo-camera', connected: false },
-              { name: 'Facebook', icon: 'group', connected: true, connectedName: profile.full_name },
+              { name: 'Instagram', icon: 'photo-camera' },
+              { name: 'Facebook', icon: 'group' },
             ].map((s) => (
               <View key={s.name} style={styles.socialRow}>
                 <View style={styles.socialIcon}>
@@ -283,21 +294,19 @@ function EditProfileForm() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.socialLabel}>{s.name}</Text>
-                  {s.connected && <Text style={styles.connectedName}>{s.connectedName}</Text>}
+                  <Text style={styles.connectedName}>Not connected</Text>
                 </View>
-                {s.connected ? (
-                  <View style={styles.connectedBadge}>
-                    <MaterialIcons name="check" size={14} color={Colors.onPrimary} />
-                    <Text style={styles.connectedText}>Connected</Text>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.connectBtn}
-                    onPress={() => showAlert(s.name, 'OAuth connection coming soon.')}
-                  >
-                    <Text style={styles.connectText}>Connect</Text>
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  style={styles.connectBtn}
+                  onPress={() =>
+                    showAlert(
+                      s.name,
+                      `Linking ${s.name} is coming soon. It will help neighbors know you are real.`,
+                    )
+                  }
+                >
+                  <Text style={styles.connectText}>Connect</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -364,8 +373,6 @@ const styles = StyleSheet.create({
   socialIcon: { width: 40, height: 40, borderRadius: BorderRadius.full, backgroundColor: Colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   socialLabel: { ...Typography.bodyMd, color: Colors.onSurface, fontWeight: '600' },
   connectedName: { ...Typography.bodySm, color: Colors.onSurfaceVariant, fontSize: 11 },
-  connectedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.primary, paddingHorizontal: 10, paddingVertical: 6, borderRadius: BorderRadius.full },
-  connectedText: { ...Typography.labelSm, color: Colors.onPrimary },
   connectBtn: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.primary },
   connectText: { ...Typography.labelSm, color: Colors.primary },
   dangerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },

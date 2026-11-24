@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { registerPushToken } from '../lib/firebase';
-import { configurePushNotifications, getPushToken } from '../lib/push';
+import { configurePushNotifications, getPushToken, rememberPushToken } from '../lib/push';
 
 /**
  * Registers this device for push once a trader is signed in, and keeps the
@@ -39,6 +39,7 @@ export function usePushRegistration(uid?: string): void {
         tokenSubscription = Notifications.addPushTokenListener((next) => {
           const value = typeof next.data === 'string' ? next.data : null;
           if (!value) return;
+          rememberPushToken(value);
           registerPushToken(uid, value).catch(() => {});
         });
       } catch {

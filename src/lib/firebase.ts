@@ -143,8 +143,30 @@ export function authErrorMessage(error: unknown): string {
     'auth/provider-already-linked': 'This account is already linked to that provider.',
     'auth/user-disabled': 'This account has been disabled.',
     'auth/requires-recent-login': 'Please sign in again to continue.',
+    // The same email is registered under a different sign-in method. Firebase
+    // refuses to silently merge them, so point the user at the method they
+    // already used instead of leaking the raw SDK sentence.
+    'auth/account-exists-with-different-credential':
+      'This email is already registered with a different sign-in method. Sign in the way you originally created the account (for example with your password), then link Google from your profile.',
+    'auth/unauthorized-domain': 'This domain is not authorised for sign-in. Add it under Firebase Console → Authentication → Settings → Authorized domains.',
+    'auth/popup-blocked': 'Your browser blocked the sign-in window. Allow pop-ups for this site and try again.',
+    'auth/popup-closed-by-user': 'Sign-in was cancelled because the window was closed.',
+    'auth/cancelled-popup-request': 'Sign-in was cancelled.',
+    'auth/redirect-cancelled-by-user': 'Sign-in was cancelled.',
+    'auth/web-storage-unsupported': 'Sign-in needs cookies and site data. Enable them for this site and try again.',
+    'auth/internal-error': 'Sign-in could not complete. Please try again.',
+    // Native Google Sign-In gaps that surface before Firebase sees them.
+    'auth/invalid-credential-token': 'Google returned an invalid token. Check that the client IDs match the Firebase project.',
+    'auth/missing-android-pkg-name': 'Google Sign-In is missing the Android package name.',
+    'auth/missing-client-identifier':
+      'Google Sign-In is not configured for this build. Register this app\u2019s signing SHA-1 in the Firebase project.',
   };
-  return messages[code] || err?.message || 'Something went wrong. Please try again.';
+  if (messages[code]) return messages[code];
+
+  // Fall back to the SDK text, minus the noisy "Firebase: " prefix, so an
+  // unmapped error is still readable rather than a wall of prose.
+  const raw = err?.message?.replace(/^Firebase:\s*/, '').trim();
+  return raw || 'Something went wrong. Please try again.';
 }
 
 export async function signUp(
@@ -500,6 +522,19 @@ export async function saveUserProfile(uid: string, patch: Partial<Profile>): Pro
   await setDoc(doc(db, 'users', uid), clean(patch), { merge: true });
 }
 
+/**
+ * Removes the stored coordinates from a profile. `clean()` strips `undefined`,
+ * so a plain patch cannot clear a field; a `deleteField()` sentinel is needed
+ * (and must skip `clean()` for the same reason `registerPushToken` does).
+ */
+export async function clearUserProfileLocation(uid: string): Promise<void> {
+  if (!db) return;
+  await updateDoc(doc(db, 'users', uid), {
+    latitude: deleteField(),
+    longitude: deleteField(),
+  });
+}
+
 export async function saveFavorite(uid: string, itemId: string, favorite: boolean): Promise<void> {
   if (!db) return;
   const favoriteId = `${uid}_${itemId}`;
@@ -517,6 +552,30 @@ export async function saveFavorite(uid: string, itemId: string, favorite: boolea
 export async function saveConversation(id: string, conversation: ConversationDoc): Promise<void> {
   if (!db) return;
   await setDoc(doc(db, 'conversations', id), clean(conversation));
+}
+
+/**
+ * Creates a conversation and its opening message in one atomic batch.
+ *
+ * Writing them separately could leave an empty thread behind if the second
+ * write failed (offline, rejected rules): the conversation document would
+ * exist with zero messages, so the realtime listener would show a blank chat.
+ */
+export async function createConversationWithMessage(
+  conversationId: string,
+  conversation: ConversationDoc,
+  senderId: string,
+  firstMessage: string,
+): Promise<void> {
+  if (!db) return;
+  const messageId = newDocId('messages');
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'conversations', conversationId), clean(conversation));
+  batch.set(
+    doc(db, 'conversations', conversationId, 'messages', messageId),
+    clean({ sender_id: senderId, text: firstMessage, created_at: Date.now() } satisfies MessageDoc),
+  );
+  await batch.commit();
 }
 
 /**

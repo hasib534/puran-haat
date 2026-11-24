@@ -71,15 +71,31 @@ export async function signInWithGoogleNative(
     return idToken;
   } catch (error) {
     if (isErrorWithCode(error)) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) return null;
-      if (error.code === statusCodes.IN_PROGRESS) {
+      const code = String(error.code);
+      if (code === statusCodes.SIGN_IN_CANCELLED) return null;
+      if (code === statusCodes.IN_PROGRESS) {
         throw new Error('Google sign-in is already in progress.');
       }
-      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      if (code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         throw new Error('Google Play Services is unavailable or needs an update.');
       }
-      if (error.code === statusCodes.NULL_PRESENTER) {
+      if (code === statusCodes.NULL_PRESENTER) {
         throw new GoogleSignInUnavailableError(DEVELOPMENT_BUILD_MESSAGE);
+      }
+      // Android status code 10. The native library rejects with the raw string
+      // "DEVELOPER_ERROR: Follow troubleshooting instructions at ...", which is
+      // useless to a trader. In practice it means the signing certificate (or
+      // package name) baked into this build is not registered in the Google
+      // Cloud / Firebase project, so Google refuses to hand back an ID token.
+      if (code === '10') {
+        throw new Error(
+          'Google sign-in rejected this build (DEVELOPER_ERROR). The app\u2019s signing SHA-1 ' +
+            'fingerprint is not registered for package com.puranhaat.app in the Firebase ' +
+            'project. Add it under Project settings \u2192 Your apps, then reinstall.',
+        );
+      }
+      if (code === '12500') {
+        throw new Error('Google sign-in failed. Please try again.');
       }
     }
     throw error;

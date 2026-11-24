@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "676232289406-ibisja2grbm06vo4n1rv49gsfs2kods6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.puranhaat.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "676232289406-j2kj0mf1lf88r5dtur4mee1bakgor4em.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

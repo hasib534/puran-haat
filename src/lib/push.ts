@@ -25,6 +25,9 @@ export const PUSH_CHANNEL_ID = 'messages';
 /** True when a push sender is configured; without it everything stays inert. */
 export const isPushConfigured = Boolean(WORKER_URL);
 
+/** This device's last known push token, kept so sign-out can unregister it. */
+let cachedPushToken: string | null = null;
+
 type NotificationsModule = typeof import('expo-notifications');
 
 /**
@@ -109,11 +112,30 @@ export async function getPushToken(): Promise<string | null> {
   const projectId = expoProjectId();
   if (projectId) {
     const token = await Notifications.getExpoPushTokenAsync({ projectId });
+    cachedPushToken = token.data;
     return token.data;
   }
 
   const device = await Notifications.getDevicePushTokenAsync();
-  return typeof device.data === 'string' ? device.data : null;
+  const value = typeof device.data === 'string' ? device.data : null;
+  cachedPushToken = value;
+  return value;
+}
+
+/**
+ * Remembers a token in memory so sign-out can remove it from the account being
+ * left behind. Called on registration and when the provider rotates a token.
+ */
+export function rememberPushToken(token: string | null): void {
+  cachedPushToken = token;
+}
+
+/**
+ * The token last obtained on this device, if any. Never prompts for permission,
+ * so it is safe to call on sign-out.
+ */
+export function peekPushToken(): string | null {
+  return cachedPushToken;
 }
 
 /**

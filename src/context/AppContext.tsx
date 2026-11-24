@@ -14,11 +14,12 @@ import { useAuth } from './AuthContext';
 import { useLocation } from './LocationContext';
 import {
   clearConversationUnread,
+  clearUserProfileLocation,
+  createConversationWithMessage,
   deleteItemDoc,
   isFirebaseConfigured,
   newDocId,
   respondToProposal,
-  saveConversation,
   saveFavorite,
   saveItem,
   saveProposalWithConversation,
@@ -135,7 +136,9 @@ interface AppContextValue {
   profile: Profile;
   ecoPoints: number;
   tradeCount: number;
-  updateProfile: (patch: Partial<Profile>) => Promise<{ avatarUploadFailed?: boolean }>;
+  updateProfile: (
+    patch: Partial<Profile>,
+  ) => Promise<{ avatarUploadFailed?: boolean; avatarError?: string }>;
   /** True when Cloudinary is configured and photo uploads can run. */
   canUploadPhotos: boolean;
   /** Uploads local listing photo URIs and resolves to their public URLs. */
@@ -377,6 +380,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Stores this device's push token so the Worker can reach the trader.
   usePushRegistration(user?.uid);
 
+  // Derived primitives so the Firestore listeners below re-subscribe only when
+  // the account really changes, instead of on every `refreshCurrentUser()`
+  // (which hands back a fresh object on each app foreground and used to tear
+  // down and rebuild all five listeners).
+  const userUid = user?.uid;
+  const userEmailVerified = user?.emailVerified;
+  const userDisplayName = user?.displayName;
+  const userEmail = user?.email;
+  const userPhotoURL = user?.photoURL;
+
   const [rawItems, setRawItems] = useState<Item[]>(isFirebaseConfigured ? [] : MOCK_ITEMS);
   const [itemsLoading, setItemsLoading] = useState(isFirebaseConfigured);
   const [isOffline, setIsOffline] = useState(false);
@@ -401,6 +414,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [profileState, setProfileState] = useState<Profile>(currentUser);
   const [profileOwner, setProfileOwner] = useState('');
+  // The last applied profile, so an optimistic edit can be rolled back if the
+  // Firestore write is rejected.
+  const profileStateRef = useRef(profileState);
+  useEffect(() => {
+    profileStateRef.current = profileState;
+  }, [profileState]);
 
   // Live item feed.
   useEffect(() => {
@@ -465,8 +484,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Live favorites for the signed-in user.
   useEffect(() => {
-    if (!isFirebaseConfigured || !user) return;
-    const uid = user.uid;
+    if (!isFirebaseConfigured || !userUid) return;
+    const uid = userUid;
     return subscribeToFavorites(
       uid,
       (rows) => {
@@ -477,12 +496,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Favorites listener failed:', error.message),
     );
-  }, [user]);
+  }, [userUid]);
 
   // Live conversations for the signed-in user.
   useEffect(() => {
-    if (!isFirebaseConfigured || !user) return;
-    const uid = user.uid;
+    if (!isFirebaseConfigured || !userUid) return;
+    const uid = userUid;
     return subscribeToConversations(
       uid,
       (rows) => {
@@ -493,12 +512,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Conversations listener failed:', error.message),
     );
-  }, [user]);
+  }, [userUid]);
 
   // Live proposals for the signed-in user.
   useEffect(() => {
-    if (!isFirebaseConfigured || !user) return;
-    const uid = user.uid;
+    if (!isFirebaseConfigured || !userUid) return;
+    const uid = userUid;
     return subscribeToProposals(
       uid,
       (rows) => {
@@ -511,13 +530,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Proposals listener failed:', error.message),
     );
-  }, [user]);
+  }, [userUid]);
 
   // Live presence for every trader, so a chat can show an online dot without
   // opening one listener per conversation. Rows that stopped heartbeating are
   // aged out here rather than trusted at face value.
   useEffect(() => {
-    if (!isFirebaseConfigured || !user) return;
+    if (!isFirebaseConfigured || !userUid) return;
     return subscribeToPresence(
       (rows) => {
         const next: Record<string, PresenceEntry> = {};
@@ -531,18 +550,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Presence listener failed:', error.message),
     );
-  }, [user]);
+  }, [userUid]);
 
   // Live profile document, created on first sign-in if it does not exist.
   useEffect(() => {
-    if (!isFirebaseConfigured || !user) return;
-    const uid = user.uid;
+    if (!isFirebaseConfigured || !userUid) return;
+    const uid = userUid;
     return subscribeToUserProfile(
       uid,
       (record) => {
         if (record) {
           const mapped = mapProfile(record);
-          if (user.emailVerified && !mapped.is_verified) {
+          if (userEmailVerified && !mapped.is_verified) {
             mapped.is_verified = true;
             saveUserProfile(uid, { is_verified: true }).catch((error) =>
               console.warn('Could not sync verification badge:', error.message),
@@ -554,15 +573,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
         const initial: Profile = {
           id: uid,
-          full_name: user.displayName || user.email?.split('@')[0] || 'Trader',
+          full_name: userDisplayName || userEmail?.split('@')[0] || 'Trader',
           username: undefined,
-          avatar_url: user.photoURL || undefined,
+          avatar_url: userPhotoURL || undefined,
           district: 'Dhaka',
           bio: '',
           rating: 0,
           trade_count: 0,
           eco_points: 0,
-          is_verified: user.emailVerified,
+          is_verified: Boolean(userEmailVerified),
         };
         setProfileOwner(uid);
         setProfileState(initial);
@@ -572,7 +591,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       },
       (error) => console.warn('Profile listener failed:', error.message),
     );
-  }, [user]);
+  }, [userUid, userEmailVerified, userDisplayName, userEmail, userPhotoURL]);
 
   const favoriteIds = useMemo(() => {
     if (!isFirebaseConfigured) return favoriteState.ids;
@@ -628,7 +647,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const tradeCount = isFirebaseConfigured ? acceptedTradeCount : profile.trade_count;
 
   const updateProfile = useCallback(
-    async (patch: Partial<Profile>): Promise<{ avatarUploadFailed?: boolean }> => {
+    async (
+      patch: Partial<Profile>,
+    ): Promise<{ avatarUploadFailed?: boolean; avatarError?: string }> => {
       if (!isFirebaseConfigured) {
         setProfileState((prev) => ({ ...prev, ...patch }));
         return {};
@@ -637,6 +658,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       let nextPatch = patch;
       let avatarUploadFailed = false;
+      let avatarError: string | undefined;
       if (patch.avatar_url && !/^https?:\/\//i.test(patch.avatar_url)) {
         // A picked image (file://, blob:, data:) must be uploaded before it is
         // written to Firestore so other devices can load it.
@@ -649,18 +671,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           };
         } catch (error) {
           // Uploads may be unconfigured or offline. Keep the existing photo
-          // rather than losing every other profile edit the user just made.
+          // rather than losing every other profile edit the user just made, but
+          // report the real reason instead of always blaming the config.
           avatarUploadFailed = true;
+          avatarError = (error as Error).message;
           nextPatch = { ...patch };
           delete nextPatch.avatar_url;
-          console.warn('Profile photo upload failed:', error);
+          console.warn('Profile photo upload failed:', avatarError);
         }
       }
 
+      const previous = profileStateRef.current;
       setProfileOwner(user.uid);
       setProfileState((prev) => ({ ...prev, ...nextPatch }));
-      await saveUserProfile(user.uid, nextPatch);
-      return { avatarUploadFailed };
+      try {
+        await saveUserProfile(user.uid, nextPatch);
+      } catch (error) {
+        // Roll the optimistic edit back so the form never shows values that were
+        // not actually persisted.
+        setProfileState(previous);
+        throw error;
+      }
+
+      // Keep the stored pin consistent with the label: if the area changed but
+      // no new coordinates came with it, drop the stale pin so distance is not
+      // measured from the place the user just left.
+      const hasCoords = nextPatch.latitude != null && nextPatch.longitude != null;
+      if (nextPatch.district !== undefined && !hasCoords && nextPatch.district !== previous.district) {
+        await clearUserProfileLocation(user.uid).catch((error) =>
+          console.warn('Could not clear stale profile location:', (error as Error).message),
+        );
+      }
+
+      return { avatarUploadFailed, avatarError };
     },
     [user],
   );
@@ -896,7 +939,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           uid: user.uid,
           rows: [conversation, ...optimistic.rows.filter((entry) => entry.id !== id)],
         });
-        saveConversation(id, doc)
+        createConversationWithMessage(id, doc, user.uid, message)
           .then(() => {
             setConversationState((prev) => ({
               ...prev,
@@ -904,9 +947,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 entry.id === id ? { ...entry, pending: false } : entry,
               ),
             }));
-            return sendMessageDoc(id, user.uid, [user.uid, other.id], message);
-          })
-          .then(() => {
             void notifyConversationMessage(id);
           })
           .catch((error) => {
