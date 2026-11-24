@@ -195,7 +195,7 @@ export default function AuthScreen() {
                 <MaterialIcons name="info-outline" size={18} color={Colors.primary} />
                 <Text style={styles.guestNoteText}>
                   You&apos;re browsing as a guest. Create an account to keep your chats and start
-                  posting items.
+                  posting items — or keep browsing for now.
                 </Text>
               </View>
             )}
@@ -357,6 +357,19 @@ export default function AuthScreen() {
                 <Text style={styles.socialText}>Apple</Text>
               </TouchableOpacity>
             </View>
+
+            {isGuest && configured && (
+              <TouchableOpacity
+                style={styles.guestContinue}
+                onPress={leaveAuth}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Continue browsing as a guest"
+              >
+                <Text style={styles.guestContinueText}>Continue as guest</Text>
+                <MaterialIcons name="arrow-forward" size={16} color={Colors.primary} />
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -568,5 +581,20 @@ const styles = StyleSheet.create({
     ...Typography.labelLg,
     color: Colors.onSurface,
     fontWeight: '600',
+  },
+  // Guest escape hatch: the intro sends first-time visitors here, so they need
+  // a clearly labelled way to skip sign-up and keep browsing.
+  guestContinue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: Spacing.lg,
+    paddingVertical: 6,
+  },
+  guestContinueText: {
+    ...Typography.labelLg,
+    color: Colors.primary,
+    fontWeight: '700',
   },
 });

@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 
 import { Colors } from '../constants/colors';
 import { Typography, BorderRadius, Spacing, Shadows } from '../constants/theme';
+import { useAuth } from '../context/AuthContext';
 import { markOnboardingSeen } from '../lib/onboarding';
 
 interface OnboardingStep {
@@ -54,6 +55,7 @@ const STEPS: OnboardingStep[] = [
 
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
+  const { user, configured } = useAuth();
   const listRef = useRef<FlatList<OnboardingStep>>(null);
   const [index, setIndex] = useState(0);
   const [finishing, setFinishing] = useState(false);
@@ -81,10 +83,14 @@ export default function OnboardingScreen() {
     if (finishing) return;
     setFinishing(true);
     await markOnboardingSeen();
-    // Everyone lands on the feed. Guests get a silent anonymous session so they
-    // can browse and chat right away, then create an account whenever they like.
-    router.replace('/' as never);
-  }, [finishing]);
+    // A first-time visitor is asked to sign in or create an account rather than
+    // being dropped into the feed. Guests browse with a silent anonymous
+    // session, so `user` is normally already set by the time the intro ends —
+    // only a real, non-anonymous account skips straight to the app. With
+    // Firebase unset (demo mode) there is no auth screen to send them to.
+    const hasAccount = !configured || Boolean(user && !user.isAnonymous);
+    router.replace((hasAccount ? '/' : '/auth') as never);
+  }, [configured, finishing, user]);
 
   const primaryLabel = isLast ? 'Get Started' : 'Next';
 
