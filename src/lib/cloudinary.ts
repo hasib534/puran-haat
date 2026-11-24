@@ -63,6 +63,75 @@ interface CloudinaryResponse {
   error?: { message?: string };
 }
 
+/** Turn a thrown transport error into something a trader can act on. */
+function describeRequestError(error: unknown): string {
+  const candidate = error as { name?: string; message?: string } | null;
+  const message = typeof candidate?.message === 'string' ? candidate.message.trim() : '';
+
+  // React Native reports an unreadable picker URI through this message; it is
+  // not a network problem at all and saying "check your connection" would send
+  // the user chasing the wrong thing.
+  if (/Could not retrieve file for uri/i.test(message)) {
+    return 'the photo could not be read from this device — try picking it again';
+  }
+  if (/Network request failed/i.test(message)) {
+    return 'the connection dropped during the upload';
+  }
+  if (message) return message;
+  if (candidate?.name) return candidate.name;
+  return 'the request failed';
+}
+
+// Uploading several megabytes over mobile data fails intermittently ("Network
+// request failed", a dropped socket, a flaky handover between Wi-Fi and data),
+// so retry the transport itself before telling the user their connection is
+// bad. A failed *response* is never retried here — that is a configuration
+// problem and retrying would just burn the user's data again.
+const UPLOAD_ATTEMPTS = 3;
+
+async function postFormWithRetry(endpoint: string, form: FormData): Promise<Response> {
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= UPLOAD_ATTEMPTS; attempt += 1) {
+    try {
+      return await fetch(endpoint, { method: 'POST', body: form });
+    } catch (error) {
+      lastError = error;
+      if (attempt < UPLOAD_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, 600 * attempt));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * Explain why an upload never got an answer.
+ *
+ * The distinction matters: if a plain request to the same host also fails, the
+ * phone cannot reach Cloudinary at all (VPN, private DNS or carrier filtering)
+ * and retrying the upload will never help. If the probe succeeds, the host is
+ * fine and the connection died mid-upload, which is worth retrying.
+ */
+async function describeUploadFailure(error: unknown, endpoint: string): Promise<string> {
+  const reason = describeRequestError(error);
+
+  // A file that cannot be read is not a network fault; say so plainly.
+  if (reason.includes('could not be read from this device')) return reason;
+
+  try {
+    await fetch(endpoint, { method: 'HEAD' });
+    return `${reason}. Cloudinary is reachable, so the upload itself was interrupted — please try again.`;
+  } catch {
+    return (
+      `${reason}. This phone cannot reach api.cloudinary.com at all, so the ` +
+      'upload never started. Check mobile data or Wi-Fi, and turn off any VPN ' +
+      'or private DNS before trying again.'
+    );
+  }
+}
+
 export interface UploadImageOptions {
   folder?: string;
 }
@@ -98,60 +167,69 @@ export async function uploadImageToCloudinary(
   ): Promise<{ response: Response; payload: CloudinaryResponse }> => {
     let response: Response;
     try {
-      response = await fetch(endpoint, { method: 'POST', body: form });
-    } catch {
-      throw new Error('Could not reach Cloudinary. Check your internet connection and try again.');
+      response = await postFormWithRetry(endpoint, form);
+    } catch (error) {
+      console.warn('Cloudinary upload request failed:', error);
+      throw new Error(await describeUploadFailure(error, endpoint));
     }
     const payload = (await response.json().catch(() => ({}))) as CloudinaryResponse;
     return { response, payload };
   };
 
-  let response: Response;
-  let payload: CloudinaryResponse;
+  // Attempts are tried in order. On native there is only one: a picked photo is
+  // a file:// path in the app cache, and retrying it as a blob through
+  // fetch(uri) does not work on Android (fetch cannot open file: or content:
+  // URIs), so that fallback only wasted a second multi-megabyte upload before
+  // failing with a different, less useful message.
+  const attempts: (() => Promise<{ response: Response; payload: CloudinaryResponse }>)[] = [];
 
   if (Platform.OS === 'web') {
     const source = await fetch(uri);
     if (!source.ok) throw new Error('Could not read the selected photo.');
     const blob = await source.blob();
-    const webForm = buildForm((form) => form.append('file', blob, fileNameFor(uri)));
-    ({ response, payload } = await send(webForm));
+    attempts.push(() => send(buildForm((form) => form.append('file', blob, fileNameFor(uri)))));
   } else {
-    const nativeForm = buildForm((form) => {
-      form.append('file', {
-        uri,
-        name: fileNameFor(uri),
-        type: mimeFor(uri),
-      } as unknown as Blob);
-    });
-    ({ response, payload } = await send(nativeForm));
-
-    // The Android photo picker sometimes hands back a URI whose bytes the
-    // multipart encoder cannot stream, which Cloudinary rejects as an invalid
-    // file. Re-read it as a blob and retry once before surfacing the error.
-    if (!response.ok) {
-      try {
-        const blob = await (await fetch(uri)).blob();
-        if (blob.size > 0) {
-          const retryForm = buildForm((form) => form.append('file', blob, fileNameFor(uri)));
-          ({ response, payload } = await send(retryForm));
-        }
-      } catch {
-        // Keep the original failure; it carries Cloudinary's own message.
-      }
-    }
-  }
-
-  if (!response.ok || payload.error) {
-    throw new Error(
-      payload.error?.message ||
-        `Cloudinary rejected the upload (HTTP ${response.status}). Check the cloud name and upload preset.`,
+    attempts.push(() =>
+      send(
+        buildForm((form) =>
+          form.append('file', {
+            uri,
+            name: fileNameFor(uri),
+            type: mimeFor(uri),
+          } as unknown as Blob),
+        ),
+      ),
     );
   }
 
-  const url = payload.secure_url || payload.url;
-  if (!url) throw new Error('Cloudinary did not return an image URL.');
+  // Prefer Cloudinary's own explanation (it means the request arrived) over a
+  // transport error, but report the transport error when nothing got through.
+  let serverError: string | null = null;
+  let requestError: Error | null = null;
 
-  return url;
+  for (const attempt of attempts) {
+    let outcome: { response: Response; payload: CloudinaryResponse };
+    try {
+      outcome = await attempt();
+    } catch (error) {
+      requestError = error as Error;
+      continue;
+    }
+
+    if (outcome.response.ok && !outcome.payload.error) {
+      const url = outcome.payload.secure_url || outcome.payload.url;
+      if (!url) throw new Error('Cloudinary did not return an image URL.');
+      return url;
+    }
+
+    serverError =
+      outcome.payload.error?.message ||
+      `Cloudinary rejected the upload (HTTP ${outcome.response.status}). Check the cloud name and upload preset.`;
+  }
+
+  throw new Error(
+    serverError || requestError?.message || 'Could not upload the photo. Please try again.',
+  );
 }
 
 /** Upload images in order, reporting which one failed. */
