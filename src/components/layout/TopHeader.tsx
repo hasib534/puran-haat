@@ -53,37 +53,39 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.locationPill, !shortLabel && styles.locationPillEmpty]}
-          onPress={openPicker}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel={
-            shortLabel
-              ? `Change location, currently ${label}`
-              : 'Set your location area'
-          }
-          accessibilityState={{ busy: detecting }}
-        >
-          <MaterialIcons
-            name={location?.source === 'gps' ? 'my-location' : 'location-on'}
-            size={17}
-            color={shortLabel ? Colors.primary : Colors.onSurfaceVariant}
-          />
-          <Text
-            style={[styles.locationText, !shortLabel && styles.locationTextEmpty]}
-            numberOfLines={1}
+        <View style={styles.sideSlot}>
+          <TouchableOpacity
+            style={[styles.locationPill, !shortLabel && styles.locationPillEmpty]}
+            onPress={openPicker}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={
+              shortLabel
+                ? `Change location, currently ${label}`
+                : 'Set your location area'
+            }
+            accessibilityState={{ busy: detecting }}
           >
-            {pillLabel}
-          </Text>
-          <MaterialIcons name="expand-more" size={15} color={Colors.onSurfaceVariant} />
-        </TouchableOpacity>
+            <MaterialIcons
+              name={location?.source === 'gps' ? 'my-location' : 'location-on'}
+              size={17}
+              color={shortLabel ? Colors.primary : Colors.onSurfaceVariant}
+            />
+            <Text
+              style={[styles.locationText, !shortLabel && styles.locationTextEmpty]}
+              numberOfLines={1}
+            >
+              {pillLabel}
+            </Text>
+            <MaterialIcons name="expand-more" size={15} color={Colors.onSurfaceVariant} />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.brandTitle} numberOfLines={1}>
           Puran Haat
         </Text>
 
-        <View style={styles.rightSlot}>
+        <View style={[styles.sideSlot, styles.sideSlotEnd]}>
           {showNotifications ? (
             <TouchableOpacity
               style={styles.iconButton}
@@ -170,19 +172,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  brandTitle: {
+  // The two side slots are equal flex columns, so the wordmark between them is
+  // centred on the screen itself rather than in whatever space the location pill
+  // happened to leave behind. The pill is ~97dp wide against a 40dp avatar, and
+  // that asymmetry used to push the title ~29dp right of centre. Equal columns
+  // also mean a long district name truncates inside its own column instead of
+  // running underneath the wordmark.
+  sideSlot: {
     flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  sideSlotEnd: {
+    alignItems: 'flex-end',
+  },
+  brandTitle: {
+    flexShrink: 1,
     textAlign: 'center',
     ...Typography.headlineSm,
     color: Colors.primary,
     fontWeight: '700',
     letterSpacing: -0.3,
-  },
-  rightSlot: {
-    width: 40,
-    height: 40,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   notificationDot: {
     position: 'absolute',
