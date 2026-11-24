@@ -10,13 +10,13 @@
     "ios": {
       "bundleIdentifier": "com.puranhaat.app",
       "googleServicesFile": "./GoogleService-Info.plist",
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "package": "com.puranhaat.app",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "backgroundColor": "#FDFAE7",
+        "backgroundColor": "#154212",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -34,7 +34,7 @@
         {
           "backgroundColor": "#FDFAE7",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 168
         }
       ],
       "expo-sqlite",

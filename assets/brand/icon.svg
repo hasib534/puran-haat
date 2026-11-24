@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0" stop-color="#1A4C16"/>
+    <stop offset="1" stop-color="#123A10"/>
+  </linearGradient></defs><rect width="1024" height="1024" fill="url(#bg)"/><g transform="translate(512 512) scale(1.08) translate(-512 -512)">
+    <g color="#FDFAE7">
+      <path fill="currentColor" d="M 205.05 375.34
+    A 336 336 0 0 1 818.95 375.34
+    L 839.05 366.39 L 825.54 508.14 L 711.15 423.33 L 731.25 414.38
+    A 240 240 0 0 0 292.75 414.38
+    A 48 48 0 0 0 205.05 375.34 Z"/>
+      <path fill="currentColor" d="M 818.95 648.66
+    A 336 336 0 0 1 205.05 648.66
+    L 184.95 657.61 L 198.46 515.86 L 312.85 600.67 L 292.75 609.62
+    A 240 240 0 0 0 731.25 609.62
+    A 48 48 0 0 0 818.95 648.66 Z"/>
+    </g>
+    <path d="M 512 324
+    C 622 399.84, 622 545.2, 512 630.52
+    C 402 545.2, 402 399.84, 512 324 Z" fill="#FFB4A1"/><path d="M 512 354 Q 531.8 466.2 512 614.52"
+        fill="none" stroke="#9E4A2E" stroke-width="10" stroke-linecap="round" opacity="0.32"/>
+    <path d="M 512 616.52 L 512 666.52" stroke="#FFB4A1" stroke-width="22" stroke-linecap="round"/>
+  </g></svg>
